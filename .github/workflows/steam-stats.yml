@@ -1,0 +1,26 @@
+name: Update README with Steam Stats
+
+on:
+    schedule:
+    # Runs on every Sunday midnight IST (UTC+5:30)
+    - cron: "30 18 * * 6"
+    workflow_dispatch:
+
+jobs:
+    update-readme:
+        runs-on: ubuntu-latest
+        steps:
+          - name: Checkout repository
+            uses: actions/checkout@v4
+          - name: Set up Python
+            uses: actions/setup-python@v2
+            with:
+                python-version: '3.x'
+          - name: Install dependencies
+            run: pip install requests
+          - name: Fetch and Update Steam Stats in README
+            env:
+                GH_TOKEN: ${{ secrets.GH_TOKEN }}
+                STEAM_API_KEY: ${{ secrets.STEAM_WEB_API_KEY }}
+                STEAM_ID: ${{ secrets.STEAM_ID }}
+            run: python steam_stats.py

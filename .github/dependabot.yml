@@ -3,7 +3,7 @@
 
 version: 2
 updates:
-  - package-ecosystem: "npm"
+  - package-ecosystem: "pip"
     directory: "/"
     schedule:
-      interval: "weekly"
+        interval: "weekly"
