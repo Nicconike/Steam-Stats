@@ -132,7 +132,7 @@ def generate_markdown(processed_data):
     markdown_content = f"""
 ## Steam User Summary for {processed_data['personaname']}
 
-- **Persona State:** {personastate_str}
+- **Steam Status:** {personastate_str}
 - **Last Logoff (IST):** {processed_data['lastlogoff']}
 - **Profile URL:** [Visit Profile]({processed_data['profileurl']})
 - **Avatar:** ![Avatar]({processed_data['avatarmedium']})
@@ -165,8 +165,21 @@ def generate_markdown_for_recently_played_games(recently_played_data):
 
     markdown_content = f"## Recently Played Games (Total: {total_count})\n"
     for game in games:
+        # Convert playtime from minutes to hours and minutes
+        playtime_2weeks_hours = game['playtime_2weeks'] // 60
+        playtime_2weeks_minutes = game['playtime_2weeks'] % 60
+        playtime_forever_hours = game['playtime_forever'] // 60
+        playtime_forever_minutes = game['playtime_forever'] % 60
+
+        # Format the playtime as strings
+        playtime_2weeks_str = f"{playtime_2weeks_hours} hrs {
+            playtime_2weeks_minutes} mins" if playtime_2weeks_hours else f"{playtime_2weeks_minutes} mins"
+        playtime_forever_str = f"{playtime_forever_hours} hrs {
+            playtime_forever_minutes} mins" if playtime_forever_hours else f"{playtime_forever_minutes} mins"
+
+        # Add the game information to the markdown content
         markdown_content += f"- {game['name']}: Playtime last 2 weeks: {
-            game['playtime_2weeks']} mins, Total playtime: {game['playtime_forever']} mins\n"
+            playtime_2weeks_str}, Total playtime: {playtime_forever_str}\n"
     return markdown_content
 
 
