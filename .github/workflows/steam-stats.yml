@@ -1,4 +1,4 @@
-name: Update README with Steam Stats
+name: Steam Stats
 
 on:
     schedule:
@@ -23,4 +23,4 @@ jobs:
           STEAM_API_KEY: ${{ secrets.STEAM_API_KEY }}
           STEAM_ID: ${{ secrets.STEAM_ID }}
           STEAM_APP_ID: ${{ secrets.STEAM_APP_ID }}
-        run: python steam_stats.py
+        run: python ../api/steam_stats.py

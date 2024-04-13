@@ -1,5 +1,5 @@
 # Steam Stats
-
+[![Steam Stats](https://github.com/Nicconike/Steam-Stats/actions/workflows/steam-stats.yml/badge.svg?branch=master)](https://github.com/Nicconike/Steam-Stats/actions/workflows/steam-stats.yml)
 ![Visitors](https://visitor-badge.glitch.me/badge?page_id=nicconike.steam-stats&left_color=green&right_color=red)
 
 <!-- Steam-Stats start -->
