@@ -179,7 +179,7 @@ def create_steam_stats_card(steam_player_summary, steam_recently_played_games):
     return dwg.tostring()
 
 
-def update_readme(markdown_content, readme_path="../README.md"):
+def update_readme(markdown_content, readme_path="README.md"):
     """Updates the README.md file with the provided Markdown content."""
     start_marker = "<!-- Steam-Stats start -->"
     end_marker = "<!-- Steam-Stats end -->"
