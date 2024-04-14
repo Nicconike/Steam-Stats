@@ -7,20 +7,18 @@ on:
     workflow_dispatch:
 
 jobs:
-  update-readme:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.x'
-      - name: Install dependencies
-        run: pip install requests python-dotenv svgwrite pytz
-      - name: Fetch and Update Steam Stats in README
-        env:
-          STEAM_API_KEY: ${{ secrets.STEAM_API_KEY }}
-          STEAM_ID: ${{ secrets.STEAM_ID }}
-          STEAM_APP_ID: ${{ secrets.STEAM_APP_ID }}
-        run: python api/steam_stats.py
+    update-readme:
+        runs-on: ubuntu-latest
+        steps:
+          - name: Checkout repository
+            uses: actions/checkout@v4
+          - name: Set up Python
+            uses: actions/setup-python@v5
+            with:
+                python-version: '3.x'
+          - name: Fetch and Update Steam Stats in README
+            env:
+                STEAM_API_KEY: ${{ secrets.STEAM_API_KEY }}
+                STEAM_ID: ${{ secrets.STEAM_ID }}
+                STEAM_APP_ID: ${{ secrets.STEAM_APP_ID }}
+            run: python api/steam_stats.py
