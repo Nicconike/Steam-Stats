@@ -1,0 +1,26 @@
+{
+    "version": 2,
+    "builds": [
+        {
+            "src": "api/*.py",
+            "use": "@vercel/python"
+        }
+    ],
+    "routes": [
+        {
+            "src": "/api/(.*)",
+            "dest": "/api/$1.py"
+        }
+    ],
+    "env": {
+        "STEAM_API_KEY": "@steam_api_key",
+        "STEAM_ID": "@steam_id",
+        "STEAM_APP_ID": "@steam_app_id"
+    },
+    "redirects": [
+        {
+            "source": "/",
+            "destination": "https://github.com/Nicconike/Steam-Stats"
+        }
+    ]
+}
