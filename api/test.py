@@ -1,18 +1,14 @@
-"""Retrieves and displays Steam User Data in README using Steam Web API"""
-from zoneinfo import ZoneInfo  # Python 3.9 and newer
+"""Testing file that retrieves and displays Steam User Data in README using Steam Web API"""
+from http.server import BaseHTTPRequestHandler
 from datetime import datetime, timezone
+from zoneinfo import ZoneInfo
 import os
-import svgwrite
-from dotenv import load_dotenv
 import requests
 
-# Load environment variables from .env file
-load_dotenv()
-
 # Secrets Configuration
-STEAM_API_KEY = os.getenv('STEAM_API_KEY')
-STEAM_ID = os.getenv('STEAM_ID')
-STEAM_APP_ID = os.getenv('STEAM_APP_ID')
+STEAM_API_KEY = os.environ.get('STEAM_API_KEY')
+STEAM_ID = os.environ.get('STEAM_ID')
+STEAM_APP_ID = os.environ.get('STEAM_APP_ID')
 
 # A reasonable timeout for the request (connection and read timeout)
 REQUEST_TIMEOUT = (10, 15)
@@ -186,3 +182,32 @@ if __name__ == "__main__":
         print("README.md has been successfully updated.")
     else:
         print("Failed to fetch or process data.")
+
+
+class handler(BaseHTTPRequestHandler):
+    """HTTP Requests Handler"""
+
+    def do_GET(self):
+        # Your logic to handle the GET request
+        player_summary = get_player_summaries()
+        recently_played_games = get_recently_played_games()
+
+        markdown_content = ""
+        if player_summary and recently_played_games and player_summary['response']['players']:
+            player_data = player_summary['response']['players'][0]
+            processed_data = process_player_summary_data(player_data)
+            markdown_content += generate_markdown(
+                processed_data, recently_played_games)
+
+        if markdown_content:
+            # Send the markdown content as a response
+            self.send_response(200)
+            self.send_header('Content-type', 'text/plain')
+            self.end_headers()
+            self.wfile.write(markdown_content.encode())
+        else:
+            # Send an error response
+            self.send_response(404)
+            self.send_header('Content-type', 'text/plain')
+            self.end_headers()
+            self.wfile.write("Failed to fetch or process data.".encode())
