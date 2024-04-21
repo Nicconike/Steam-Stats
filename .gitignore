@@ -157,5 +157,6 @@ cython_debug/
 
 # Vercel
 vercel.txt
+vercel.json
 Pipfile
 Pipfile.lock

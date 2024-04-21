@@ -1,21 +1,24 @@
 """Retrieves and displays Steam User Data in README using Steam Web API"""
-from http.server import BaseHTTPRequestHandler
+from zoneinfo import ZoneInfo  # Python 3.9 and newer
 from datetime import datetime, timezone
-from zoneinfo import ZoneInfo
 import os
+from dotenv import load_dotenv
 import requests
 
+# Load environment variables from .env file
+load_dotenv()
+
 # Secrets Configuration
-STEAM_API_KEY = os.environ.get('STEAM_API_KEY')
-STEAM_ID = os.environ.get('STEAM_ID')
-STEAM_APP_ID = os.environ.get('STEAM_APP_ID')
+STEAM_API_KEY = os.getenv('STEAM_API_KEY')
+STEAM_ID = os.getenv('STEAM_ID')
+STEAM_APP_ID = os.getenv('STEAM_APP_ID')
 
 # A reasonable timeout for the request (connection and read timeout)
 REQUEST_TIMEOUT = (10, 15)
 
 # Steam Web API endpoints
-PLAYER_SUMMARIES_URL = "http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/"
-RECENTLY_PLAYED_GAMES_URL = "http://api.steampowered.com/IPlayerService/GetRecentlyPlayedGames/v0001/"
+PLAYER_SUMMARIES = "http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/"
+RECENTLY_PLAYED_GAMES = "http://api.steampowered.com/IPlayerService/GetRecentlyPlayedGames/v0001/"
 
 # Steam Account Status Mapping
 PERSONASTATE_MAPPING = {
@@ -33,7 +36,7 @@ def get_player_summaries():
     """Get Player Summaries from Steam
     Fetch basic profile information for a list of 64-bit Steam IDs"""
     # Construct the URL with all parameters
-    url = f"{PLAYER_SUMMARIES_URL}?key={STEAM_API_KEY}&steamids={STEAM_ID}"
+    url = f"{PLAYER_SUMMARIES}?key={STEAM_API_KEY}&steamids={STEAM_ID}"
     try:
         response = requests.get(url, timeout=REQUEST_TIMEOUT)
         response.raise_for_status()
@@ -49,7 +52,7 @@ def get_player_summaries():
 
 def get_recently_played_games():
     """Fetch a list of games a player has played in the last two weeks"""
-    url = f"{RECENTLY_PLAYED_GAMES_URL}?key={
+    url = f"{RECENTLY_PLAYED_GAMES}?key={
         STEAM_API_KEY}&steamid={STEAM_ID}&format=json"
     response = requests.get(url, timeout=REQUEST_TIMEOUT)
     try:
@@ -72,7 +75,7 @@ def process_player_summary_data(player_data):
     lastlogoff_str = lastlogoff_ist.strftime('%d/%m/%Y %H:%M:%S')
 
     # Extract other fields
-    processed_data = {
+    process_data = {
         'personaname': player_data['personaname'],
         'profileurl': player_data['profileurl'],
         'avatarmedium': player_data['avatarmedium'],
@@ -80,7 +83,7 @@ def process_player_summary_data(player_data):
         'personastate': PERSONASTATE_MAPPING.get(player_data['personastate'], "Unknown"),
         'gameid': player_data.get('gameid')
     }
-    return processed_data
+    return process_data
 
 
 def generate_markdown(summary_data, recently_played_data):
@@ -135,7 +138,7 @@ def generate_markdown(summary_data, recently_played_data):
     return combined_markdown
 
 
-def update_readme(markdown_content, readme_path="README.md"):
+def update_readme(markdown_data, readme_path="../README.md"):
     """Updates the README.md file with the provided Markdown content."""
     start_marker = "<!-- Steam-Stats start -->"
     end_marker = "<!-- Steam-Stats end -->"
@@ -156,7 +159,7 @@ def update_readme(markdown_content, readme_path="README.md"):
     # Construct the new README content with the updated section
     new_readme_content = (
         readme_content[:start_index] + "\n" +
-        markdown_content + "\n" + readme_content[end_index:]
+        markdown_data + "\n" + readme_content[end_index:]
     )
 
     # Write the updated content back to the README file
@@ -169,45 +172,16 @@ if __name__ == "__main__":
     player_summary = get_player_summaries()
     recently_played_games = get_recently_played_games()
 
-    markdown_content = ""
+    MARKDOWN_CONTENT = ""
     # generate_markdown(player_summary, recently_played_games)
     if player_summary and recently_played_games and player_summary['response']['players']:
-        player_data = player_summary['response']['players'][0]
-        processed_data = process_player_summary_data(player_data)
-        markdown_content += generate_markdown(
+        steam_player_data = player_summary['response']['players'][0]
+        processed_data = process_player_summary_data(steam_player_data)
+        MARKDOWN_CONTENT += generate_markdown(
             processed_data, recently_played_games)
 
-    if markdown_content:
-        update_readme(markdown_content)
+    if MARKDOWN_CONTENT:
+        update_readme(MARKDOWN_CONTENT)
         print("README.md has been successfully updated.")
     else:
         print("Failed to fetch or process data.")
-
-
-class handler(BaseHTTPRequestHandler):
-    """HTTP Requests Handler"""
-
-    def do_GET(self):
-        # Your logic to handle the GET request
-        player_summary = get_player_summaries()
-        recently_played_games = get_recently_played_games()
-
-        markdown_content = ""
-        if player_summary and recently_played_games and player_summary['response']['players']:
-            player_data = player_summary['response']['players'][0]
-            processed_data = process_player_summary_data(player_data)
-            markdown_content += generate_markdown(
-                processed_data, recently_played_games)
-
-        if markdown_content:
-            # Send the markdown content as a response
-            self.send_response(200)
-            self.send_header('Content-type', 'text/plain')
-            self.end_headers()
-            self.wfile.write(markdown_content.encode())
-        else:
-            # Send an error response
-            self.send_response(404)
-            self.send_header('Content-type', 'text/plain')
-            self.end_headers()
-            self.wfile.write("Failed to fetch or process data.".encode())
