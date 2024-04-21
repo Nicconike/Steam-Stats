@@ -24,4 +24,4 @@ jobs:
                 STEAM_ID: ${{ secrets.STEAM_ID }}
                 STEAM_CUSTOM_ID: ${{ secrets.STEAM_CUSTOM_ID }}
                 STEAM_APP_ID: ${{ secrets.STEAM_APP_ID }}
-            run: python api/steam_stats.py
+            run: python api/main.py
