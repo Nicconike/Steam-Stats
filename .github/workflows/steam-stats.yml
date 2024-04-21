@@ -17,7 +17,7 @@ jobs:
             with:
                 python-version: '3.x'
           - name: Install dependencies
-            run: pip install requests python-dotenv svgwrite pytz
+            run: pip install requests python-dotenv svgwrite pytz bs4
           - name: Update Steam Stats in README
             env:
                 STEAM_API_KEY: ${{ secrets.STEAM_API_KEY }}
