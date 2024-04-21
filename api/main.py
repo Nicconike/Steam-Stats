@@ -89,7 +89,7 @@ def generate_svg_card(total_stats):
     return dwg.tostring()
 
 
-def update_readme(markdown_data, start_marker, end_marker, readme_path="../README.md"):
+def update_readme(markdown_data, start_marker, end_marker, readme_path="README.md"):
     """Updates the README.md file with the provided Markdown content within specified markers."""
     # Read the current README content
     with open(readme_path, "r", encoding="utf-8") as file:
