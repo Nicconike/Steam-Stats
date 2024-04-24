@@ -138,7 +138,7 @@ def generate_svg_for_recently_played_games(player_data):
         print("No game data available to display")
 
     # Render the chart to an SVG file
-    bar_chart.render_to_file("../assets/recently_played_games.svg")
+    bar_chart.render_to_file("assets/recently_played_games.svg")
 
     return "![Recently Played Games](https://github.com/Nicconike/Steam-Stats/blob/master/assets/recently_played_games.svg?sanitize=true)"
 
@@ -159,7 +159,7 @@ def generate_svg_for_steam_workshop(total_stats):
                      total_stats["total_unique_visitors"])
 
     # Render the chart to an SVG file
-    funnel_chart.render_to_file("../assets/steam_workshop_stats.svg")
+    funnel_chart.render_to_file("assets/steam_workshop_stats.svg")
 
     return "![Steam Workshop Data](https://github.com/Nicconike/Steam-Stats/blob/master/assets/steam_workshop_stats.svg?sanitize=true)"
 
