@@ -139,10 +139,9 @@ def generate_svg_for_recently_played_games(player_data):
         print("No game data available to display")
 
     # Render the chart to an SVG file
-    # bar_chart.render_to_file('recently_played_games.svg')
+    bar_chart.render_to_file("../assets/recently_played_games.svg")
 
-    # return the SVG data as a string to embed directly in Markdown
-    return bar_chart.render(is_unicode=True)
+    return "![Recently Played Games](https://github.com/Nicconike/Steam-Stats/tree/master/assets/recently_played_games.svg?sanitize=true)"
 
 
 def generate_svg_for_steam_workshop(total_stats):
@@ -161,13 +160,12 @@ def generate_svg_for_steam_workshop(total_stats):
                      total_stats["total_unique_visitors"])
 
     # Render the chart to an SVG file
-    # funnel_chart.render_to_file('steam_workshop_stats.svg')
+    funnel_chart.render_to_file("../assets/steam_workshop_stats.svg")
 
-    # Return the SVG data as a string to embed directly in Markdown
-    return funnel_chart.render(is_unicode=True)
+    return "![Steam Workshop Data](https://github.com/Nicconike/Steam-Stats/tree/master/assets/steam_workshop_stats.svg?sanitize=true)"
 
 
-def update_readme(markdown_data, start_marker, end_marker, readme_path="README.md"):
+def update_readme(markdown_data, start_marker, end_marker, readme_path="../README.md"):
     """Updates the README.md file with the provided Markdown content within specified markers."""
     # Read the current README content
     with open(readme_path, "r", encoding="utf-8") as file:
@@ -193,17 +191,6 @@ def update_readme(markdown_data, start_marker, end_marker, readme_path="README.m
         file.write(new_readme_content)
 
 
-def save_to_file(data, filename):
-    """Save fetched data to a file in JSON format"""
-    if data is not None:
-        with open(filename, 'w', encoding='utf-8') as file:
-            # Use json.dump to write the JSON data to the file
-            json.dump(data, file, indent=4)
-        print(f"Data saved to {filename}")
-    else:
-        print("No data to save")
-
-
 # Entry Code
 if __name__ == "__main__":
     # Start the timer
@@ -224,7 +211,7 @@ if __name__ == "__main__":
         workshop_data = fetch_all_workshop_stats(links)
         WORKSHOP_MARKDOWN_CONTENT = generate_svg_for_steam_workshop(
             workshop_data)
-        print("Retrieved all workshop stats and created svg")
+        print("Retrieved all Workshop Stats")
     else:
         print("No workshop content was found")
 
