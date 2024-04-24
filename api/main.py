@@ -2,12 +2,23 @@
 import json
 import os
 import time
-import svgwrite
 from steam_stats import get_player_summaries, get_recently_played_games, process_player_summary_data
 from steam_workshop import fetch_workshop_item_links, fetch_all_workshop_stats
+import pygal
 
 # Secrets Configuration
 STEAM_ID = os.getenv("STEAM_CUSTOM_ID")
+
+# Steam Account Status Mapping
+PERSONASTATE_MAPPING = {
+    0: "Offline",
+    1: "Online",
+    2: "Busy",
+    3: "Away",
+    4: "Snooze",
+    5: "Looking to Trade",
+    6: "Looking to Play"
+}
 
 
 def generate_markdown(summary_data, recently_played_data):
@@ -62,34 +73,101 @@ def generate_markdown(summary_data, recently_played_data):
     return combined_markdown
 
 
-def generate_svg_card(total_stats):
-    """Generates SVG Card for retrieved Workshop Data"""
+# def generate_svg_for_steam_summary(player_data):
+#     """Generates SVG Card for retrieved Steam Summary Data"""
+#     # Create an SVG drawing instance
+#     dwg = svgwrite.Drawing(size=('500px', '150px'), profile='full')
 
-    # Create an SVG drawing instance
-    dwg = svgwrite.Drawing(size=('300px', '150px'))
+#     # Set up styles
+#     styles = """
+#     .header { font: bold 16px sans-serif; fill: #333; }
+#     .info { font: 12px sans-serif; fill: #666; }
+#     """
+#     dwg.defs.add(dwg.style(styles))
 
-    # Set up styles and background
-    dwg.add(dwg.rect(insert=(0, 0), size=('100%', '100%'), fill='white'))
-    styles = """
-    .title { font: bold 20px sans-serif; }
-    .stat { font: normal 16px sans-serif; }
-    """
-    dwg.defs.add(dwg.style(styles))
+#     # Add background
+#     dwg.add(dwg.rect(insert=(0, 0), size=('100%', '100%'), fill='white'))
 
-    # Add title and stats
-    dwg.add(dwg.text("Steam Workshop Stats", insert=(10, 30), class_='title'))
-    dwg.add(dwg.text(f'Total Unique Visitors: {
-            total_stats["total_unique_visitors"]}', insert=(10, 60), class_='stat'))
-    dwg.add(dwg.text(f'Total Subscribers: {
-            total_stats["total_current_subscribers"]}', insert=(10, 80), class_='stat'))
-    dwg.add(dwg.text(f'Total Favorites: {
-            total_stats["total_current_favorites"]}', insert=(10, 100), class_='stat'))
+#     # Add avatar image on the left side
+#     if 'avatarmedium' in player_data:
+#         dwg.add(dwg.image(player_data['avatarmedium'], insert=(
+#             10, 10), size=('100px', '100px')))
 
-    # Return SVG content as a string
-    return dwg.tostring()
+#     # Add personaname and hyperlink to profileurl
+#     if 'personaname' in player_data and 'profileurl' in player_data:
+#         link = dwg.add(dwg.a(href=player_data['profileurl']))
+#         link.add(dwg.text(player_data['personaname'], insert=(
+#             '120px', '30px'), class_='header'))
+
+#     # Add personastate and gameextrainfo on the right side
+#     personastate_text = PERSONASTATE_MAPPING.get(
+#         player_data.get('personastate', 0), "Unknown")
+#     dwg.add(dwg.text(f"State: {personastate_text}",
+#             insert=('120px', '60px'), class_='info'))
+
+#     if 'gameextrainfo' in player_data:
+#         dwg.add(dwg.text(f"Playing: {player_data['gameextrainfo']}", insert=(
+#             '120px', '80px'), class_='info'))
+
+#     # Return SVG content as a string
+#     return dwg.tostring()
+
+def generate_svg_for_recently_played_games(player_data):
+    """Generate SVG for Recently Played Games in Steam in the last 2 weeks"""
+    bar_chart = pygal.HorizontalBar(
+        legend_at_bottom=True, rounded_bars=15, show_legend=True)
+    bar_chart.title = "Playtime in the Last Two Weeks (hours)"
+
+    # Add data to the chart
+    if player_data and "response" in player_data and "games" in player_data["response"]:
+        for game in player_data["response"]["games"]:
+            if "name" in game and "playtime_2weeks" in game:
+                playtime_minutes = game["playtime_2weeks"]
+                playtime_hours = playtime_minutes / 60  # Convert minutes to hours for plotting
+
+                # Determine the label based on the original playtime in minutes
+                if playtime_minutes >= 60:
+                    # Display in hours if 60 mins or more
+                    label = f"{game["name"]} ({playtime_hours:.2f} hrs)"
+                else:
+                    # Display in minutes if less than 60
+                    label = f"{game["name"]} ({playtime_minutes} mins)"
+
+                # Add to chart using the hours value for consistency in scaling
+                bar_chart.add(label, playtime_hours)
+    else:
+        print("No game data available to display")
+
+    # Render the chart to an SVG file
+    # bar_chart.render_to_file('recently_played_games.svg')
+
+    # Optionally, return the SVG data as a string to embed directly in HTML or Markdown
+    return bar_chart.render(is_unicode=True)
 
 
-def update_readme(markdown_data, start_marker, end_marker, readme_path="README.md"):
+def generate_svg_for_steam_workshop(total_stats):
+    """Generates SVG Card for retrieved Workshop Data using Pygal Funnel Chart"""
+    # Create a Funnel chart instance
+    funnel_chart = pygal.Funnel(legend_at_bottom=True)
+    funnel_chart.title = 'Steam Workshop Stats'
+
+    # funnel_chart.x_labels = ['Total Favorites','Total Subscribers', 'Total Unique Visitors']
+
+    # Add data to the radar chart
+    funnel_chart.add('Total Subscribers',
+                     total_stats["total_current_subscribers"])
+    funnel_chart.add('Total Favorites', total_stats["total_current_favorites"])
+    funnel_chart.add('Total Unique Visitors',
+                     total_stats["total_unique_visitors"])
+
+    # Render the chart to an SVG file
+    # funnel_chart.render_to_file('steam_workshop_stats.svg')
+
+    # Optionally, return the SVG data as a string to embed directly in HTML or Markdown
+    return funnel_chart.render(is_unicode=True)
+
+
+def update_readme(markdown_data, start_marker, end_marker, readme_path="../README.md"):
     """Updates the README.md file with the provided Markdown content within specified markers."""
     # Read the current README content
     with open(readme_path, "r", encoding="utf-8") as file:
@@ -130,15 +208,12 @@ def save_to_file(data, filename):
 if __name__ == "__main__":
     # Start the timer
     start_time = time.time()
-    player_summary = get_player_summaries()
     recently_played_games = get_recently_played_games()
 
     USER_MARKDOWN_CONTENT = ""
-    if player_summary and recently_played_games and player_summary["response"]["players"]:
-        steam_player_data = player_summary["response"]["players"][0]
-        processed_data = process_player_summary_data(steam_player_data)
-        USER_MARKDOWN_CONTENT += generate_markdown(
-            processed_data, recently_played_games)
+    if recently_played_games:
+        USER_MARKDOWN_CONTENT += generate_svg_for_recently_played_games(
+            recently_played_games)
         print("Successfully retrieved Steam User Data")
     else:
         print("Failed to fetch steam data")
@@ -147,7 +222,8 @@ if __name__ == "__main__":
     links = fetch_workshop_item_links(STEAM_ID)
     if links:
         workshop_data = fetch_all_workshop_stats(links)
-        WORKSHOP_MARKDOWN_CONTENT = generate_svg_card(workshop_data)
+        WORKSHOP_MARKDOWN_CONTENT = generate_svg_for_steam_workshop(
+            workshop_data)
         print("Retrieved all workshop stats and created svg")
     else:
         print("No workshop content was found")

@@ -1,4 +1,4 @@
-"""Scrape Workshop Data and embed it in Readme"""
+"""Scrape Steam Workshop Data"""
 import requests
 from bs4 import BeautifulSoup, Tag
 
