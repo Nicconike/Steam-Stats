@@ -2,7 +2,7 @@
 import json
 import os
 import time
-from steam_stats import get_player_summaries, get_recently_played_games, process_player_summary_data
+from steam_stats import get_recently_played_games
 from steam_workshop import fetch_workshop_item_links, fetch_all_workshop_stats
 import pygal
 
@@ -21,56 +21,56 @@ PERSONASTATE_MAPPING = {
 }
 
 
-def generate_markdown(summary_data, recently_played_data):
-    """Generate combined Markdown content for player data, achievements, recently played games"""
+# def generate_markdown(summary_data, recently_played_data):
+#     """Generate combined Markdown content for player data, achievements, recently played games"""
 
-    # Generate Steam User Summary Markdown
-    personastate_str = summary_data["personastate"]
-    summary_markdown = f"""
-## Steam User Summary for {summary_data["personaname"]}
+#     # Generate Steam User Summary Markdown
+#     personastate_str = summary_data["personastate"]
+#     summary_markdown = f"""
+# ## Steam User Summary for {summary_data["personaname"]}
 
-- **Steam Status:** {personastate_str}
-- **Last Logoff (IST):** {summary_data["lastlogoff"]}
-- **Profile URL:** [Visit Profile]({summary_data["profileurl"]})
-- **Avatar:** ![Avatar]({summary_data["avatarmedium"]})
-"""
+# - **Steam Status:** {personastate_str}
+# - **Last Logoff (IST):** {summary_data["lastlogoff"]}
+# - **Profile URL:** [Visit Profile]({summary_data["profileurl"]})
+# - **Avatar:** ![Avatar]({summary_data["avatarmedium"]})
+# """
 
-    # Add game status if the user is in-game
-    if "gameid" in summary_data and summary_data["gameid"]:
-        summary_markdown += f"\n- **Currently In-Game:** {
-            summary_data["gameid"]}"
+#     # Add game status if the user is in-game
+#     if "gameid" in summary_data and summary_data["gameid"]:
+#         summary_markdown += f"\n- **Currently In-Game:** {
+#             summary_data["gameid"]}"
 
-    # Generate Recently Played Games Markdown
-    total_count = recently_played_data["response"]["total_count"]
-    games_markdown = f"## Recently Played Games (Total: {total_count})\n"
-    for game in recently_played_data["response"]["games"]:
-        playtime_2weeks = game["playtime_2weeks"]
-        playtime_forever = game["playtime_forever"]
+#     # Generate Recently Played Games Markdown
+#     total_count = recently_played_data["response"]["total_count"]
+#     games_markdown = f"## Recently Played Games (Total: {total_count})\n"
+#     for game in recently_played_data["response"]["games"]:
+#         playtime_2weeks = game["playtime_2weeks"]
+#         playtime_forever = game["playtime_forever"]
 
-        # Format playtime for the last 2 weeks
-        if playtime_2weeks >= 60:
-            playtime_2weeks_hours = playtime_2weeks // 60
-            playtime_2weeks_minutes = playtime_2weeks % 60
-            playtime_2weeks_str = f"{playtime_2weeks_hours} hrs {
-                playtime_2weeks_minutes} mins"
-        else:
-            playtime_2weeks_str = f"{playtime_2weeks} mins"
+#         # Format playtime for the last 2 weeks
+#         if playtime_2weeks >= 60:
+#             playtime_2weeks_hours = playtime_2weeks // 60
+#             playtime_2weeks_minutes = playtime_2weeks % 60
+#             playtime_2weeks_str = f"{playtime_2weeks_hours} hrs {
+#                 playtime_2weeks_minutes} mins"
+#         else:
+#             playtime_2weeks_str = f"{playtime_2weeks} mins"
 
-        # Format total playtime
-        if playtime_forever >= 60:
-            playtime_forever_hours = playtime_forever // 60
-            playtime_forever_minutes = playtime_forever % 60
-            playtime_forever_str = f"{playtime_forever_hours} hrs {
-                playtime_forever_minutes} mins"
-        else:
-            playtime_forever_str = f"{playtime_forever} mins"
+#         # Format total playtime
+#         if playtime_forever >= 60:
+#             playtime_forever_hours = playtime_forever // 60
+#             playtime_forever_minutes = playtime_forever % 60
+#             playtime_forever_str = f"{playtime_forever_hours} hrs {
+#                 playtime_forever_minutes} mins"
+#         else:
+#             playtime_forever_str = f"{playtime_forever} mins"
 
-        games_markdown += f"- {game["name"]}: Playtime last 2 weeks: {
-            playtime_2weeks_str}, Total playtime: {playtime_forever_str}\n"
+#         games_markdown += f"- {game["name"]}: Playtime last 2 weeks: {
+#             playtime_2weeks_str}, Total playtime: {playtime_forever_str}\n"
 
-    # Combine all Markdown sections
-    combined_markdown = summary_markdown + "\n" + games_markdown
-    return combined_markdown
+#     # Combine all Markdown sections
+#     combined_markdown = summary_markdown + "\n" + games_markdown
+#     return combined_markdown
 
 
 # def generate_svg_for_steam_summary(player_data):
@@ -167,7 +167,7 @@ def generate_svg_for_steam_workshop(total_stats):
     return funnel_chart.render(is_unicode=True)
 
 
-def update_readme(markdown_data, start_marker, end_marker, readme_path="../README.md"):
+def update_readme(markdown_data, start_marker, end_marker, readme_path="README.md"):
     """Updates the README.md file with the provided Markdown content within specified markers."""
     # Read the current README content
     with open(readme_path, "r", encoding="utf-8") as file:
