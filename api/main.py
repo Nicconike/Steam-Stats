@@ -141,7 +141,7 @@ def generate_svg_for_recently_played_games(player_data):
     # Render the chart to an SVG file
     # bar_chart.render_to_file('recently_played_games.svg')
 
-    # Optionally, return the SVG data as a string to embed directly in HTML or Markdown
+    # return the SVG data as a string to embed directly in Markdown
     return bar_chart.render(is_unicode=True)
 
 
@@ -163,7 +163,7 @@ def generate_svg_for_steam_workshop(total_stats):
     # Render the chart to an SVG file
     # funnel_chart.render_to_file('steam_workshop_stats.svg')
 
-    # Optionally, return the SVG data as a string to embed directly in HTML or Markdown
+    # Return the SVG data as a string to embed directly in Markdown
     return funnel_chart.render(is_unicode=True)
 
 
