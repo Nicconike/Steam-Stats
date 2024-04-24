@@ -1,5 +1,4 @@
 """Main Runner Script"""
-import json
 import os
 import time
 from steam_stats import get_recently_played_games
@@ -141,7 +140,7 @@ def generate_svg_for_recently_played_games(player_data):
     # Render the chart to an SVG file
     bar_chart.render_to_file("../assets/recently_played_games.svg")
 
-    return "![Recently Played Games](https://github.com/Nicconike/Steam-Stats/tree/master/assets/recently_played_games.svg?sanitize=true)"
+    return "![Recently Played Games](https://github.com/Nicconike/Steam-Stats/blob/master/assets/recently_played_games.svg?sanitize=true)"
 
 
 def generate_svg_for_steam_workshop(total_stats):
@@ -152,7 +151,7 @@ def generate_svg_for_steam_workshop(total_stats):
 
     # funnel_chart.x_labels = ['Total Favorites','Total Subscribers', 'Total Unique Visitors']
 
-    # Add data to the radar chart
+    # Add data to the funnel chart
     funnel_chart.add('Total Subscribers',
                      total_stats["total_current_subscribers"])
     funnel_chart.add('Total Favorites', total_stats["total_current_favorites"])
@@ -162,7 +161,7 @@ def generate_svg_for_steam_workshop(total_stats):
     # Render the chart to an SVG file
     funnel_chart.render_to_file("../assets/steam_workshop_stats.svg")
 
-    return "![Steam Workshop Data](https://github.com/Nicconike/Steam-Stats/tree/master/assets/steam_workshop_stats.svg?sanitize=true)"
+    return "![Steam Workshop Data](https://github.com/Nicconike/Steam-Stats/blob/master/assets/steam_workshop_stats.svg?sanitize=true)"
 
 
 def update_readme(markdown_data, start_marker, end_marker, readme_path="README.md"):
@@ -196,6 +195,7 @@ if __name__ == "__main__":
     # Start the timer
     start_time = time.time()
     recently_played_games = get_recently_played_games()
+    links = fetch_workshop_item_links(STEAM_ID)
 
     USER_MARKDOWN_CONTENT = ""
     if recently_played_games:
@@ -206,7 +206,6 @@ if __name__ == "__main__":
         print("Failed to fetch steam data")
 
     WORKSHOP_MARKDOWN_CONTENT = ""
-    links = fetch_workshop_item_links(STEAM_ID)
     if links:
         workshop_data = fetch_all_workshop_stats(links)
         WORKSHOP_MARKDOWN_CONTENT = generate_svg_for_steam_workshop(
