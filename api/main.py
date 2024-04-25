@@ -114,7 +114,7 @@ PERSONASTATE_MAPPING = {
 def generate_svg_for_recently_played_games(player_data):
     """Generate SVG for Recently Played Games in Steam in the last 2 weeks"""
     bar_chart = pygal.HorizontalBar(
-        legend_at_bottom=True, rounded_bars=15, show_legend=True)
+        legend_at_bottom=True, rounded_bars=15, explicit_size=True)
     bar_chart.title = "Playtime in the Last Two Weeks (hours)"
 
     # Add data to the chart
@@ -144,22 +144,22 @@ def generate_svg_for_recently_played_games(player_data):
 
 
 def generate_svg_for_steam_workshop(total_stats):
-    """Generates SVG Card for retrieved Workshop Data using Pygal Funnel Chart"""
-    # Create a Funnel chart instance
-    funnel_chart = pygal.Funnel(legend_at_bottom=True)
-    funnel_chart.title = 'Steam Workshop Stats'
+    """Generates SVG Card for retrieved Workshop Data using Pygal Pyramid Chart"""
+    # Create a Pyramid chart instance
+    pyramid_chart = pygal.Pyramid(
+        legend_at_bottom=True, explicit_size=True, human_readable=True)
+    pyramid_chart.title = 'Steam Workshop Stats'
 
-    # funnel_chart.x_labels = ['Total Favorites','Total Subscribers', 'Total Unique Visitors']
-
-    # Add data to the funnel chart
-    funnel_chart.add('Total Subscribers',
-                     total_stats["total_current_subscribers"])
-    funnel_chart.add('Total Favorites', total_stats["total_current_favorites"])
-    funnel_chart.add('Total Unique Visitors',
-                     total_stats["total_unique_visitors"])
+    # Add data to the pyramid chart
+    pyramid_chart.add('Total Subscribers',
+                      total_stats["total_current_subscribers"])
+    pyramid_chart.add('Total Favorites',
+                      total_stats["total_current_favorites"])
+    pyramid_chart.add('Total Unique Visitors',
+                      total_stats["total_unique_visitors"])
 
     # Render the chart to an SVG file
-    funnel_chart.render_to_file("assets/steam_workshop_stats.svg")
+    pyramid_chart.render_to_file("assets/steam_workshop_stats.svg")
 
     return "![Steam Workshop Data](assets/steam_workshop_stats.svg)"
 
