@@ -8,18 +8,6 @@ import pygal
 # Secrets Configuration
 STEAM_ID = os.getenv("STEAM_CUSTOM_ID")
 
-# Steam Account Status Mapping
-PERSONASTATE_MAPPING = {
-    0: "Offline",
-    1: "Online",
-    2: "Busy",
-    3: "Away",
-    4: "Snooze",
-    5: "Looking to Trade",
-    6: "Looking to Play"
-}
-
-
 # def generate_markdown(summary_data, recently_played_data):
 #     """Generate combined Markdown content for player data, achievements, recently played games"""
 
@@ -122,7 +110,7 @@ def generate_svg_for_recently_played_games(player_data):
         for game in player_data["response"]["games"]:
             if "name" in game and "playtime_2weeks" in game:
                 playtime_minutes = game["playtime_2weeks"]
-                playtime_hours = playtime_minutes / 60  # Convert minutes to hours for plotting
+                playtime_hours = playtime_minutes / 60  # for plotting
 
                 # Determine the label based on the original playtime in minutes
                 if playtime_minutes >= 60:
@@ -138,30 +126,34 @@ def generate_svg_for_recently_played_games(player_data):
         print("No game data available to display")
 
     # Render the chart to an SVG file
-    bar_chart.render_to_file("assets/recently_played_games.svg")
+    # bar_chart.render_to_file("assets/recently_played_games.svg")
 
-    return "![Recently Played Games](assets/recently_played_games.svg)"
+    return bar_chart.render(is_unicode=True)
 
 
 def generate_svg_for_steam_workshop(total_stats):
-    """Generates SVG Card for retrieved Workshop Data using Pygal Pyramid Chart"""
-    # Create a Pyramid chart instance
-    pyramid_chart = pygal.Pyramid(
-        legend_at_bottom=True, explicit_size=True, human_readable=True)
-    pyramid_chart.title = 'Steam Workshop Stats'
+    """Generates SVG Card for retrieved Workshop Data using Pygal Multi-series Pie Chart"""
+    # Create a multi-series pie chart instance
+    pie_chart = pygal.Pie(legend_at_bottom=True, explicit_size=True)
+    pie_chart.title = "Steam Workshop Stats"
 
-    # Add data to the pyramid chart
-    pyramid_chart.add('Total Subscribers',
-                      total_stats["total_current_subscribers"])
-    pyramid_chart.add('Total Favorites',
-                      total_stats["total_current_favorites"])
-    pyramid_chart.add('Total Unique Visitors',
-                      total_stats["total_unique_visitors"])
+    # Extract all element values from individual_stats and add them as a series
+    unique_visitors = [stat["unique_visitors"]
+                       for stat in total_stats["individual_stats"]]
+    current_subscribers = [stat["current_subscribers"]
+                           for stat in total_stats["individual_stats"]]
+    current_favorites = [stat["current_favorites"]
+                         for stat in total_stats["individual_stats"]]
+
+    pie_chart.add("Subscribers", current_subscribers)
+    pie_chart.add("Unique Visitors", unique_visitors)
+    pie_chart.add("Favorites", current_favorites)
 
     # Render the chart to an SVG file
-    pyramid_chart.render_to_file("assets/steam_workshop_stats.svg")
+    # pie_chart.render_to_file("assets/steam_workshop_stats.svg")
 
-    return "![Steam Workshop Data](assets/steam_workshop_stats.svg)"
+    # Return the SVG data as a string to embed directly in Markdown
+    return pie_chart.render(is_unicode=True)
 
 
 def update_readme(markdown_data, start_marker, end_marker, readme_path="README.md"):
@@ -208,7 +200,7 @@ if __name__ == "__main__":
     WORKSHOP_MARKDOWN_CONTENT = ""
     if links:
         workshop_data = fetch_all_workshop_stats(links)
-        WORKSHOP_MARKDOWN_CONTENT = generate_svg_for_steam_workshop(
+        WORKSHOP_MARKDOWN_CONTENT += generate_svg_for_steam_workshop(
             workshop_data)
         print("Retrieved all Workshop Stats")
     else:

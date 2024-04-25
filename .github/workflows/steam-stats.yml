@@ -8,6 +8,7 @@ on:
 
 jobs:
     update-readme:
+        name: Steam Stats
         runs-on: ubuntu-latest
         steps:
           - name: Checkout repository

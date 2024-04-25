@@ -59,4 +59,5 @@ def fetch_all_workshop_stats(item_links):
         "total_unique_visitors": total_unique_visitors,
         "total_current_subscribers": total_current_subscribers,
         "total_current_favorites": total_current_favorites,
+        "individual_stats": all_stats
     }
