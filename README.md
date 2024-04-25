@@ -3,7 +3,9 @@
 [![Visitor Badge](https://badges.pufler.dev/visits/nicconike/steam-stats)](https://badges.pufler.dev)
 
 <!-- Steam-Stats start -->
+![Recently Played Games](assets/recently_played_games.svg)
 <!-- Steam-Stats end -->
 
 <!-- Steam-Workshop start -->
+![Steam Workshop Data](assets/steam_workshop_stats.svg)
 <!-- Steam-Workshop end -->
