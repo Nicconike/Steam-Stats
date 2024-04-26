@@ -1,15 +1,25 @@
 {
     "version": 2,
-    "functions": {
-        "api/main.py": {
-            "memory": 128,
-            "maxDuration": 10
-        },
-        "api/*.py": {
-            "memory": 128,
-            "maxDuration": 10
+    "builds": [
+        {
+            "src": "main.py",
+            "use": "@vercel/python"
         }
-    },
+    ],
+    "routes": [
+        {
+            "src": "/player-summaries",
+            "dest": "/api/app.py"
+        },
+        {
+            "src": "/recently-played-games",
+            "dest": "/api/app.py"
+        },
+        {
+            "src": "/workshop-stats/<steam_id>",
+            "dest": "/api/app.py"
+        }
+    ],
     "env": {
         "STEAM_API_KEY": "@steam_api_key",
         "STEAM_ID": "@steam_id",
