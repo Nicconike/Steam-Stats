@@ -1,11 +1,5 @@
 {
     "version": 2,
-    "functions": {
-        "api/*.py": {
-            "memory": 128,
-            "maxDuration": 10
-        }
-    },
     "builds": [
         {
             "src": "api/*.py",
