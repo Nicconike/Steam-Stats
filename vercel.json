@@ -7,10 +7,10 @@
         }
     ],
     "env": {
-        "STEAM_API_KEY": "@steam_api_key",
-        "STEAM_ID": "@steam_id",
-        "STEAM_CUSTOM_ID": "@steam_custom_id",
-        "STEAM_APP_ID": "@steam_app_id"
+        "STEAM_API_KEY": "@STEAM_API_KEY",
+        "STEAM_ID": "@STEAM_ID",
+        "STEAM_CUSTOM_ID": "@STEAM_CUSTOM_ID",
+        "STEAM_APP_ID": "@STEAM_APP_ID"
     },
     "redirects": [
         {

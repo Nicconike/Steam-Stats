@@ -2,7 +2,6 @@
 from flask import Flask, jsonify
 from steam_stats import get_player_summaries, get_recently_played_games
 from steam_workshop import fetch_workshop_item_links, fetch_all_workshop_stats
-
 app = Flask(__name__)
 
 
