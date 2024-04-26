@@ -159,3 +159,4 @@ cython_debug/
 vercel.txt
 Pipfile
 Pipfile.lock
+.vercel

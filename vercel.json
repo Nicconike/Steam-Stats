@@ -1,17 +1,15 @@
 {
     "version": 2,
-    "builds": [
-        {
-            "src": "api/*.py",
-            "use": "@vercel/python"
+    "functions": {
+        "api/main.py": {
+            "memory": 128,
+            "maxDuration": 10
+        },
+        "api/*.py": {
+            "memory": 128,
+            "maxDuration": 10
         }
-    ],
-    "routes": [
-        {
-            "src": "/api/(.*)",
-            "dest": "/api/$1.py"
-        }
-    ],
+    },
     "env": {
         "STEAM_API_KEY": "@steam_api_key",
         "STEAM_ID": "@steam_id",
