@@ -2,22 +2,8 @@
     "version": 2,
     "builds": [
         {
-            "src": "main.py",
+            "src": "app.py",
             "use": "@vercel/python"
-        }
-    ],
-    "routes": [
-        {
-            "src": "/player-summaries",
-            "dest": "/api/app.py"
-        },
-        {
-            "src": "/recently-played-games",
-            "dest": "/api/app.py"
-        },
-        {
-            "src": "/workshop-stats/<steam_id>",
-            "dest": "/api/app.py"
         }
     ],
     "env": {
