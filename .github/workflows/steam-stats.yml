@@ -18,7 +18,7 @@ jobs:
             with:
                 python-version: '3.x'
           - name: Install dependencies
-            run: pip install requests python-dotenv pytz bs4 pygal
+            run: pip install requests python-dotenv bs4 pygal
           - name: Update Steam Stats in README
             env:
                 STEAM_API_KEY: ${{ secrets.STEAM_API_KEY }}
@@ -26,3 +26,10 @@ jobs:
                 STEAM_CUSTOM_ID: ${{ secrets.STEAM_CUSTOM_ID }}
                 STEAM_APP_ID: ${{ secrets.STEAM_APP_ID }}
             run: python api/main.py
+          - name: Commit and push if changes
+            run: |
+                git config --global user.email "action@github.com"
+                git config --global user.name "GitHub Action"
+                git add README.md
+                git commit -m "Update README.md with latest Steam Stats" || echo "No changes to commit"
+                git push
