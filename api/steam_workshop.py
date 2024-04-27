@@ -1,5 +1,4 @@
 """Scrape Steam Workshop Data"""
-import json
 import requests
 from bs4 import BeautifulSoup, Tag
 
@@ -47,7 +46,7 @@ def fetch_individual_workshop_stats(item_url):
                 if len(cells) == 2:
                     key = cells[1].text.strip().lower().replace(' ', '_')
                     value = cells[0].text.strip().replace(',', '')
-                    stats[key] = int(value)
+                    stats[key] = int(value) if value else 0
         else:
             print(f"Could not find stats table at {item_url}")
     except requests.exceptions.RequestException as e:
@@ -56,18 +55,11 @@ def fetch_individual_workshop_stats(item_url):
         print(
             f"An unexpected error occurred while fetching individual workshop stats: {e}")
 
+    stats['unique_visitors'] = stats.get('unique_visitors', 0)
+    stats['current_subscribers'] = stats.get('current_subscribers', 0)
+    stats['current_favorites'] = stats.get('current_favorites', 0)
+
     return stats
-
-
-def save_to_file(data, filename):
-    """Save fetched data to a file in JSON format"""
-    if data is not None:
-        with open(filename, 'w', encoding='utf-8') as file:
-            # Use json.dump to write the JSON data to the file
-            json.dump(data, file, indent=4)
-        print(f"Data saved to {filename}")
-    else:
-        print("No data to save")
 
 
 def fetch_all_workshop_stats(item_links):
@@ -84,9 +76,3 @@ def fetch_all_workshop_stats(item_links):
             print(f"An unexpected error occurred while fetching stats for {
                   link}: {e}")
     return {"individual_stats": all_stats}
-
-
-if __name__ == "__main__":
-    links = fetch_workshop_item_links("gr1mmr3aper")
-    workshop_data = fetch_all_workshop_stats(links)
-    save_to_file(workshop_data, "workshop_data.json")

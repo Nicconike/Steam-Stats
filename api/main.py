@@ -105,7 +105,7 @@ if __name__ == "__main__":
             recently_played_games)
         print("Successfully retrieved Steam User Data")
     else:
-        print("Failed to fetch steam data")
+        print("Failed to fetch Steam data for Recently Played Games")
 
     WORKSHOP_MARKDOWN_CONTENT = ""
     if links:

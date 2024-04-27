@@ -1,5 +1,5 @@
 """Retrieves Steam User Data using Steam Web API"""
-from zoneinfo import ZoneInfo  # Python 3.9 and newer
+from zoneinfo import ZoneInfo
 from datetime import datetime, timezone
 import os
 from dotenv import load_dotenv
