@@ -62,7 +62,7 @@ def generate_svg_for_steam_workshop(total_stats):
     # Render the chart to an SVG file
     pie_chart.render_to_file("docs/steam_workshop_stats.svg")
 
-    return "![Steam Games Stats](https://nicconike.github.io/Steam-Stats/docs/steam_workshop_stats.svg)"
+    return "![Steam Workshop Stats](https://nicconike.github.io/Steam-Stats/docs/steam_workshop_stats.svg)"
 
 
 def update_readme(markdown_data, start_marker, end_marker, readme_path="README.md"):
