@@ -3,9 +3,9 @@
 [![Visitor Badge](https://badges.pufler.dev/visits/nicconike/steam-stats)](https://badges.pufler.dev)
 
 <!-- Steam-Stats start -->
-![Steam Games Stats](https://nicconike.github.io/Steam-Stats/docs/recently_played_games.svg)
+![Steam Games Stats](https://nicconike.github.io/Steam-Stats/recently_played_games.svg)
 <!-- Steam-Stats end -->
 
 <!-- Steam-Workshop start -->
-![Steam Workshop Stats](https://nicconike.github.io/Steam-Stats/docs/steam_workshop_stats.svg)
+![Steam Workshop Stats](https://nicconike.github.io/Steam-Stats/steam_workshop_stats.svg)
 <!-- Steam-Workshop end -->

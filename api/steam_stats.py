@@ -69,18 +69,27 @@ def get_recently_played_games():
 
 def process_player_summary_data(player_data):
     """Process the retrieved summary data"""
-    # Convert Unix timestamp to IST timezone and format it
-    lastlogoff_ist = datetime.fromtimestamp(
-        player_data["lastlogoff"], tz=timezone.utc).astimezone(ZoneInfo("Asia/Kolkata"))
-    lastlogoff_str = lastlogoff_ist.strftime("%d/%m/%Y %H:%M:%S")
+    try:
+        # Convert Unix timestamp to IST timezone and format it
+        lastlogoff_ist = datetime.fromtimestamp(
+            player_data["lastlogoff"], tz=timezone.utc).astimezone(ZoneInfo("Asia/Kolkata"))
+        lastlogoff_str = lastlogoff_ist.strftime("%d/%m/%Y %H:%M:%S")
 
-    # Extract other fields
-    process_data = {
-        "personaname": player_data["personaname"],
-        "profileurl": player_data["profileurl"],
-        "avatarmedium": player_data["avatarmedium"],
-        "lastlogoff": lastlogoff_str,
-        "personastate": PERSONASTATE_MAPPING.get(player_data["personastate"], "Unknown"),
-        "gameid": player_data.get("gameid")
-    }
-    return process_data
+        # Extract other fields
+        process_data = {
+            "personaname": player_data["personaname"],
+            "profileurl": player_data["profileurl"],
+            "avatarmedium": player_data["avatarmedium"],
+            "lastlogoff": lastlogoff_str,
+            "personastate": PERSONASTATE_MAPPING.get(player_data["personastate"], "Unknown"),
+            "gameid": player_data.get("gameid", "Not in game")
+        }
+        return process_data
+    except KeyError as e:
+        print(f"Missing key in player data: {e}")
+    except ValueError as e:
+        print(f"Value error in processing player data: {e}")
+    except Exception as e:
+        print(
+            f"An unexpected error occurred while processing player summary data: {e}")
+    return None
