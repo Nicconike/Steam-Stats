@@ -36,7 +36,7 @@ def generate_svg_for_recently_played_games(player_data):
         print("No game data available to display")
 
     # Render the chart to an SVG file
-    bar_chart.render_to_file("../docs/recently_played_games.svg")
+    bar_chart.render_to_file("docs/recently_played_games.svg")
 
     return "![Steam Games Stats](https://nicconike.github.io/Steam-Stats/recently_played_games.svg)"
 
@@ -61,12 +61,12 @@ def generate_svg_for_steam_workshop(total_stats):
     pie_chart.add("Favorites", current_favorites)
 
     # Render the chart to an SVG file
-    pie_chart.render_to_file("../docs/steam_workshop_stats.svg")
+    pie_chart.render_to_file("docs/steam_workshop_stats.svg")
 
     return "![Steam Workshop Stats](https://nicconike.github.io/Steam-Stats/steam_workshop_stats.svg)"
 
 
-def update_readme(markdown_data, start_marker, end_marker, readme_path="../README.md"):
+def update_readme(markdown_data, start_marker, end_marker, readme_path="README.md"):
     """Updates the README.md file with the provided Markdown content within specified markers."""
     # Read the current README content
     with open(readme_path, "r", encoding="utf-8") as file:
