@@ -1,6 +1,7 @@
 """Main Runner Script"""
 import os
 import time
+import plotly.graph_objects as go
 from steam_stats import get_recently_played_games
 from steam_workshop import fetch_workshop_item_links, fetch_all_workshop_stats
 import pygal
@@ -42,7 +43,8 @@ def generate_svg_for_recently_played_games(player_data):
 
 
 def generate_svg_for_steam_workshop(total_stats):
-    """Generates SVG Card for retrieved Workshop Data using Pygal Multi-series Pie Chart"""
+    """Generates SVG Card for retrieved Workshop Data using Pygal Multi-series Pie Chart
+    and Plotly for table creation"""
     # Create a multi-series pie chart instance
     pie_chart = pygal.Pie(legend_at_bottom=True,
                           explicit_size=True, width=500, height=500)
@@ -61,9 +63,25 @@ def generate_svg_for_steam_workshop(total_stats):
     pie_chart.add("Favorites", current_favorites)
 
     # Render the chart to an SVG file
-    pie_chart.render_to_file("docs/steam_workshop_stats.svg")
+    pie_chart.render_to_file("docs/pie_chart.svg")
 
-    return "![Steam Workshop Stats](https://nicconike.github.io/Steam-Stats/steam_workshop_stats.svg)"
+    # Create the table data
+    header_values = ["Workshop Stats", "Total"]
+    cell_values = [
+        ["Total Unique Visitors", "Current Subscribers", "Current Favorites"],
+        [total_stats["total_unique_visitors"], total_stats["total_current_subscribers"],
+            total_stats["total_current_favorites"]],
+    ]
+
+    # Create the table figure
+    fig = go.Figure(data=[go.Table(
+        header=dict(values=header_values,
+                    fill_color='paleturquoise', align='left'),
+        cells=dict(values=cell_values, fill_color='lavender', align='left'))
+    ])
+    fig.write_image("docs/table.svg")
+
+    return "![Steam Workshop Stats](https://nicconike.github.io/Steam-Stats/pie_chart.svg)" and "![Steam Workshop Stats](https://nicconike.github.io/Steam-Stats/table.svg)"
 
 
 def update_readme(markdown_data, start_marker, end_marker, readme_path="README.md"):

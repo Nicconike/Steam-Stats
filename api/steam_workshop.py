@@ -75,4 +75,16 @@ def fetch_all_workshop_stats(item_links):
         except Exception as e:
             print(f"An unexpected error occurred while fetching stats for {
                   link}: {e}")
-    return {"individual_stats": all_stats}
+
+    # Calculate the totals
+    total_unique_visitors = sum(
+        item["unique_visitors"] for item in all_stats)
+    total_current_subscribers = sum(
+        item["current_subscribers"] for item in all_stats)
+    total_current_favorites = sum(
+        item["current_favorites"] for item in all_stats)
+
+    return {"total_unique_visitors": total_unique_visitors,
+            "total_current_subscribers": total_current_subscribers,
+            "total_current_favorites": total_current_favorites,
+            "individual_stats": all_stats}
