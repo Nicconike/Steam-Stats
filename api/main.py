@@ -1,6 +1,8 @@
 """Main Runner Script"""
 import os
 import time
+import numpy as np
+import pandas as pd
 import plotly.graph_objects as go
 from steam_stats import get_recently_played_games
 from steam_workshop import fetch_workshop_item_links, fetch_all_workshop_stats
@@ -37,54 +39,44 @@ def generate_svg_for_recently_played_games(player_data):
         print("No game data available to display")
 
     # Render the chart to an SVG file
-    bar_chart.render_to_file("docs/recently_played_games.svg")
+    bar_chart.render_to_file("../assets/recently_played_games.svg")
 
-    return "![Steam Games Stats](https://nicconike.github.io/Steam-Stats/recently_played_games.svg)"
+    return "![Steam Games Stats](https://github.com/Nicconike/Steam-Stats/blob/master/assets/recently_played_games.svg?sanitize=true)"
 
 
-def generate_svg_for_steam_workshop(total_stats):
-    """Generates SVG Card for retrieved Workshop Data using Pygal Multi-series Pie Chart
-    and Plotly for table creation"""
-    # Create a multi-series pie chart instance
-    pie_chart = pygal.Pie(legend_at_bottom=True,
-                          explicit_size=True, width=500, height=500)
-    pie_chart.title = "Steam Workshop Stats"
-
-    # Extract all element values from individual_stats and add them as a series
-    unique_visitors = [stat["unique_visitors"]
-                       for stat in total_stats["individual_stats"]]
-    current_subscribers = [stat["current_subscribers"]
-                           for stat in total_stats["individual_stats"]]
-    current_favorites = [stat["current_favorites"]
-                         for stat in total_stats["individual_stats"]]
-
-    pie_chart.add("Subscribers", current_subscribers)
-    pie_chart.add("Unique Visitors", unique_visitors)
-    pie_chart.add("Favorites", current_favorites)
-
-    # Render the chart to an SVG file
-    pie_chart.render_to_file("docs/pie_chart.svg")
-
+def generate_svg_for_steam_workshop(workshop_stats):
+    """Generates SVG Card for retrieved Workshop Data using Plotly for table creation"""
     # Create the table data
     header_values = ["Workshop Stats", "Total"]
-    cell_values = [
-        ["Total Unique Visitors", "Current Subscribers", "Current Favorites"],
-        [total_stats["total_unique_visitors"], total_stats["total_current_subscribers"],
-            total_stats["total_current_favorites"]],
-    ]
+    data = {
+        "Workshop_Stats": ["Unique Visitors", "Current Subscribers", "Current Favorites"],
+        "Total": [
+            workshop_stats["total_unique_visitors"],
+            workshop_stats["total_current_subscribers"],
+            workshop_stats["total_current_favorites"]
+        ]
+    }
+    df = pd.DataFrame(data)
+    # Generate random colors for each row
+    colors = [f'rgb({np.random.randint(0, 256)}, {np.random.randint(0, 256)}, {
+        np.random.randint(0, 256)})' for _ in range(len(df))]
 
     # Create the table figure
     fig = go.Figure(data=[go.Table(
-        header=dict(values=header_values,
-                    fill_color='paleturquoise', align='left'),
-        cells=dict(values=cell_values, fill_color='lavender', align='left'))
+        header=dict(values=header_values, line_color="paleturquoise",
+                    fill_color="paleturquoise", align="center", font=dict(color='black', size=16)),
+        cells=dict(values=[df[col].tolist() for col in df.columns],
+                   line_color=[colors],
+                   fill_color=[colors],
+                   align="center",
+                   font=dict(color='black', size=14)))
     ])
-    fig.write_image("docs/table.svg")
+    fig.write_image("../assets/steam_workshop_stats.svg")
 
-    return "![Steam Workshop Stats](https://nicconike.github.io/Steam-Stats/pie_chart.svg)" and "![Steam Workshop Stats](https://nicconike.github.io/Steam-Stats/table.svg)"
+    return "![Steam Games Stats](https://github.com/Nicconike/Steam-Stats/blob/master/assets/steam_workshop_stats.svg?sanitize=true)"
 
 
-def update_readme(markdown_data, start_marker, end_marker, readme_path="README.md"):
+def update_readme(markdown_data, start_marker, end_marker, readme_path="../README.md"):
     """Updates the README.md file with the provided Markdown content within specified markers."""
     # Read the current README content
     with open(readme_path, "r", encoding="utf-8") as file:
