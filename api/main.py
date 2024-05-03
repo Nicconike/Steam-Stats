@@ -73,9 +73,8 @@ def generate_svg_for_steam_workshop(workshop_stats):
     ])
     # Adjust layout to fit the table size
     fig.update_layout(
-        # Set all the margins to 0
-        margin=dict(l=0, r=0, t=0, b=0),
-        autosize=True
+        autosize=True,
+        margin=dict(pad=0)
     )
     fig.write_image("assets/steam_workshop_stats.svg")
 
