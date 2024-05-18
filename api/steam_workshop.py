@@ -7,25 +7,48 @@ REQUEST_TIMEOUT = (10, 15)
 
 
 def fetch_workshop_item_links(steam_id):
-    """Fetch each workshop item's link"""
-    url = f"https://steamcommunity.com/id/{steam_id}/myworkshopfiles/"
+    """Fetch each workshop item's link, navigating through all pages"""
+    base_url = f"https://steamcommunity.com/id/{steam_id}/myworkshopfiles/"
     item_links = []
+    page_number = 1
 
-    try:
-        response = requests.get(url, timeout=REQUEST_TIMEOUT)
-        response.raise_for_status()
-        soup = BeautifulSoup(response.content, "html.parser")
-        workshop_items = soup.find_all("div", class_="workshopItem")
+    while True:
+        url = f"{base_url}?p={page_number}"
+        try:
+            response = requests.get(url, timeout=REQUEST_TIMEOUT)
+            response.raise_for_status()
+            soup = BeautifulSoup(response.content, "html.parser")
+            workshop_items = soup.find_all("div", class_="workshopItem")
 
-        for item in workshop_items:
-            link_tag = item.find("a", class_="ugc")
-            if link_tag and "href" in link_tag.attrs:
-                item_links.append(link_tag["href"])
-    except requests.exceptions.RequestException as e:
-        print(f"Request failed: {e}")
-    except Exception as e:
-        print(
-            f"An unexpected error occurred while fetching workshop item links: {e}")
+            # If no items are found, break the loop
+            if not workshop_items:
+                break
+
+            for item in workshop_items:
+                link_tag = item.find("a", class_="ugc")
+                if link_tag and "href" in link_tag.attrs:
+                    item_links.append(link_tag["href"])
+
+            # Check for the next page link
+            paging_controls = soup.find(
+                "div", class_="workshopBrowsePagingControls")
+            if paging_controls:
+                next_page_link = paging_controls.find(
+                    "a", class_="pagebtn", string=">")
+                if not next_page_link:
+                    break  # No more pages
+            else:
+                break  # No pagination controls found
+
+            page_number += 1
+
+        except requests.exceptions.RequestException as e:
+            print(f"Request failed: {e}")
+            break
+        except Exception as e:
+            print(
+                f"An unexpected error occurred while fetching workshop item links: {e}")
+            break
 
     return item_links
 
