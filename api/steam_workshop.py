@@ -22,6 +22,7 @@ def fetch_workshop_item_links(steam_id):
 
             # If no items are found, break the loop
             if not workshop_items:
+                print(f"No workshop items found on page {page_number}")
                 break
 
             for item in workshop_items:
@@ -42,13 +43,26 @@ def fetch_workshop_item_links(steam_id):
 
             page_number += 1
 
-        except requests.exceptions.RequestException as e:
-            print(f"Request failed: {e}")
+        except requests.exceptions.ConnectionError:
+            print("Connection error occurred. Please check your network connection")
             break
-        except Exception as e:
-            print(
-                f"An unexpected error occurred while fetching workshop item links: {e}")
+        except requests.exceptions.Timeout:
+            print("Request timed out. Please try again later")
             break
+        except requests.exceptions.TooManyRedirects:
+            print("Too many redirects. Check the URL and try again")
+            break
+        except requests.exceptions.HTTPError as e:
+            print(f"HTTP error occurred: {
+                  e.response.status_code} - {e.response.reason}")
+            break
+        except AttributeError as e:
+            print(f"Parsing error: {
+                  e}. The structure of the page might have changed")
+            break
+
+    if not item_links and page_number == 1:
+        raise ValueError("No items were found in your Steam Workshop")
 
     return item_links
 
@@ -69,15 +83,29 @@ def fetch_individual_workshop_stats(item_url):
                 if len(cells) == 2:
                     key = cells[1].text.strip().lower().replace(' ', '_')
                     value = cells[0].text.strip().replace(',', '')
-                    stats[key] = int(value) if value else 0
+                    try:
+                        stats[key] = int(value) if value else 0
+                    except ValueError:
+                        print(f"Could not convert value to int: {value}")
+                        stats[key] = 0
         else:
             print(f"Could not find stats table at {item_url}")
+    except requests.exceptions.ConnectionError:
+        print("Connection error occurred. Please check your network connection")
+    except requests.exceptions.Timeout:
+        print("Request timed out. Please try again later")
+    except requests.exceptions.TooManyRedirects:
+        print("Too many redirects. Check the URL and try again")
+    except requests.exceptions.HTTPError as e:
+        print(f"HTTP error occurred: {
+              e.response.status_code} - {e.response.reason}")
     except requests.exceptions.RequestException as e:
         print(f"Request failed: {e}")
-    except Exception as e:
-        print(
-            f"An unexpected error occurred while fetching individual workshop stats: {e}")
+    except AttributeError as e:
+        print(f"Parsing error: {
+              e}. The structure of the page might have changed")
 
+    # Ensure all expected stats are present, even if they are zero
     stats['unique_visitors'] = stats.get('unique_visitors', 0)
     stats['current_subscribers'] = stats.get('current_subscribers', 0)
     stats['current_favorites'] = stats.get('current_favorites', 0)
@@ -88,26 +116,38 @@ def fetch_individual_workshop_stats(item_url):
 def fetch_all_workshop_stats(item_links):
     """Fetch Stats for all of the items in Steam User's Workshop"""
     all_stats = []
+
     for link in item_links:
         try:
             stats = fetch_individual_workshop_stats(link)
             if stats:
                 all_stats.append(stats)
+        except requests.exceptions.ConnectionError:
+            print(f"Connection error occurred while fetching stats for {
+                  link}. Please check your network connection.")
+        except requests.exceptions.Timeout:
+            print(f"Request timed out while fetching stats for {
+                  link}. Please try again later.")
+        except requests.exceptions.TooManyRedirects:
+            print(f"Too many redirects while fetching stats for {
+                  link}. Check the URL and try again.")
+        except requests.exceptions.HTTPError as e:
+            print(f"HTTP error occurred while fetching stats for {
+                  link}: {e.response.status_code} - {e.response.reason}")
         except requests.exceptions.RequestException as e:
             print(f"Request failed for {link}: {e}")
-        except Exception as e:
-            print(f"An unexpected error occurred while fetching stats for {
-                  link}: {e}")
 
     # Calculate the totals
-    total_unique_visitors = sum(
-        item["unique_visitors"] for item in all_stats)
+    total_unique_visitors = sum(item.get("unique_visitors", 0)
+                                for item in all_stats)
     total_current_subscribers = sum(
-        item["current_subscribers"] for item in all_stats)
+        item.get("current_subscribers", 0) for item in all_stats)
     total_current_favorites = sum(
-        item["current_favorites"] for item in all_stats)
+        item.get("current_favorites", 0) for item in all_stats)
 
-    return {"total_unique_visitors": total_unique_visitors,
-            "total_current_subscribers": total_current_subscribers,
-            "total_current_favorites": total_current_favorites,
-            "individual_stats": all_stats}
+    return {
+        "total_unique_visitors": total_unique_visitors,
+        "total_current_subscribers": total_current_subscribers,
+        "total_current_favorites": total_current_favorites,
+        "individual_stats": all_stats
+    }
