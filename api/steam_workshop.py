@@ -20,41 +20,19 @@ def fetch_workshop_item_links(steam_id):
             soup = BeautifulSoup(response.content, "html.parser")
             workshop_items = soup.find_all("div", class_="workshopItem")
 
-            # If no items are found, break the loop
             if not workshop_items:
                 print(f"No workshop items found on page {page_number}")
                 break
 
-            for item in workshop_items:
-                link_tag = item.find("a", class_="ugc")
-                if link_tag and "href" in link_tag.attrs:
-                    item_links.append(link_tag["href"])
+            item_links.extend(extract_links(workshop_items))
 
-            # Check for the next page link
-            paging_controls = soup.find(
-                "div", class_="workshopBrowsePagingControls")
-            if paging_controls:
-                next_page_link = paging_controls.find(
-                    "a", class_="pagebtn", string=">")
-                if not next_page_link:
-                    break  # No more pages
-            else:
-                break  # No pagination controls found
+            if not has_next_page(soup):
+                break
 
             page_number += 1
 
-        except requests.exceptions.ConnectionError:
-            print("Connection error occurred. Please check your network connection")
-            break
-        except requests.exceptions.Timeout:
-            print("Request timed out. Please try again later")
-            break
-        except requests.exceptions.TooManyRedirects:
-            print("Too many redirects. Check the URL and try again")
-            break
-        except requests.exceptions.HTTPError as e:
-            print(f"HTTP error occurred: {
-                  e.response.status_code} - {e.response.reason}")
+        except requests.exceptions.RequestException as e:
+            handle_request_exception(e)
             break
         except AttributeError as e:
             print(f"Parsing error: {
@@ -65,6 +43,41 @@ def fetch_workshop_item_links(steam_id):
         raise ValueError("No items were found in your Steam Workshop")
 
     return item_links
+
+
+def extract_links(workshop_items):
+    """Extract links from workshop items"""
+    links = []
+    for item in workshop_items:
+        link_tag = item.find("a", class_="ugc")
+        if link_tag and "href" in link_tag.attrs:
+            links.append(link_tag["href"])
+    return links
+
+
+def has_next_page(soup):
+    """Check if there is a next page"""
+    paging_controls = soup.find("div", class_="workshopBrowsePagingControls")
+    if paging_controls:
+        next_page_link = paging_controls.find(
+            "a", class_="pagebtn", string=">")
+        return next_page_link is not None
+    return False
+
+
+def handle_request_exception(e):
+    """Handle request exceptions"""
+    if isinstance(e, requests.exceptions.ConnectionError):
+        print("Connection error occurred. Please check your network connection")
+    elif isinstance(e, requests.exceptions.Timeout):
+        print("Request timed out. Please try again later")
+    elif isinstance(e, requests.exceptions.TooManyRedirects):
+        print("Too many redirects. Check the URL and try again")
+    elif isinstance(e, requests.exceptions.HTTPError):
+        print(f"HTTP error occurred: {
+              e.response.status_code} - {e.response.reason}")
+    else:
+        print(f"An error occurred: {e}")
 
 
 def fetch_individual_workshop_stats(item_url):
