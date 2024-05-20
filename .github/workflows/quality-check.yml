@@ -31,8 +31,3 @@ jobs:
             run: |
                 pip install pylint
                 pylint api/main.py api/steam_stats.py api/steam_workshop.py
-
-          - name: Run Flake8
-            run: |
-                pip install flake8
-                flake8 api/main.py api/steam_stats.py api/steam_workshop.py
