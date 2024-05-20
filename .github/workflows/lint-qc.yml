@@ -1,0 +1,64 @@
+name: Lint and Quality Check
+
+on:
+    push:
+        branches:
+        - master
+    pull_request:
+        branches:
+        - master
+
+jobs:
+    lint:
+        name: Lint Code Base
+        runs-on: ubuntu-latest
+
+        steps:
+          - name: Checkout code
+            uses: actions/checkout@v4
+
+          - name: Run Super-Linter
+            uses: github/super-linter@v6
+            env:
+                VALIDATE_ALL_CODEBASE: "true"
+                GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+
+          - name: Run Lint Action
+            uses: wearerequired/lint-action@v2
+            with:
+                github_token: ${{ secrets.GH_TOKEN }}
+                auto_fix: false
+                commit: false
+                continue_on_error: false
+                eslint: true
+                stylelint: true
+                flake8: true
+                pylint: true
+
+    quality-check:
+        name: Quality Check
+        runs-on: ubuntu-latest
+
+        steps:
+          - name: Checkout code
+            uses: actions/checkout@v3
+
+          - name: Set up Python
+            uses: actions/setup-python@v4
+            with:
+                python-version: '3.x'
+
+          - name: Install dependencies
+            run: |
+                python -m pip install --upgrade pip
+                pip install -r requirements.txt
+
+          - name: Run Pylint
+            run: |
+                pip install pylint
+                pylint main.py steam_stats.py steam_workshop.py
+
+          - name: Run Flake8
+            run: |
+                pip install flake8
+                flake8 main.py steam_stats.py steam_workshop.py

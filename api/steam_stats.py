@@ -1,9 +1,8 @@
 """Retrieves Steam User Data using Steam Web API"""
-from zoneinfo import ZoneInfo
-from datetime import datetime, timezone
 import os
 from dotenv import load_dotenv
 import requests
+import svgwrite
 
 # Load environment variables from .env file
 load_dotenv()
@@ -11,7 +10,11 @@ load_dotenv()
 # Secrets Configuration
 STEAM_API_KEY = os.getenv("STEAM_API_KEY")
 STEAM_ID = os.getenv("STEAM_ID")
-STEAM_APP_ID = os.getenv("STEAM_APP_ID")
+
+# Verify that the environment variables are loaded correctly
+if not STEAM_API_KEY or not STEAM_ID:
+    raise ValueError(
+        "Missing STEAM_API_KEY or STEAM_ID in environment variables")
 
 # A reasonable timeout for the request (connection and read timeout)
 REQUEST_TIMEOUT = (10, 15)
@@ -19,17 +22,6 @@ REQUEST_TIMEOUT = (10, 15)
 # Steam Web API endpoints
 PLAYER_SUMMARIES = "http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/"
 RECENTLY_PLAYED_GAMES = "http://api.steampowered.com/IPlayerService/GetRecentlyPlayedGames/v0001/"
-
-# Steam Account Status Mapping
-PERSONASTATE_MAPPING = {
-    0: "Offline",
-    1: "Online",
-    2: "Busy",
-    3: "Away",
-    4: "Snooze",
-    5: "Looking to Trade",
-    6: "Looking to Play"
-}
 
 
 def get_player_summaries():
@@ -67,29 +59,45 @@ def get_recently_played_games():
         return None
 
 
-def process_player_summary_data(player_data):
-    """Process the retrieved summary data"""
-    try:
-        # Convert Unix timestamp to IST timezone and format it
-        lastlogoff_ist = datetime.fromtimestamp(
-            player_data["lastlogoff"], tz=timezone.utc).astimezone(ZoneInfo("Asia/Kolkata"))
-        lastlogoff_str = lastlogoff_ist.strftime("%d/%m/%Y %H:%M:%S")
+def generate_svg(player_data, output_file):
+    """Generate SVG for Steam Player Summary"""
+    dwg = svgwrite.Drawing(output_file, profile='tiny',
+                           size=('600px', '200px'))
 
-        # Extract other fields
-        process_data = {
-            "personaname": player_data["personaname"],
-            "profileurl": player_data["profileurl"],
-            "avatarmedium": player_data["avatarmedium"],
-            "lastlogoff": lastlogoff_str,
-            "personastate": PERSONASTATE_MAPPING.get(player_data["personastate"], "Unknown"),
-            "gameid": player_data.get("gameid", "Not in game")
-        }
-        return process_data
-    except KeyError as e:
-        print(f"Missing key in player data: {e}")
-    except ValueError as e:
-        print(f"Value error in processing player data: {e}")
-    except Exception as e:
-        print(
-            f"An unexpected error occurred while processing player summary data: {e}")
-    return None
+    # Add background rectangle for the card
+    dwg.add(dwg.rect(insert=(0, 0), size=('100%', '100%'),
+            rx=10, ry=10, class_='background'))
+
+    # Access the player data
+    player = player_data["response"]["players"][0]
+
+    # Add avatar image with hyperlink
+    avatarmedium = player["avatarmedium"]
+    profileurl = player["profileurl"]
+    avatar_group = dwg.g(class_='avatar-group')
+    avatar_group.add(dwg.image(avatarmedium, insert=(
+        20, 50), size=(64, 64), class_='avatar'))
+    avatar_group.add(dwg.rect(insert=(20, 50), size=(64, 64),
+                     fill='none', stroke='none', id='avatar-link'))
+    dwg.add(avatar_group)
+
+    # Add persona name in the middle
+    personaname = player["personaname"]
+    dwg.add(dwg.text(f'{personaname}', insert=('50%', 40), class_='name'))
+
+    # Add location country code on the right side
+    loccountrycode = player.get("loccountrycode", "N/A").lower()
+    if loccountrycode != "n/a":
+        flag_url = f"https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.0.0/flags/4x3/{
+            loccountrycode}.svg"
+        dwg.add(dwg.image(flag_url, insert=(520, 20),
+                size=(64, 48), class_='location'))
+
+    # Add JavaScript for hyperlink functionality
+    dwg.script(content=f"""
+        document.getElementById('avatar-link').addEventListener('click', function() {{
+            window.open('{profileurl}', '_blank');
+        }});
+    """)
+
+    dwg.save()
