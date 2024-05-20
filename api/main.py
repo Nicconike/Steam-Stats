@@ -41,7 +41,11 @@ def generate_svg_for_recently_played_games(player_data):
     # Render the chart to an SVG file
     bar_chart.render_to_file("assets/recently_played_games.svg")
 
-    return "![Steam Games Stats](https://github.com/Nicconike/Steam-Stats/blob/master/assets/recently_played_games.svg?sanitize=true)"
+    return (
+        "![Steam Games Stats]("
+        "https://github.com/Nicconike/Steam-Stats/blob/master/assets/recently_played_games.svg"
+        "?sanitize=true)"
+    )
 
 
 def generate_svg_for_steam_workshop(workshop_stats):
@@ -61,24 +65,37 @@ def generate_svg_for_steam_workshop(workshop_stats):
     colors = [f'rgb({np.random.randint(0, 256)}, {np.random.randint(0, 256)}, {
         np.random.randint(0, 256)})' for _ in range(len(df))]
 
+    header = {
+        "values": header_values,
+        "line_color": "paleturquoise",
+        "fill_color": "paleturquoise",
+        "align": "center",
+        "font": {"color": "black", "size": 16}
+    }
+
+    cells = {
+        "values": [df[col].tolist() for col in df.columns],
+        "line_color": [colors],
+        "fill_color": [colors],
+        "align": "center",
+        "font": {"color": "black", "size": 14}
+    }
+
     # Create the table figure
-    fig = go.Figure(data=[go.Table(
-        header=dict(values=header_values, line_color="paleturquoise",
-                    fill_color="paleturquoise", align="center", font=dict(color='black', size=16)),
-        cells=dict(values=[df[col].tolist() for col in df.columns],
-                   line_color=[colors],
-                   fill_color=[colors],
-                   align="center",
-                   font=dict(color='black', size=14)))
-    ])
+    fig = go.Figure(data=[go.Table(header=header, cells=cells)])
+
     # Adjust layout to fit the table size
     fig.update_layout(
         autosize=True,
-        margin=dict(pad=0)
+        margin={"pad": 0}
     )
     fig.write_image("assets/steam_workshop_stats.svg")
 
-    return "![Steam Games Stats](https://github.com/Nicconike/Steam-Stats/blob/master/assets/steam_workshop_stats.svg?sanitize=true)"
+    return (
+        "![Steam Workshop Stats]("
+        "https://github.com/Nicconike/Steam-Stats/blob/master/assets/steam_workshop_stats.svg"
+        "?sanitize=true)"
+    )
 
 
 def update_readme(markdown_data, start_marker, end_marker, readme_path="README.md"):

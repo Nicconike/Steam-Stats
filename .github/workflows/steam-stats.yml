@@ -21,7 +21,7 @@ jobs:
             with:
                 python-version: '3.x'
           - name: Install dependencies
-            run: pip install requests python-dotenv bs4 pygal plotly kaleido pandas
+            run: pip install requests python-dotenv bs4 pygal plotly kaleido pandas pandas numpy plotly
           - name: Update Steam Stats in README
             env:
                 STEAM_API_KEY: ${{ secrets.STEAM_API_KEY }}
