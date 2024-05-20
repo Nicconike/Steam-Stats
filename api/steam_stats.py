@@ -1,11 +1,7 @@
 """Retrieves Steam User Data using Steam Web API"""
 import os
-from dotenv import load_dotenv
 import requests
 import svgwrite
-
-# Load environment variables from .env file
-load_dotenv()
 
 # Secrets Configuration
 STEAM_API_KEY = os.getenv("STEAM_API_KEY")
