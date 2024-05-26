@@ -1,7 +1,9 @@
 """Retrieves Steam User Data using Steam Web API"""
 import os
 import requests
-import svgwrite
+from dotenv import load_dotenv
+
+load_dotenv()
 
 # Secrets Configuration
 STEAM_API_KEY = os.getenv("STEAM_API_KEY")
@@ -53,47 +55,3 @@ def get_recently_played_games():
     except requests.exceptions.RequestException as err:
         print(f"An error occurred: {err}")
         return None
-
-
-def generate_svg(player_data, output_file):
-    """Generate SVG for Steam Player Summary"""
-    dwg = svgwrite.Drawing(output_file, profile='tiny',
-                           size=('600px', '200px'))
-
-    # Add background rectangle for the card
-    dwg.add(dwg.rect(insert=(0, 0), size=('100%', '100%'),
-            rx=10, ry=10, class_='background'))
-
-    # Access the player data
-    player = player_data["response"]["players"][0]
-
-    # Add avatar image with hyperlink
-    avatarmedium = player["avatarmedium"]
-    profileurl = player["profileurl"]
-    avatar_group = dwg.g(class_='avatar-group')
-    avatar_group.add(dwg.image(avatarmedium, insert=(
-        20, 50), size=(64, 64), class_='avatar'))
-    avatar_group.add(dwg.rect(insert=(20, 50), size=(64, 64),
-                     fill='none', stroke='none', id='avatar-link'))
-    dwg.add(avatar_group)
-
-    # Add persona name in the middle
-    personaname = player["personaname"]
-    dwg.add(dwg.text(f'{personaname}', insert=('50%', 40), class_='name'))
-
-    # Add location country code on the right side
-    loccountrycode = player.get("loccountrycode", "N/A").lower()
-    if loccountrycode != "n/a":
-        flag_url = f"https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.0.0/flags/4x3/{
-            loccountrycode}.svg"
-        dwg.add(dwg.image(flag_url, insert=(520, 20),
-                size=(64, 48), class_='location'))
-
-    # Add JavaScript for hyperlink functionality
-    dwg.script(content=f"""
-        document.getElementById('avatar-link').addEventListener('click', function() {{
-            window.open('{profileurl}', '_blank');
-        }});
-    """)
-
-    dwg.save()

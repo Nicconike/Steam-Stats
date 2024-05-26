@@ -39,7 +39,7 @@ def generate_svg_for_recently_played_games(player_data):
         print("No game data available to display")
 
     # Render the chart to an SVG file
-    bar_chart.render_to_file("assets/recently_played_games.svg")
+    bar_chart.render_to_file("../assets/recently_played_games.svg")
 
     return (
         "![Steam Games Stats]("
@@ -89,7 +89,7 @@ def generate_svg_for_steam_workshop(workshop_stats):
         autosize=True,
         margin={"pad": 0}
     )
-    fig.write_image("assets/steam_workshop_stats.svg")
+    fig.write_image("../assets/steam_workshop_stats.svg")
 
     return (
         "![Steam Workshop Stats]("
@@ -98,7 +98,7 @@ def generate_svg_for_steam_workshop(workshop_stats):
     )
 
 
-def update_readme(markdown_data, start_marker, end_marker, readme_path="README.md"):
+def update_readme(markdown_data, start_marker, end_marker, readme_path="../README.md"):
     """Updates the README.md file with the provided Markdown content within specified markers."""
     # Read the current README content
     with open(readme_path, "r", encoding="utf-8") as file:
