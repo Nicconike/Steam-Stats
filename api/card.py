@@ -1,7 +1,8 @@
 """Generate Card for Steam Stats"""
+import json
 import os
-import requests
 from dotenv import load_dotenv
+from steam_stats import get_player_summaries
 
 load_dotenv()
 
@@ -10,31 +11,14 @@ STEAM_API_KEY = os.getenv("STEAM_API_KEY")
 STEAM_ID = os.getenv("STEAM_ID")
 
 
-def get_player_summaries(api_key, steam_id):
-    """Get Player Summaries from Steam"""
-    url = f"https://api.steampowered.com/ISteamUser/GetPlayerSummaries/v2/?key={
-        api_key}&steamids={steam_id}"
-    try:
-        response = requests.get(url, timeout=10)
-        response.raise_for_status()
-        data = response.json()
-        return data["response"]["players"][0]
-    except requests.exceptions.RequestException as e:
-        print(f"Error fetching player summaries: {e}")
-        return None
-
-
-def generate_card_for_player_summary(api_key, steam_id):
-    """Generate HTML content based on player data"""
-    player_data = get_player_summaries(api_key, steam_id)
-    if not player_data:
-        return None
-
-    personaname = player_data["personaname"]
-    personastate = player_data["personastate"]
-    avatarfull = player_data["avatarfull"]
-    loccountrycode = player_data["loccountrycode"]
-    gameextrainfo = player_data.get("gameextrainfo", None)
+def generate_card_for_player_summary(player_data):
+    """Generate HTML content based on Steam Player Summary Data"""
+    summary_data = player_data["response"]["players"][0]
+    personaname = summary_data["personaname"]
+    personastate = summary_data["personastate"]
+    avatarfull = summary_data["avatarfull"]
+    loccountrycode = summary_data["loccountrycode"]
+    gameextrainfo = summary_data.get("gameextrainfo", None)
 
     personastate_map = {
         0: 'Offline',
@@ -45,7 +29,7 @@ def generate_card_for_player_summary(api_key, steam_id):
         5: 'Looking to trade',
         6: 'Looking to play'
     }
-    personastate_text = personastate_map.get(personastate, 'Unknown')
+    personastate_value = personastate_map.get(personastate, 'Unknown')
 
     html_content = f"""
 <!DOCTYPE html>
@@ -86,14 +70,32 @@ def generate_card_for_player_summary(api_key, steam_id):
         <div class="content">
             <img id="avatar" class="avatar" src="{avatarfull}" alt="Avatar">
             <h2 id="name">Name: {personaname}</h2>
-            <p id="status">Status: {personastate_text}</p>
+            <p id="status">Status: {personastate_value}</p>
             <p id="country">Country: <span id="country-code">{loccountrycode}</span>
                 <img id="flag" class="flag"
                 src="https://flagcdn.com/w320/{loccountrycode.lower()}.png" alt="Flag">
             </p>
             {"<p id='game'>Currently Playing: <span id='game-info'>" +
-             gameextrainfo + "</span></p>" if gameextrainfo else ""}</div></div>
+             gameextrainfo + "</span></p>" if gameextrainfo else ""}</div>
+    </div>
 </body>
 </html>
     """
     return html_content
+
+
+def save_to_file(data, filename):
+    """Save fetched data to a file in JSON format"""
+    if data is not None:
+        with open(filename, 'w', encoding='utf-8') as file:
+            # Use json.dump to write the JSON data to the file
+            json.dump(data, file, indent=4)
+        print(f"Data saved to {filename}")
+    else:
+        print("No data to save")
+
+
+if __name__ == "__main__":
+    summary = get_player_summaries()
+    html = generate_card_for_player_summary(summary)
+    print(html)
