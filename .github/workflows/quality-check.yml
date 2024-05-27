@@ -31,3 +31,16 @@ jobs:
             run: |
                 pip install pylint
                 pylint api/main.py api/steam_stats.py api/steam_workshop.py
+
+          - name: Generate Pylint Badge
+            uses: Silleellie/pylint-github-action@v2
+            with:
+                lint-path: api
+                python-version: 3.x
+                requirements-path: requirements.txt
+                readme-path: README.md
+                badge-text: PyLint
+                color-bad-score: red
+                color-ok-score: orange
+                color-good-score: yellow
+                color-perfect-score: brightgreen
