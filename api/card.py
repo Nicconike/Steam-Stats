@@ -92,7 +92,7 @@ def generate_card_for_player_summary(player_data):
         file.write(html_content)
 
     return (
-        "![Steam Summary]("
+        "[Steam Summary]("
         "https://github.com/Nicconike/Steam-Stats/blob/master/assets/steam_summary.html"
         "?sanitize=true)\n"
     )
@@ -149,7 +149,7 @@ def generate_card_for_played_games(games_data):
         file.write(html_content)
 
     return (
-        "![Steam Games Stats]("
+        "[Steam Games Stats]("
         "https://github.com/Nicconike/Steam-Stats/blob/master/assets/recently_played_games.html"
         "?sanitize=true)"
     )
