@@ -97,7 +97,7 @@ def generate_card_for_player_summary(player_data):
 </body>
 </html>
     """
-    with open("../assets/steam_summary.html", "w", encoding="utf-8") as file:
+    with open("assets/steam_summary.html", "w", encoding="utf-8") as file:
         file.write(html_content)
 
     return (
@@ -141,7 +141,7 @@ def generate_card_for_played_games(games_data):
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Recently Played Games in Last 2 Weeks</title>
-    <link rel="stylesheet" href="../assets/style.css">
+    <link rel="stylesheet" href="assets/style.css">
 </head>
 <body>
     <div class="card">
@@ -154,7 +154,7 @@ def generate_card_for_played_games(games_data):
 </html>
     """
 
-    with open("../assets/recently_played_games.html", "w", encoding="utf-8") as file:
+    with open("assets/recently_played_games.html", "w", encoding="utf-8") as file:
         file.write(html_content)
 
     return (
