@@ -19,18 +19,24 @@ jobs:
             with:
                 token: ${{ secrets.GH_TOKEN }}
                 fetch-depth: 0
+
           - name: Set up Python
             uses: actions/setup-python@v5
             with:
                 python-version: '3.x'
+
           - name: Install dependencies
-            run: pip install requests python-dotenv bs4 pygal plotly kaleido pandas pandas numpy plotly
+            run: |
+                python -m pip install --upgrade pip
+                pip install -r requirements.txt
+
           - name: Update Steam Stats in README
             env:
                 STEAM_API_KEY: ${{ secrets.STEAM_API_KEY }}
                 STEAM_ID: ${{ secrets.STEAM_ID }}
                 STEAM_CUSTOM_ID: ${{ secrets.STEAM_CUSTOM_ID }}
             run: python api/main.py
+
           - name: Commit and push if changes
             run: |
                 git config --global user.email "action@github.com"
