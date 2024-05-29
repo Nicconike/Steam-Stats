@@ -1,14 +1,5 @@
 """Generate Cards for Steam Stats"""
 import datetime
-import os
-from dotenv import load_dotenv
-from steam_stats import get_player_summaries, get_recently_played_games
-
-load_dotenv()
-
-# Secrets Configuration
-STEAM_API_KEY = os.getenv("STEAM_API_KEY")
-STEAM_ID = os.getenv("STEAM_ID")
 
 
 def format_unix_time(unix_time):
@@ -103,7 +94,7 @@ def generate_card_for_player_summary(player_data):
     return (
         "![Steam Summary]("
         "https://github.com/Nicconike/Steam-Stats/blob/master/assets/steam_summary.html"
-        "?sanitize=true)"
+        "?sanitize=true)\n"
     )
 
 
@@ -162,11 +153,3 @@ def generate_card_for_played_games(games_data):
         "https://github.com/Nicconike/Steam-Stats/blob/master/assets/recently_played_games.html"
         "?sanitize=true)"
     )
-
-
-if __name__ == "__main__":
-    summary = get_player_summaries()
-    recent_game = get_recently_played_games()
-    summary_content = generate_card_for_player_summary(summary)
-    recently_played_games = generate_card_for_played_games(
-        recent_game)

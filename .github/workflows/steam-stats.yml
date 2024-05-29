@@ -30,7 +30,6 @@ jobs:
                 STEAM_API_KEY: ${{ secrets.STEAM_API_KEY }}
                 STEAM_ID: ${{ secrets.STEAM_ID }}
                 STEAM_CUSTOM_ID: ${{ secrets.STEAM_CUSTOM_ID }}
-                STEAM_APP_ID: ${{ secrets.STEAM_APP_ID }}
             run: python api/main.py
           - name: Commit and push if changes
             run: |
