@@ -1,10 +1,20 @@
 """Generate Cards for Steam Stats"""
 import datetime
+from html2image import Html2Image
 
 
 def format_unix_time(unix_time):
     """Convert Unix time to human-readable format"""
     return datetime.datetime.fromtimestamp(unix_time).strftime("%d/%m/%Y")
+
+
+def convert_html_to_png(html_file, output_file):
+    """Convert HTML file to PNG image using html2image"""
+    # Initialize Html2Image
+    html2png = Html2Image()
+
+    # Convert HTML to PNG
+    html2png.screenshot(html_file=html_file, save_as=output_file)
 
 
 def generate_card_for_player_summary(player_data):
@@ -91,10 +101,13 @@ def generate_card_for_player_summary(player_data):
     with open("assets/steam_summary.html", "w", encoding="utf-8") as file:
         file.write(html_content)
 
+    html_file = "assets/steam_summary.html"
+    output_file = "assets/steam_summary.png"
+    convert_html_to_png(html_file, output_file)
+
     return (
-        "[Steam Summary]("
-        "https://github.com/Nicconike/Steam-Stats/blob/master/assets/steam_summary.html"
-        "?sanitize=true)\n"
+        "![Steam Summary]"
+        "(https://github.com/Nicconike/Steam-Stats/blob/master/assets/steam_summary.png)\n"
     )
 
 
@@ -148,8 +161,11 @@ def generate_card_for_played_games(games_data):
     with open("assets/recently_played_games.html", "w", encoding="utf-8") as file:
         file.write(html_content)
 
+    html_file = "assets/recently_played_games.html"
+    output_file = "assets/recently_played_games.png"
+    convert_html_to_png(html_file, output_file)
+
     return (
-        "[Steam Games Stats]("
-        "https://github.com/Nicconike/Steam-Stats/blob/master/assets/recently_played_games.html"
-        "?sanitize=true)"
+        "![Steam Games Stats]"
+        "(https://github.com/Nicconike/Steam-Stats/blob/master/assets/recently_played_games.png)"
     )
