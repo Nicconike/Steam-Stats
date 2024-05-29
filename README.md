@@ -6,7 +6,10 @@
 [![Visitor Badge](https://badges.pufler.dev/visits/nicconike/steam-stats)](https://badges.pufler.dev)
 
 <!-- Steam-Stats start -->
+![Steam Summary](https://github.com/Nicconike/Steam-Stats/blob/master/assets/steam_summary.png)
+![Steam Games Stats](https://github.com/Nicconike/Steam-Stats/blob/master/assets/recently_played_games.png)
 <!-- Steam-Stats end -->
 
 <!-- Steam-Workshop start -->
+![Steam Workshop Stats](https://github.com/Nicconike/Steam-Stats/blob/master/assets/steam_workshop_stats.svg?sanitize=true)
 <!-- Steam-Workshop end -->
