@@ -1,0 +1,52 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Responsive SVG Card</title>
+    <style>
+        .card {
+            width: 100%;
+            max-width: 500px;
+            margin: auto;
+            border: 2px solid #000;
+            padding: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            background-color: #fff;
+        }
+        .avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            margin: auto;
+        }
+        .content {
+            text-align: center;
+        }
+        .flag {
+            width: 32px;
+            height: 24px;
+            vertical-align: middle;
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <div class="content">
+            <img id="avatar" class="avatar" src="https://avatars.steamstatic.com/0718d631353dd49100dde0be17dd7e88e984478f_full.jpg" alt="Avatar">
+            <h2 id="name">Name: Nicco</h2>
+            <p id="status">Status: Online</p>
+            <p id="country">Country: <span id="country-code">IN</span>
+                <img id="flag" class="flag"
+                src="https://flagcdn.com/w320/in.png" alt="Flag">
+            </p>
+            <p id="lastlogoff">Last Logoff: 29/05/2024</p>
+            <p id="lastlogoff">Gaming Since: 12/07/2017</p>
+            
+        </div>
+    </div>
+</body>
+</html>
+    

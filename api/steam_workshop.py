@@ -94,8 +94,8 @@ def fetch_individual_workshop_stats(item_url):
             for row in stats_table.find_all("tr"):
                 cells = row.find_all("td")
                 if len(cells) == 2:
-                    key = cells[1].text.strip().lower().replace(' ', '_')
-                    value = cells[0].text.strip().replace(',', '')
+                    key = cells[1].text.strip().lower().replace(" ", "_")
+                    value = cells[0].text.strip().replace(",", "")
                     try:
                         stats[key] = int(value) if value else 0
                     except ValueError:
@@ -119,9 +119,9 @@ def fetch_individual_workshop_stats(item_url):
               e}. The structure of the page might have changed")
 
     # Ensure all expected stats are present, even if they are zero
-    stats['unique_visitors'] = stats.get('unique_visitors', 0)
-    stats['current_subscribers'] = stats.get('current_subscribers', 0)
-    stats['current_favorites'] = stats.get('current_favorites', 0)
+    stats["unique_visitors"] = stats.get("unique_visitors", 0)
+    stats["current_subscribers"] = stats.get("current_subscribers", 0)
+    stats["current_favorites"] = stats.get("current_favorites", 0)
 
     return stats
 

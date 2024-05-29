@@ -4,48 +4,17 @@ import time
 import numpy as np
 import pandas as pd
 import plotly.graph_objects as go
-from steam_stats import get_recently_played_games
+from steam_stats import get_player_summaries, get_recently_played_games
 from steam_workshop import fetch_workshop_item_links, fetch_all_workshop_stats
-import pygal
+from card import generate_card_for_player_summary, generate_card_for_played_games
 
 # Secrets Configuration
 STEAM_ID = os.getenv("STEAM_CUSTOM_ID")
 
-
-def generate_svg_for_recently_played_games(player_data):
-    """Generate SVG for Recently Played Games in Steam in the last 2 weeks"""
-    bar_chart = pygal.HorizontalBar(
-        legend_at_bottom=True, rounded_bars=15, explicit_size=True, width=800, height=400)
-    bar_chart.title = "Playtime in the Last Two Weeks (hours)"
-
-    # Add data to the chart
-    if player_data and "response" in player_data and "games" in player_data["response"]:
-        for game in player_data["response"]["games"]:
-            if "name" in game and "playtime_2weeks" in game:
-                playtime_minutes = game["playtime_2weeks"]
-                playtime_hours = playtime_minutes / 60  # for plotting
-
-                # Determine the label based on the original playtime in minutes
-                if playtime_minutes >= 60:
-                    # Display in hours if 60 mins or more
-                    label = f"{game["name"]} ({playtime_hours:.2f} hrs)"
-                else:
-                    # Display in minutes if less than 60
-                    label = f"{game["name"]} ({playtime_minutes} mins)"
-
-                # Add to chart using the hours value for consistency in scaling
-                bar_chart.add(label, playtime_hours)
-    else:
-        print("No game data available to display")
-
-    # Render the chart to an SVG file
-    bar_chart.render_to_file("assets/recently_played_games.svg")
-
-    return (
-        "![Steam Games Stats]("
-        "https://github.com/Nicconike/Steam-Stats/blob/master/assets/recently_played_games.svg"
-        "?sanitize=true)"
-    )
+# Verify that the environment variables are loaded correctly
+if not STEAM_ID:
+    raise ValueError(
+        "Missing STEAM_ID in environment variables")
 
 
 def generate_svg_for_steam_workshop(workshop_stats):
@@ -62,8 +31,8 @@ def generate_svg_for_steam_workshop(workshop_stats):
     }
     df = pd.DataFrame(data)
     # Generate random colors for each row
-    colors = [f'rgb({np.random.randint(0, 256)}, {np.random.randint(0, 256)}, {
-        np.random.randint(0, 256)})' for _ in range(len(df))]
+    colors = [f"rgb({np.random.randint(0, 256)}, {np.random.randint(0, 256)}, {
+        np.random.randint(0, 256)})" for _ in range(len(df))]
 
     header = {
         "values": header_values,
@@ -89,7 +58,7 @@ def generate_svg_for_steam_workshop(workshop_stats):
         autosize=True,
         margin={"pad": 0}
     )
-    fig.write_image("assets/steam_workshop_stats.svg")
+    fig.write_image("../assets/steam_workshop_stats.svg")
 
     return (
         "![Steam Workshop Stats]("
@@ -98,7 +67,7 @@ def generate_svg_for_steam_workshop(workshop_stats):
     )
 
 
-def update_readme(markdown_data, start_marker, end_marker, readme_path="README.md"):
+def update_readme(markdown_data, start_marker, end_marker, readme_path="../README.md"):
     """Updates the README.md file with the provided Markdown content within specified markers."""
     # Read the current README content
     with open(readme_path, "r", encoding="utf-8") as file:
@@ -128,16 +97,25 @@ def update_readme(markdown_data, start_marker, end_marker, readme_path="README.m
 if __name__ == "__main__":
     # Start the timer
     start_time = time.time()
+    player_summary = get_player_summaries()
     recently_played_games = get_recently_played_games()
     links = fetch_workshop_item_links(STEAM_ID)
 
     USER_MARKDOWN_CONTENT = ""
-    if recently_played_games:
-        USER_MARKDOWN_CONTENT += generate_svg_for_recently_played_games(
+    if player_summary and recently_played_games:
+        summary_content = generate_card_for_player_summary(player_summary)
+        recent_games = generate_card_for_played_games(
             recently_played_games)
-        print("Successfully retrieved Steam User Data")
+
+        if summary_content and recent_games:
+            USER_MARKDOWN_CONTENT += summary_content
+            USER_MARKDOWN_CONTENT += recent_games
+            print("Successfully retrieved Steam User Data")
+        else:
+            print(
+                "Failed to generate HTML content for Steam Summary or Recently Played Games")
     else:
-        print("Failed to fetch Steam data for Recently Played Games")
+        print("Failed to fetch Steam Summary & Games Data")
 
     WORKSHOP_MARKDOWN_CONTENT = ""
     if links:
@@ -153,7 +131,7 @@ if __name__ == "__main__":
                       "<!-- Steam-Stats start -->", "<!-- Steam-Stats end -->")
         update_readme(WORKSHOP_MARKDOWN_CONTENT,
                       "<!-- Steam-Workshop start -->", "<!-- Steam-Workshop end -->")
-        print("README.md has been successfully updated.")
+        print("README.md has been successfully updated")
     else:
         print("Failed to fetch or process data")
 

@@ -1,8 +1,8 @@
-"""Generate Card for Steam Stats"""
-import json
+"""Generate Cards for Steam Stats"""
+import datetime
 import os
 from dotenv import load_dotenv
-from steam_stats import get_player_summaries
+from steam_stats import get_player_summaries, get_recently_played_games
 
 load_dotenv()
 
@@ -11,25 +11,38 @@ STEAM_API_KEY = os.getenv("STEAM_API_KEY")
 STEAM_ID = os.getenv("STEAM_ID")
 
 
+def format_unix_time(unix_time):
+    """Convert Unix time to human-readable format"""
+    return datetime.datetime.fromtimestamp(unix_time).strftime("%d/%m/%Y")
+
+
 def generate_card_for_player_summary(player_data):
     """Generate HTML content based on Steam Player Summary Data"""
+    if not player_data:
+        return None
     summary_data = player_data["response"]["players"][0]
     personaname = summary_data["personaname"]
     personastate = summary_data["personastate"]
     avatarfull = summary_data["avatarfull"]
     loccountrycode = summary_data["loccountrycode"]
+    lastlogoff = summary_data["lastlogoff"]
+    timecreated = summary_data["timecreated"]
     gameextrainfo = summary_data.get("gameextrainfo", None)
 
+    # Convert lastlogoff & timecreated from Unix time to human-readable format
+    lastlogoff_str = format_unix_time(lastlogoff)
+    timecreated_str = format_unix_time(timecreated)
+
     personastate_map = {
-        0: 'Offline',
-        1: 'Online',
-        2: 'Busy',
-        3: 'Away',
-        4: 'Snooze',
-        5: 'Looking to trade',
-        6: 'Looking to play'
+        0: "Offline",
+        1: "Online",
+        2: "Busy",
+        3: "Away",
+        4: "Snooze",
+        5: "Looking to trade",
+        6: "Looking to play"
     }
-    personastate_value = personastate_map.get(personastate, 'Unknown')
+    personastate_value = personastate_map.get(personastate, "Unknown")
 
     html_content = f"""
 <!DOCTYPE html>
@@ -41,7 +54,7 @@ def generate_card_for_player_summary(player_data):
     <style>
         .card {{
             width: 100%;
-            max-width: 600px;
+            max-width: 500px;
             margin: auto;
             border: 2px solid #000;
             padding: 20px;
@@ -75,27 +88,85 @@ def generate_card_for_player_summary(player_data):
                 <img id="flag" class="flag"
                 src="https://flagcdn.com/w320/{loccountrycode.lower()}.png" alt="Flag">
             </p>
+            <p id="lastlogoff">Last Logoff: {lastlogoff_str}</p>
+            <p id="lastlogoff">Gaming Since: {timecreated_str}</p>
             {"<p id='game'>Currently Playing: <span id='game-info'>" +
-             gameextrainfo + "</span></p>" if gameextrainfo else ""}</div>
+             gameextrainfo + "</span></p>" if gameextrainfo else ""}
+        </div>
     </div>
 </body>
 </html>
     """
-    return html_content
+    with open("../assets/steam_summary.html", "w", encoding="utf-8") as file:
+        file.write(html_content)
+
+    return (
+        "![Steam Summary]("
+        "https://github.com/Nicconike/Steam-Stats/blob/master/assets/steam_summary.html"
+        "?sanitize=true)"
+    )
 
 
-def save_to_file(data, filename):
-    """Save fetched data to a file in JSON format"""
-    if data is not None:
-        with open(filename, 'w', encoding='utf-8') as file:
-            # Use json.dump to write the JSON data to the file
-            json.dump(data, file, indent=4)
-        print(f"Data saved to {filename}")
-    else:
-        print("No data to save")
+def generate_card_for_played_games(games_data):
+    """Generate HTML content for recently played games with a horizontal bar graph"""
+    if not games_data:
+        return None
+
+    max_playtime = games_data["response"]["games"][0]["playtime_2weeks"]
+
+    # Generate the progress bars with repeating styles
+    progress_bars = ""
+    for i, game in enumerate(games_data["response"]["games"]):
+        if "name" in game and "playtime_2weeks" in game:
+            name = game["name"]
+            playtime = game["playtime_2weeks"]
+            img_icon_url = f"https://media.steampowered.com/steamcommunity/public/images/apps/{
+                game["appid"]}/{game["img_icon_url"]}.jpg"
+            normalized_playtime = (playtime / max_playtime) * 100
+            display_time = f"{playtime} mins" if playtime < 60 else f"{
+                playtime / 60:.2f} hrs"
+            progress_bars += f"""
+            <div class="bar-container">
+                <img src="{img_icon_url}" alt="{name}" class="game-icon">
+                <progress id="p{i}" value="{normalized_playtime}" max="100"
+                class="bar-{(i % 6) + 1}"></progress>
+                <span class="game-info"><b>{name} ({display_time})</b></span>
+            </div>
+            """
+
+    html_content = f"""
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recently Played Games in Last 2 Weeks</title>
+    <link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+    <div class="card">
+        <div class="content">
+            <h2>Recently Played Games</h2>
+            {progress_bars}
+        </div>
+    </div>
+</body>
+</html>
+    """
+
+    with open("../assets/recently_played_games.html", "w", encoding="utf-8") as file:
+        file.write(html_content)
+
+    return (
+        "![Steam Games Stats]("
+        "https://github.com/Nicconike/Steam-Stats/blob/master/assets/recently_played_games.html"
+        "?sanitize=true)"
+    )
 
 
 if __name__ == "__main__":
     summary = get_player_summaries()
-    html = generate_card_for_player_summary(summary)
-    print(html)
+    recent_game = get_recently_played_games()
+    summary_content = generate_card_for_player_summary(summary)
+    recently_played_games = generate_card_for_played_games(
+        recent_game)
