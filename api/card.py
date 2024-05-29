@@ -8,10 +8,10 @@ def format_unix_time(unix_time):
     return datetime.datetime.fromtimestamp(unix_time).strftime("%d/%m/%Y")
 
 
-def convert_html_to_png(html_file, output_file):
+def convert_html_to_png(html_file, output_dir, output_file):
     """Convert HTML file to PNG image using html2image"""
     # Initialize Html2Image
-    html2png = Html2Image()
+    html2png = Html2Image(output_path=output_dir)
 
     # Convert HTML to PNG
     html2png.screenshot(html_file=html_file, save_as=output_file)
@@ -102,8 +102,9 @@ def generate_card_for_player_summary(player_data):
         file.write(html_content)
 
     html_file = "assets/steam_summary.html"
-    output_file = "assets/steam_summary.png"
-    convert_html_to_png(html_file, output_file)
+    output_dir = "assets"
+    output_file = "steam_summary.png"
+    convert_html_to_png(html_file, output_dir, output_file)
 
     return (
         "![Steam Summary]"
@@ -162,8 +163,9 @@ def generate_card_for_played_games(games_data):
         file.write(html_content)
 
     html_file = "assets/recently_played_games.html"
-    output_file = "assets/recently_played_games.png"
-    convert_html_to_png(html_file, output_file)
+    output_dir = "assets"
+    output_file = "recently_played_games.png"
+    convert_html_to_png(html_file, output_dir, output_file)
 
     return (
         "![Steam Games Stats]"
