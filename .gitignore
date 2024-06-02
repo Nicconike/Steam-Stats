@@ -160,3 +160,6 @@ vercel.txt
 Pipfile
 Pipfile.lock
 .vercel
+
+#Chromium
+Chromium

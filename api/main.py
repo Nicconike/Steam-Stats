@@ -1,12 +1,13 @@
 """Main Runner Script"""
 import os
 import time
-import numpy as np
-import pandas as pd
-import plotly.graph_objects as go
 from steam_stats import get_player_summaries, get_recently_played_games
 from steam_workshop import fetch_workshop_item_links, fetch_all_workshop_stats
-from card import generate_card_for_player_summary, generate_card_for_played_games
+from card import (
+    generate_card_for_player_summary,
+    generate_card_for_played_games,
+    generate_card_for_steam_workshop
+)
 
 # Secrets Configuration
 STEAM_ID = os.getenv("STEAM_CUSTOM_ID")
@@ -17,57 +18,7 @@ if not STEAM_ID:
         "Missing STEAM_ID in environment variables")
 
 
-def generate_svg_for_steam_workshop(workshop_stats):
-    """Generates SVG Card for retrieved Workshop Data using Plotly for table creation"""
-    # Create the table data
-    header_values = ["Workshop Stats", "Total"]
-    data = {
-        "Workshop_Stats": ["Unique Visitors", "Current Subscribers", "Current Favorites"],
-        "Total": [
-            workshop_stats["total_unique_visitors"],
-            workshop_stats["total_current_subscribers"],
-            workshop_stats["total_current_favorites"]
-        ]
-    }
-    df = pd.DataFrame(data)
-    # Generate random colors for each row
-    colors = [f"rgb({np.random.randint(0, 256)}, {np.random.randint(0, 256)}, {
-        np.random.randint(0, 256)})" for _ in range(len(df))]
-
-    header = {
-        "values": header_values,
-        "line_color": "paleturquoise",
-        "fill_color": "paleturquoise",
-        "align": "center",
-        "font": {"color": "black", "size": 16}
-    }
-
-    cells = {
-        "values": [df[col].tolist() for col in df.columns],
-        "line_color": [colors],
-        "fill_color": [colors],
-        "align": "center",
-        "font": {"color": "black", "size": 14}
-    }
-
-    # Create the table figure
-    fig = go.Figure(data=[go.Table(header=header, cells=cells)])
-
-    # Adjust layout to fit the table size
-    fig.update_layout(
-        autosize=True,
-        margin={"pad": 0}
-    )
-    fig.write_image("assets/steam_workshop_stats.svg")
-
-    return (
-        "![Steam Workshop Stats]("
-        "https://github.com/Nicconike/Steam-Stats/blob/master/assets/steam_workshop_stats.svg"
-        "?sanitize=true)"
-    )
-
-
-def update_readme(markdown_data, start_marker, end_marker, readme_path="README.md"):
+def update_readme(markdown_data, start_marker, end_marker, readme_path="../README.md"):
     """Updates the README.md file with the provided Markdown content within specified markers."""
     # Read the current README content
     with open(readme_path, "r", encoding="utf-8") as file:
@@ -120,7 +71,7 @@ if __name__ == "__main__":
     WORKSHOP_MARKDOWN_CONTENT = ""
     if links:
         workshop_data = fetch_all_workshop_stats(links)
-        WORKSHOP_MARKDOWN_CONTENT += generate_svg_for_steam_workshop(
+        WORKSHOP_MARKDOWN_CONTENT += generate_card_for_steam_workshop(
             workshop_data)
         print("Retrieved all Workshop Stats")
     else:
