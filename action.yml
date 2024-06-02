@@ -45,3 +45,6 @@ runs:
               STEAM_CUSTOM_ID: ${{ inputs.steam_custom_id }}
               INPUT_WORKSHOP: ${{ inputs.workshop }}
               INPUT_PLOT_SCALE: ${{ inputs.plot_scale }}
+branding:
+    icon: bar-chart-2
+    color: blue
