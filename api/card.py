@@ -181,11 +181,11 @@ def generate_card_for_player_summary(player_data):
 </body>
 </html>
     """
-    with open("../assets/steam_summary.html", "w", encoding="utf-8") as file:
+    with open("assets/steam_summary.html", "w", encoding="utf-8") as file:
         file.write(html_content)
 
-    convert_html_to_png("../assets/steam_summary.html",
-                        "../assets/steam_summary.png", ".card")
+    convert_html_to_png("assets/steam_summary.html",
+                        "assets/steam_summary.png", ".card")
 
     return (
         "![Steam Summary]"
@@ -244,11 +244,11 @@ def generate_card_for_played_games(games_data):
 </html>
     """
 
-    with open("../assets/recently_played_games.html", "w", encoding="utf-8") as file:
+    with open("assets/recently_played_games.html", "w", encoding="utf-8") as file:
         file.write(html_content)
 
-    convert_html_to_png("../assets/recently_played_games.html",
-                        "../assets/recently_played_games.png", ".card")
+    convert_html_to_png("assets/recently_played_games.html",
+                        "assets/recently_played_games.png", ".card")
 
     return (
         "![Steam Summary]"
@@ -332,11 +332,11 @@ def generate_card_for_steam_workshop(workshop_stats):
 </body>
 </html>
     """
-    with open("../assets/steam_workshop_stats.html", "w", encoding="utf-8") as file:
+    with open("assets/steam_workshop_stats.html", "w", encoding="utf-8") as file:
         file.write(html_content)
 
-    convert_html_to_png("../assets/steam_workshop_stats.html",
-                        "../assets/steam_workshop_stats.png", ".card")
+    convert_html_to_png("assets/steam_workshop_stats.html",
+                        "assets/steam_workshop_stats.png", ".card")
 
     return (
         "![Steam Summary]"

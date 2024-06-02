@@ -24,6 +24,7 @@ jobs:
             uses: actions/setup-python@v5
             with:
                 python-version: '3.x'
+                cache: 'pip'
 
           - name: Install dependencies
             run: |
@@ -35,6 +36,8 @@ jobs:
                 STEAM_API_KEY: ${{ secrets.STEAM_API_KEY }}
                 STEAM_ID: ${{ secrets.STEAM_ID }}
                 STEAM_CUSTOM_ID: ${{ secrets.STEAM_CUSTOM_ID }}
+                WORKSHOP_STATS: true
+                LOG_SCALE: true
             run: python api/main.py
 
           - name: Commit and push if changes

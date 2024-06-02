@@ -16,13 +16,16 @@ load_dotenv()
 STEAM_API_KEY = os.getenv("STEAM_API_KEY")
 STEAM_CUSTOM_ID = os.getenv("STEAM_CUSTOM_ID")
 
+workshop_stats = os.getenv("WORKSHOP_STATS", "false").lower() == "true"
+plot_scale = os.getenv("PLOT_SCALE", "normal").lower()
+
 # Verify that the environment variables are loaded correctly
 if not STEAM_CUSTOM_ID:
     raise ValueError(
         "Missing STEAM_ID in environment variables")
 
 
-def update_readme(markdown_data, start_marker, end_marker, readme_path="../README.md"):
+def update_readme(markdown_data, start_marker, end_marker, readme_path="README.md"):
     """Updates the README.md file with the provided Markdown content within specified markers."""
     # Read the current README content
     with open(readme_path, "r", encoding="utf-8") as file:
@@ -52,6 +55,7 @@ def update_readme(markdown_data, start_marker, end_marker, readme_path="../READM
 if __name__ == "__main__":
     # Start the timer
     start_time = time.time()
+
     player_summary = get_player_summaries()
     recently_played_games = get_recently_played_games()
     links = fetch_workshop_item_links(STEAM_CUSTOM_ID, STEAM_API_KEY)
@@ -72,14 +76,15 @@ if __name__ == "__main__":
     else:
         print("Failed to fetch Steam Summary & Games Data")
 
-    WORKSHOP_MARKDOWN_CONTENT = ""
-    if links:
-        workshop_data = fetch_all_workshop_stats(links)
-        WORKSHOP_MARKDOWN_CONTENT += generate_card_for_steam_workshop(
-            workshop_data)
-        print("Retrieved all Workshop Stats")
-    else:
-        print("No workshop content was found")
+    if workshop_stats is True:
+        WORKSHOP_MARKDOWN_CONTENT = ""
+        if links:
+            workshop_data = fetch_all_workshop_stats(links)
+            WORKSHOP_MARKDOWN_CONTENT += generate_card_for_steam_workshop(
+                workshop_data)
+            print("Retrieved all Workshop Stats")
+        else:
+            print("No workshop content was found")
 
     if USER_MARKDOWN_CONTENT and WORKSHOP_MARKDOWN_CONTENT:
         update_readme(USER_MARKDOWN_CONTENT,

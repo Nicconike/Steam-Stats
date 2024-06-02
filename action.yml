@@ -1,0 +1,47 @@
+name: "Steam Stats"
+description: "Update your GitHub profile with your latest Steam stats"
+author: "Your Name <your.email@example.com>"
+inputs:
+    STEAM_API_KEY:
+        description: "Steam API Key"
+        required: true
+    STEAM_ID:
+        description: "64bit SteamID of the user"
+        required: true
+    STEAM_CUSTOM_ID:
+        description: "Steam Custom ID"
+        required: true
+    WORKSHOP_STATS:
+        description: "Include Steam Workshop Stats"
+        required: false
+        default: "false"
+    LOG_SCALE:
+        description: "Use logarithmic scale for recently played games"
+        required: false
+        default: "normal"
+runs:
+    using: composite
+    steps:
+        - name: Checkout repository
+          uses: actions/checkout@v4
+
+        - name: Set up Python
+          uses: actions/setup-python@v5
+          with:
+              python-version: "3.x"
+
+        - name: Install dependencies
+          shell: bash
+          run: |
+              python -m pip install --upgrade pip
+              pip install -r requirements.txt
+
+        - name: Update Steam Stats in README
+          run: python api/main.py
+          shell: bash
+          env:
+              STEAM_API_KEY: ${{ inputs.steam_api_key }}
+              STEAM_ID: ${{ inputs.steam_id }}
+              STEAM_CUSTOM_ID: ${{ inputs.steam_custom_id }}
+              INPUT_WORKSHOP: ${{ inputs.workshop }}
+              INPUT_PLOT_SCALE: ${{ inputs.plot_scale }}
