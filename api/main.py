@@ -8,17 +8,21 @@ from card import (
     generate_card_for_played_games,
     generate_card_for_steam_workshop
 )
+from dotenv import load_dotenv
+
+load_dotenv()
 
 # Secrets Configuration
-STEAM_ID = os.getenv("STEAM_CUSTOM_ID")
+STEAM_API_KEY = os.getenv("STEAM_API_KEY")
+STEAM_CUSTOM_ID = os.getenv("STEAM_CUSTOM_ID")
 
 # Verify that the environment variables are loaded correctly
-if not STEAM_ID:
+if not STEAM_CUSTOM_ID:
     raise ValueError(
         "Missing STEAM_ID in environment variables")
 
 
-def update_readme(markdown_data, start_marker, end_marker, readme_path="README.md"):
+def update_readme(markdown_data, start_marker, end_marker, readme_path="../README.md"):
     """Updates the README.md file with the provided Markdown content within specified markers."""
     # Read the current README content
     with open(readme_path, "r", encoding="utf-8") as file:
@@ -50,7 +54,7 @@ if __name__ == "__main__":
     start_time = time.time()
     player_summary = get_player_summaries()
     recently_played_games = get_recently_played_games()
-    links = fetch_workshop_item_links(STEAM_ID)
+    links = fetch_workshop_item_links(STEAM_CUSTOM_ID, STEAM_API_KEY)
 
     USER_MARKDOWN_CONTENT = ""
     if player_summary and recently_played_games:

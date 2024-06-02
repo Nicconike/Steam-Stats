@@ -3,26 +3,23 @@ import datetime
 import math
 import os
 import asyncio
-import time
+import tempfile
 import zipfile
 from pyppeteer import launch
 import requests
-from steam_stats import get_player_summaries, get_recently_played_games
-from steam_workshop import fetch_workshop_item_links, fetch_all_workshop_stats
-from dotenv import load_dotenv
 
-load_dotenv()
-
-# Secrets Configuration
-STEAM_API_KEY = os.getenv("STEAM_API_KEY")
-STEAM_ID = os.getenv("STEAM_ID")
-STEAM_CUSTOM_ID = os.getenv("STEAM_CUSTOM_ID")
 REQUEST_TIMEOUT = (10, 15)
 
-CHROMIUM_ZIP_URL = "https://commondatastorage.googleapis.com/chromium-browser-snapshots/Win_x64/1309077/chrome-win.zip"
-CHROMIUM_DIR = os.path.join(os.getcwd(), 'chromium')
-CHROMIUM_EXECUTABLE = os.path.join(CHROMIUM_DIR, 'chrome-win', 'chrome.exe')
+CHROMIUM_ZIP_URL = (
+    "https://commondatastorage.googleapis.com/chromium-browser-snapshots/Win_x64/1309077/"
+    "chrome-win.zip"
+)
+CHROMIUM_DIR = os.path.join(os.getcwd(), "chromium")
+CHROMIUM_EXECUTABLE = os.path.join(CHROMIUM_DIR, "chrome-win", "chrome.exe")
 MARGIN = 5
+
+# Set the PYPPETEER_HOME environment variable to a directory with appropriate permissions
+os.environ["PYPPETEER_HOME"] = os.path.join(os.getcwd(), "pyppeteer_home")
 
 
 def download_and_extract_chromium():
@@ -43,11 +40,15 @@ def download_and_extract_chromium():
         with zipfile.ZipFile(zip_path, 'r') as zip_ref:
             zip_ref.extractall(CHROMIUM_DIR)
         print("Chromium extracted successfully.")
+    # Ensure the Chromium executable has the correct permissions
+    os.chmod(CHROMIUM_EXECUTABLE, 0o755)
 
 
 async def get_element_bounding_box(html_file, selector):
     """Get the bounding box of the specified element using pyppeteer"""
-    browser = await launch(headless=True, executablePath=CHROMIUM_EXECUTABLE)
+    user_data_dir = tempfile.mkdtemp()
+    browser = await launch(headless=True, executablePath=CHROMIUM_EXECUTABLE, args=['--no-sandbox'],
+                           userDataDir=user_data_dir)
     page = await browser.newPage()
     await page.goto(f'file://{os.path.abspath(html_file)}')
     bounding_box = await page.evaluate(f'''() => {{
@@ -55,19 +56,22 @@ async def get_element_bounding_box(html_file, selector):
         var rect = element.getBoundingClientRect();
         return {{x: rect.x, y: rect.y, width: rect.width, height: rect.height}};
     }}''')
+    await page.close()
     await browser.close()
     # Add margin to the bounding box
-    bounding_box['x'] = max(bounding_box['x'] - MARGIN, 0)
-    bounding_box['y'] = max(bounding_box['y'] - MARGIN, 0)
-    bounding_box['width'] += 2 * MARGIN
-    bounding_box['height'] += 2 * MARGIN
+    bounding_box["x"] = max(bounding_box["x"] - MARGIN, 0)
+    bounding_box["y"] = max(bounding_box["y"] - MARGIN, 0)
+    bounding_box["width"] += 2 * MARGIN
+    bounding_box["height"] += 2 * MARGIN
     return bounding_box
 
 
 async def html_to_png(html_file, output_file, selector):
     """Convert HTML file to PNG using pyppeteer with clipping"""
     bounding_box = await get_element_bounding_box(html_file, selector)
-    browser = await launch(headless=True, executablePath=CHROMIUM_EXECUTABLE)
+    user_data_dir = tempfile.mkdtemp()
+    browser = await launch(headless=True, executablePath=CHROMIUM_EXECUTABLE, args=['--no-sandbox'],
+                           userDataDir=user_data_dir)
     page = await browser.newPage()
     await page.goto(f'file://{os.path.abspath(html_file)}')
     await page.screenshot({
@@ -79,6 +83,7 @@ async def html_to_png(html_file, output_file, selector):
             'height': bounding_box['height']
         }
     })
+    await page.close()
     await browser.close()
 
 
@@ -176,11 +181,11 @@ def generate_card_for_player_summary(player_data):
 </body>
 </html>
     """
-    with open("assets/steam_summary.html", "w", encoding="utf-8") as file:
+    with open("../assets/steam_summary.html", "w", encoding="utf-8") as file:
         file.write(html_content)
 
-    convert_html_to_png("assets/steam_summary.html",
-                        "assets/steam_summary.png", ".card")
+    convert_html_to_png("../assets/steam_summary.html",
+                        "../assets/steam_summary.png", ".card")
 
     return (
         "![Steam Summary]"
@@ -239,11 +244,11 @@ def generate_card_for_played_games(games_data):
 </html>
     """
 
-    with open("assets/recently_played_games.html", "w", encoding="utf-8") as file:
+    with open("../assets/recently_played_games.html", "w", encoding="utf-8") as file:
         file.write(html_content)
 
-    convert_html_to_png("assets/recently_played_games.html",
-                        "assets/recently_played_games.png", ".card")
+    convert_html_to_png("../assets/recently_played_games.html",
+                        "../assets/recently_played_games.png", ".card")
 
     return (
         "![Steam Summary]"
@@ -290,7 +295,7 @@ def generate_card_for_steam_workshop(workshop_stats):
             text-align: center;
         }}
         th {{
-            background-color: #4CAF50;
+            background-color: #6495ED;
             color: white;
         }}
         tr:nth-child(even) {{
@@ -327,29 +332,13 @@ def generate_card_for_steam_workshop(workshop_stats):
 </body>
 </html>
     """
-    with open("assets/steam_workshop_stats.html", "w", encoding="utf-8") as file:
+    with open("../assets/steam_workshop_stats.html", "w", encoding="utf-8") as file:
         file.write(html_content)
 
-    convert_html_to_png("assets/steam_workshop_stats.html",
-                        "assets/steam_workshop_stats.png", ".card")
+    convert_html_to_png("../assets/steam_workshop_stats.html",
+                        "../assets/steam_workshop_stats.png", ".card")
 
     return (
         "![Steam Summary]"
-        "(https://github.com/Nicconike/Steam-Stats/blob/master/assets/steam_workshop_stats.png"
-        "?sanitize=true)\n"
+        "(https://github.com/Nicconike/Steam-Stats/blob/master/assets/steam_workshop_stats.png)"
     )
-
-
-if __name__ == "__main__":
-    start_time = time.time()
-    player_summary = get_player_summaries()
-    recently_played_games = get_recently_played_games()
-    links = fetch_workshop_item_links(STEAM_CUSTOM_ID)
-    workshop_data = fetch_all_workshop_stats(links)
-    generate_card_for_player_summary(player_summary)
-    generate_card_for_played_games(recently_played_games)
-    generate_card_for_steam_workshop(workshop_data)
-    end_time = time.time()  # End the timer
-    total_time = end_time-start_time
-    total_time = round(total_time, 3)  # Total time
-    print(f"Total Execution Time: {total_time} seconds")

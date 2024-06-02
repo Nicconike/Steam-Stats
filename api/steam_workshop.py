@@ -1,48 +1,40 @@
 """Scrape Steam Workshop Data"""
+import json
+import os
 import requests
 from bs4 import BeautifulSoup, Tag
+from dotenv import load_dotenv
+
+load_dotenv()
+
+# Secrets Configuration
+STEAM_API_KEY = os.getenv("STEAM_API_KEY")
+STEAM_CUSTOM_ID = os.getenv("STEAM_CUSTOM_ID")
 
 # A reasonable timeout for the request (connection and read timeout)
 REQUEST_TIMEOUT = (10, 15)
 
+GET_SERVER_INFO_URL = 'https://api.steampowered.com/ISteamWebAPIUtil/GetServerInfo/v1/'
 
-def fetch_workshop_item_links(steam_id):
-    """Fetch each workshop item's link, navigating through all pages"""
-    base_url = f"https://steamcommunity.com/id/{steam_id}/myworkshopfiles/"
-    item_links = []
-    page_number = 1
 
-    while True:
-        url = f"{base_url}?p={page_number}"
-        try:
-            response = requests.get(url, timeout=REQUEST_TIMEOUT)
-            response.raise_for_status()
-            soup = BeautifulSoup(response.content, "html.parser")
-            workshop_items = soup.find_all("div", class_="workshopItem")
+def get_server_info(api_key):
+    """Fetch server information from the Steam Web API"""
+    try:
+        response = requests.get(GET_SERVER_INFO_URL, params={
+                                'key': api_key}, timeout=REQUEST_TIMEOUT)
+        response.raise_for_status()
+        return response.json()
+    except requests.exceptions.RequestException as e:
+        print(f"Error fetching server info: {e}")
+        return None
 
-            if not workshop_items:
-                print(f"No workshop items found on page {page_number}")
-                break
 
-            item_links.extend(extract_links(workshop_items))
-
-            if not has_next_page(soup):
-                break
-
-            page_number += 1
-
-        except requests.exceptions.RequestException as e:
-            handle_request_exception(e)
-            break
-        except AttributeError as e:
-            print(f"Parsing error: {
-                  e}. The structure of the page might have changed")
-            break
-
-    if not item_links and page_number == 1:
-        raise ValueError("No items were found in your Steam Workshop")
-
-    return item_links
+def is_server_online(api_key):
+    """Check if the server is online based on the GetServerInfo response"""
+    serverinfo = get_server_info(api_key)
+    if serverinfo and 'servertime' in serverinfo:
+        return True
+    return False
 
 
 def extract_links(workshop_items):
@@ -78,6 +70,49 @@ def handle_request_exception(e):
               e.response.status_code} - {e.response.reason}")
     else:
         print(f"An error occurred: {e}")
+
+
+def fetch_workshop_item_links(steam_id, api_key):
+    """Fetch each workshop item's link, navigating through all pages"""
+    if not is_server_online(api_key):
+        raise ConnectionError(
+            "Steam Community is currently offline. Please try again later")
+
+    base_url = f"https://steamcommunity.com/id/{steam_id}/myworkshopfiles/"
+    item_links = []
+    page_number = 1
+
+    while True:
+        url = f"{base_url}?p={page_number}"
+        try:
+            response = requests.get(url, timeout=REQUEST_TIMEOUT)
+            response.raise_for_status()
+            soup = BeautifulSoup(response.content, "html.parser")
+            workshop_items = soup.find_all("div", class_="workshopItem")
+
+            if not workshop_items:
+                print(f"No workshop items found on page {page_number}")
+                break
+
+            item_links.extend(extract_links(workshop_items))
+
+            if not has_next_page(soup):
+                break
+
+            page_number += 1
+
+        except requests.exceptions.RequestException as e:
+            handle_request_exception(e)
+            break
+        except AttributeError as e:
+            print(f"Parsing error: {
+                  e}. The structure of the page might have changed")
+            break
+
+    if not item_links and page_number == 1:
+        raise ValueError("No items were found in your Steam Workshop")
+
+    return item_links
 
 
 def fetch_individual_workshop_stats(item_url):
@@ -164,3 +199,20 @@ def fetch_all_workshop_stats(item_links):
         "total_current_favorites": total_current_favorites,
         "individual_stats": all_stats
     }
+
+
+def save_to_file(data, filename):
+    """Save fetched data to a file in JSON format"""
+    if data is not None:
+        with open(filename, 'w', encoding='utf-8') as file:
+            # Use json.dump to write the JSON data to the file
+            json.dump(data, file, indent=4)
+        print(f"Data saved to {filename}")
+    else:
+        print("No data to save")
+
+
+if __name__ == "__main__":
+    itemlinks = fetch_workshop_item_links(STEAM_CUSTOM_ID, STEAM_API_KEY)
+    workshop_data = fetch_all_workshop_stats(itemlinks)
+    save_to_file(workshop_data, "workshop_data.json")
