@@ -1,0 +1,54 @@
+name: "Steam Stats"
+description: "Update your GitHub Profile with your latest Steam Stats"
+author: "Nicconike"
+inputs:
+    GH_TOKEN:
+        description: "GitHub access token with Repo scope"
+        required: true
+        default: ${{ github.token }}
+    STEAM_API_KEY:
+        description: "Steam Web API Key"
+        required: true
+    STEAM_ID:
+        description: "64bit SteamID of the user"
+        required: true
+    STEAM_CUSTOM_ID:
+        description: "Steam Custom ID"
+        required: true
+    WORKSHOP_STATS:
+        description: "Include Steam Workshop Stats from your Steam Account"
+        required: false
+        default: "False"
+    LOG_SCALE:
+        description: "Use logarithmic scale for plotting recently played games in steam for the last 2 weeks"
+        required: false
+        default: "False"
+runs:
+    using: composite
+    steps:
+        - name: Checkout repository
+          uses: actions/checkout@v4
+
+        - name: Set up Python
+          uses: actions/setup-python@v5
+          with:
+              python-version: "3.x"
+
+        - name: Install dependencies
+          shell: bash
+          run: |
+              python -m pip install --upgrade pip
+              pip install -r requirements.txt
+
+        - name: Update Steam Stats in README
+          run: python api/main.py
+          shell: bash
+          env:
+              STEAM_API_KEY: ${{ inputs.steam_api_key }}
+              STEAM_ID: ${{ inputs.steam_id }}
+              STEAM_CUSTOM_ID: ${{ inputs.steam_custom_id }}
+              WORKSHOP_STATS: ${{ inputs.workshop_stats }}
+              LOG_SCALE: ${{ inputs.log_scale }}
+branding:
+    icon: bar-chart-2
+    color: blue

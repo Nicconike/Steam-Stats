@@ -1,7 +1,7 @@
 # 🛠️Work in Progress 🚧|🚧 Please come back later⚒️
 [![Steam Stats](https://github.com/Nicconike/Steam-Stats/actions/workflows/steam-stats.yml/badge.svg)](https://github.com/Nicconike/Steam-Stats/actions/workflows/steam-stats.yml)
-[![Pylint](https://github.com/Nicconike/Steam-Stats/actions/workflows/pylint.yml/badge.svg)](https://github.com/Nicconike/Steam-Stats/actions/workflows/pylint.yml)
 [![CodeQL](https://github.com/Nicconike/Steam-Stats/actions/workflows/github-code-scanning/codeql/badge.svg?branch=master)](https://github.com/Nicconike/Steam-Stats/actions/workflows/github-code-scanning/codeql)
+[![Pylint](https://github.com/Nicconike/Steam-Stats/actions/workflows/pylint.yml/badge.svg)](https://github.com/Nicconike/Steam-Stats/actions/workflows/pylint.yml)
 ![pylint](https://img.shields.io/badge/PyLint-10.00-brightgreen?logo=python&logoColor=white)
 [![Visitor Badge](https://badges.pufler.dev/visits/nicconike/steam-stats)](https://badges.pufler.dev)
 
@@ -31,4 +31,4 @@
 ![Steam Summary](https://github.com/Nicconike/Steam-Stats/blob/master/assets/steam_workshop_stats.png)
 <!-- Steam-Workshop end -->
 
-[^1]: Unfortunately Steam API doesn't support Web Sockets so the status cannot be updated as soon the status changes for steam user profile
+[^1]: Unfortunately, Steam API doesn't support Web Sockets so the profile status cannot be updated as soon as it gets updated in steam profile 🥲

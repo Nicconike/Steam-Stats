@@ -32,7 +32,6 @@ jobs:
                 pyppeteer-install
                 python -m pip install pyppeteer
                 pip install -r requirements.txt
-            shell: python
 
           - name: Update Steam Stats in README
             run: python api/main.py
