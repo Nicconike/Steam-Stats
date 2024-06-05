@@ -29,7 +29,6 @@ jobs:
           - name: Install dependencies
             run: |
                 sudo apt-get install -y libxtst6 libxss1 libgconf-2-4 libnss3 libatk1.0-0 libatk-bridge2.0-0 libcups2 libdrm2 libxdamage1 libxrandr2 libgbm1 libasound2
-                pyppeteer-install
                 pip install -r requirements.txt
 
           - name: Update Steam Stats in README
