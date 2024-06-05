@@ -138,17 +138,17 @@ def generate_card_for_player_summary(player_data):
     <style>
         .card {{
             width: 100%;
-            max-width: 500px;
+            max-width: 400px;
             margin: auto;
             border: 2px solid #000;
-            padding: 20px;
+            padding: 15px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             border-radius: 10px;
             background-color: #fff;
         }}
         .avatar {{
-            width: 100px;
-            height: 100px;
+            width: 80px;
+            height: 80px;
             border-radius: 50%;
             margin: auto;
         }}
@@ -160,6 +160,14 @@ def generate_card_for_player_summary(player_data):
             height: 24px;
             vertical-align: middle;
         }}
+        .info-container {{
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+        }}
+        .info-left, .info-right {{
+            width: 48%;
+        }}
     </style>
 </head>
 <body>
@@ -167,13 +175,19 @@ def generate_card_for_player_summary(player_data):
         <div class="content">
             <img id="avatar" class="avatar" src="{avatarfull}" alt="Avatar">
             <h2 id="name">Name: {personaname}</h2>
-            <p id="status">Status: {personastate_value}</p>
-            <p id="country">Country: <span id="country-code">{loccountrycode}</span>
-                <img id="flag" class="flag"
-                src="https://flagcdn.com/w320/{loccountrycode.lower()}.png" alt="Flag">
-            </p>
-            <p id="lastlogoff">Last Logoff: {lastlogoff_str}</p>
-            <p id="lastlogoff">Gaming Since: {timecreated_str}</p>
+            <div class="info-container">
+                <div class="info-left">
+                    <p id="status">Status: {personastate_value}</p>
+                    <p id="country">Country: <span id="country-code">{loccountrycode}</span>
+                        <img id="flag" class="flag"
+                        src="https://flagcdn.com/w320/{loccountrycode.lower()}.png" alt="Flag">
+                    </p>
+                </div>
+                <div class="info-right">
+                    <p id="lastlogoff">Last Logoff: {lastlogoff_str}</p>
+                    <p id="timecreated">Gaming Since: {timecreated_str}</p>
+                </div>
+            </div>
             {"<p id='game'>Currently Playing: <span id='game-info'>" +
              gameextrainfo + "</span></p>" if gameextrainfo else ""}
         </div>
@@ -181,11 +195,11 @@ def generate_card_for_player_summary(player_data):
 </body>
 </html>
     """
-    with open("assets/steam_summary.html", "w", encoding="utf-8") as file:
+    with open("../assets/steam_summary.html", "w", encoding="utf-8") as file:
         file.write(html_content)
 
-    convert_html_to_png("assets/steam_summary.html",
-                        "assets/steam_summary.png", ".card")
+    convert_html_to_png("../assets/steam_summary.html",
+                        "../assets/steam_summary.png", ".card")
 
     return (
         "![Steam Summary]"
@@ -244,11 +258,11 @@ def generate_card_for_played_games(games_data):
 </html>
     """
 
-    with open("assets/recently_played_games.html", "w", encoding="utf-8") as file:
+    with open("../assets/recently_played_games.html", "w", encoding="utf-8") as file:
         file.write(html_content)
 
-    convert_html_to_png("assets/recently_played_games.html",
-                        "assets/recently_played_games.png", ".card")
+    convert_html_to_png("../assets/recently_played_games.html",
+                        "../assets/recently_played_games.png", ".card")
 
     return (
         "![Steam Summary]"
@@ -332,11 +346,11 @@ def generate_card_for_steam_workshop(workshop_stats):
 </body>
 </html>
     """
-    with open("assets/steam_workshop_stats.html", "w", encoding="utf-8") as file:
+    with open("../assets/steam_workshop_stats.html", "w", encoding="utf-8") as file:
         file.write(html_content)
 
-    convert_html_to_png("assets/steam_workshop_stats.html",
-                        "assets/steam_workshop_stats.png", ".card")
+    convert_html_to_png("../assets/steam_workshop_stats.html",
+                        "../assets/steam_workshop_stats.png", ".card")
 
     return (
         "![Steam Summary]"

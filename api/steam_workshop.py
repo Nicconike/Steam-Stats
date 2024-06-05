@@ -1,5 +1,4 @@
 """Scrape Steam Workshop Data"""
-import json
 import os
 import requests
 from bs4 import BeautifulSoup, Tag
@@ -7,9 +6,10 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-# Secrets Configuration
-STEAM_API_KEY = os.getenv("STEAM_API_KEY")
-STEAM_CUSTOM_ID = os.getenv("STEAM_CUSTOM_ID")
+# Required Secrets Configuration
+STEAM_API_KEY = os.environ["INPUT_STEAM_API_KEY"]
+STEAM_CUSTOM_ID = os.environ["INPUT_STEAM_CUSTOM_ID"]
+
 
 # A reasonable timeout for the request (connection and read timeout)
 REQUEST_TIMEOUT = (10, 15)
@@ -199,20 +199,3 @@ def fetch_all_workshop_stats(item_links):
         "total_current_favorites": total_current_favorites,
         "individual_stats": all_stats
     }
-
-
-def save_to_file(data, filename):
-    """Save fetched data to a file in JSON format"""
-    if data is not None:
-        with open(filename, 'w', encoding='utf-8') as file:
-            # Use json.dump to write the JSON data to the file
-            json.dump(data, file, indent=4)
-        print(f"Data saved to {filename}")
-    else:
-        print("No data to save")
-
-
-if __name__ == "__main__":
-    itemlinks = fetch_workshop_item_links(STEAM_CUSTOM_ID, STEAM_API_KEY)
-    workshop_data = fetch_all_workshop_stats(itemlinks)
-    save_to_file(workshop_data, "workshop_data.json")

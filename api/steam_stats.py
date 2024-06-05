@@ -5,14 +5,9 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-# Secrets Configuration
-STEAM_API_KEY = os.getenv("STEAM_API_KEY")
-STEAM_ID = os.getenv("STEAM_ID")
-
-# Verify that the environment variables are loaded correctly
-if not STEAM_API_KEY or not STEAM_ID:
-    raise ValueError(
-        "Missing STEAM_API_KEY or STEAM_ID in environment variables")
+# Required Secrets Configuration
+STEAM_ID = os.environ["INPUT_STEAM_ID"]
+STEAM_API_KEY = os.environ["INPUT_STEAM_API_KEY"]
 
 # A reasonable timeout for the request (connection and read timeout)
 REQUEST_TIMEOUT = (10, 15)

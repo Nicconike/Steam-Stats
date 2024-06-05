@@ -12,20 +12,17 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-# Secrets Configuration
-STEAM_API_KEY = os.getenv("STEAM_API_KEY")
-STEAM_CUSTOM_ID = os.getenv("STEAM_CUSTOM_ID")
+# Required Secrets Configuration
+STEAM_ID = os.environ["INPUT_STEAM_ID"]
+STEAM_API_KEY = os.environ["INPUT_STEAM_API_KEY"]
+STEAM_CUSTOM_ID = os.environ["INPUT_STEAM_CUSTOM_ID"]
 
-workshop_stats = os.getenv("WORKSHOP_STATS", "false").lower() == "true"
-plot_scale = os.getenv("PLOT_SCALE", "normal").lower()
-
-# Verify that the environment variables are loaded correctly
-if not STEAM_CUSTOM_ID:
-    raise ValueError(
-        "Missing STEAM_ID in environment variables")
+# Optional Feature Flags
+WORKSHOP_STATS = os.getenv("WORKSHOP_STATS", "false").lower() == "true"
+LOG_SCALE = os.getenv("LOG_SCALE", "false").lower() == "true"
 
 
-def update_readme(markdown_data, start_marker, end_marker, readme_path="README.md"):
+def update_readme(markdown_data, start_marker, end_marker, readme_path="../README.md"):
     """Updates the README.md file with the provided Markdown content within specified markers."""
     # Read the current README content
     with open(readme_path, "r", encoding="utf-8") as file:
@@ -58,7 +55,6 @@ if __name__ == "__main__":
 
     player_summary = get_player_summaries()
     recently_played_games = get_recently_played_games()
-    links = fetch_workshop_item_links(STEAM_CUSTOM_ID, STEAM_API_KEY)
 
     USER_MARKDOWN_CONTENT = ""
     if player_summary and recently_played_games:
@@ -76,26 +72,25 @@ if __name__ == "__main__":
     else:
         print("Failed to fetch Steam Summary & Games Data")
 
-    if workshop_stats is True:
+    if USER_MARKDOWN_CONTENT:
+        update_readme(USER_MARKDOWN_CONTENT,
+                      "<!-- Steam-Stats start -->", "<!-- Steam-Stats end -->")
+        print("README.md has been successfully updated with Steam User Stats")
+
+    if WORKSHOP_STATS is True:
         WORKSHOP_MARKDOWN_CONTENT = ""
+        links = fetch_workshop_item_links(STEAM_CUSTOM_ID, STEAM_API_KEY)
         if links:
             workshop_data = fetch_all_workshop_stats(links)
             WORKSHOP_MARKDOWN_CONTENT += generate_card_for_steam_workshop(
                 workshop_data)
             print("Retrieved all Workshop Stats")
+            update_readme(WORKSHOP_MARKDOWN_CONTENT,
+                          "<!-- Steam-Workshop start -->", "<!-- Steam-Workshop end -->")
+            print("README.md has been successfully updated with Steam Workshop Stats")
         else:
             print("No workshop content was found")
 
-    if USER_MARKDOWN_CONTENT and WORKSHOP_MARKDOWN_CONTENT:
-        update_readme(USER_MARKDOWN_CONTENT,
-                      "<!-- Steam-Stats start -->", "<!-- Steam-Stats end -->")
-        update_readme(WORKSHOP_MARKDOWN_CONTENT,
-                      "<!-- Steam-Workshop start -->", "<!-- Steam-Workshop end -->")
-        print("README.md has been successfully updated")
-    else:
-        print("Failed to fetch or process data")
-
     end_time = time.time()  # End the timer
-    total_time = end_time-start_time
-    total_time = round(total_time, 3)  # Total time
+    total_time = round(end_time-start_time, 3)  # Total time
     print(f"Total Execution Time: {total_time} seconds")

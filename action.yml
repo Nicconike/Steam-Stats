@@ -1,9 +1,13 @@
 name: "Steam Stats"
-description: "Update your GitHub profile with your latest Steam stats"
-author: "Your Name <your.email@example.com>"
+description: "Update your GitHub Profile with your latest Steam Stats"
+author: "Nicconike"
 inputs:
+    GH_TOKEN:
+        description: "GitHub access token with Repo scope"
+        required: true
+        default: ${{ github.token }}
     STEAM_API_KEY:
-        description: "Steam API Key"
+        description: "Steam Web API Key"
         required: true
     STEAM_ID:
         description: "64bit SteamID of the user"
@@ -12,13 +16,13 @@ inputs:
         description: "Steam Custom ID"
         required: true
     WORKSHOP_STATS:
-        description: "Include Steam Workshop Stats"
+        description: "Include Steam Workshop Stats from your Steam Account"
         required: false
-        default: "false"
+        default: "False"
     LOG_SCALE:
-        description: "Use logarithmic scale for recently played games"
+        description: "Use logarithmic scale for plotting recently played games in steam for the last 2 weeks"
         required: false
-        default: "normal"
+        default: "False"
 runs:
     using: composite
     steps:
@@ -43,8 +47,8 @@ runs:
               STEAM_API_KEY: ${{ inputs.steam_api_key }}
               STEAM_ID: ${{ inputs.steam_id }}
               STEAM_CUSTOM_ID: ${{ inputs.steam_custom_id }}
-              INPUT_WORKSHOP: ${{ inputs.workshop }}
-              INPUT_PLOT_SCALE: ${{ inputs.plot_scale }}
+              WORKSHOP_STATS: ${{ inputs.workshop_stats }}
+              LOG_SCALE: ${{ inputs.log_scale }}
 branding:
     icon: bar-chart-2
     color: blue
