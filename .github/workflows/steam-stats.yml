@@ -37,6 +37,11 @@ jobs:
                 INPUT_STEAM_CUSTOM_ID: ${{ secrets.STEAM_CUSTOM_ID }}
                 INPUT_WORKSHOP_STATS: True
                 INPUT_LOG_SCALE: True
+                PYPPETEER_HOME: /home/runner/work/Steam-Stats/Steam-Stats/pyppeteer_home
+
+          - name: Clean up Chromium files
+            run: |
+                rm -rf /home/runner/work/Steam-Stats/Steam-Stats/pyppeteer_home
 
           - name: Commit and Push
             run: |
