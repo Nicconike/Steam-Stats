@@ -47,6 +47,7 @@ schedule:
 	1. Steam Player Summary
 	2. Steam's Recently Played Games in the last 2 weeks
 		1. The Graph plot for recently played games is by default implemented in a fixed scale but if you want you can update it to be in a logarithmic scale by using this flag
+
 			`LOG_SCALE: True`
 
 **Example for Steam User Stats**
@@ -57,6 +58,7 @@ schedule:
 
 1. Steam Workshop Stats (Optional)
 	1. Workshop Stats Module can be activated/used by adding this flag in the workflow file in the environment variables
+
 		`WORKSHOP_STATS: True`
 
 	2. This module displays the total number of Unique Visitors, Subscribers and Favorites
