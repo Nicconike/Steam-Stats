@@ -23,13 +23,11 @@ jobs:
           - name: Set up Python
             uses: actions/setup-python@v5
             with:
-                python-version: '3.x'
-                cache: 'pip'
+                python-version: "3.x"
+                cache: "pip"
 
           - name: Install dependencies
-            run: |
-                sudo apt-get install -y libxtst6 libxss1 libgconf-2-4 libnss3 libatk1.0-0 libatk-bridge2.0-0 libcups2 libdrm2 libxdamage1 libxrandr2 libgbm1 libasound2
-                pip install -r requirements.txt
+            run: pip install -r requirements.txt
 
           - name: Update Steam Stats in README
             run: python api/main.py
@@ -39,7 +37,6 @@ jobs:
                 INPUT_STEAM_CUSTOM_ID: ${{ secrets.STEAM_CUSTOM_ID }}
                 INPUT_WORKSHOP_STATS: True
                 INPUT_LOG_SCALE: True
-                PYPPETEER_HOME: /home/runner/work/Steam-Stats/Steam-Stats/pyppeteer_home
 
           - name: Commit and Push
             run: |

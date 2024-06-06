@@ -26,18 +26,18 @@ def download_and_extract_chromium():
     """Download and extract Chromium from the provided URL"""
     if not os.path.exists(CHROMIUM_DIR):
         os.makedirs(CHROMIUM_DIR)
-    zip_path = os.path.join(CHROMIUM_DIR, 'chrome-win.zip')
+    zip_path = os.path.join(CHROMIUM_DIR, "chrome-win.zip")
     if not os.path.exists(zip_path):
         print("Downloading Chromium...")
         response = requests.get(
             CHROMIUM_ZIP_URL, stream=True, timeout=REQUEST_TIMEOUT)
-        with open(zip_path, 'wb') as file:
+        with open(zip_path, "wb") as file:
             for chunk in response.iter_content(chunk_size=128):
                 file.write(chunk)
         print("Chromium downloaded successfully.")
     if not os.path.exists(CHROMIUM_EXECUTABLE):
         print("Extracting Chromium...")
-        with zipfile.ZipFile(zip_path, 'r') as zip_ref:
+        with zipfile.ZipFile(zip_path, "r") as zip_ref:
             zip_ref.extractall(CHROMIUM_DIR)
         print("Chromium extracted successfully.")
     # Ensure the Chromium executable has the correct permissions
@@ -47,15 +47,16 @@ def download_and_extract_chromium():
 async def get_element_bounding_box(html_file, selector):
     """Get the bounding box of the specified element using pyppeteer"""
     user_data_dir = tempfile.mkdtemp()
-    browser = await launch(headless=True, executablePath=CHROMIUM_EXECUTABLE, args=['--no-sandbox'],
-                           userDataDir=user_data_dir)
+    browser = await launch(headless=True, executablePath=CHROMIUM_EXECUTABLE, args=["--no-sandbox"],
+                           handleSIGINT=False, handleSIGTERM=False,
+                           handleSIGHUP=False, userDataDir=user_data_dir)
     page = await browser.newPage()
-    await page.goto(f'file://{os.path.abspath(html_file)}')
-    bounding_box = await page.evaluate(f'''() => {{
-        var element = document.querySelector('{selector}');
+    await page.goto(f"file://{os.path.abspath(html_file)}")
+    bounding_box = await page.evaluate(f"""() => {{
+        var element = document.querySelector("{selector}");
         var rect = element.getBoundingClientRect();
         return {{x: rect.x, y: rect.y, width: rect.width, height: rect.height}};
-    }}''')
+    }}""")
     await page.close()
     await browser.close()
     # Add margin to the bounding box
@@ -70,17 +71,18 @@ async def html_to_png(html_file, output_file, selector):
     """Convert HTML file to PNG using pyppeteer with clipping"""
     bounding_box = await get_element_bounding_box(html_file, selector)
     user_data_dir = tempfile.mkdtemp()
-    browser = await launch(headless=True, executablePath=CHROMIUM_EXECUTABLE, args=['--no-sandbox'],
-                           userDataDir=user_data_dir)
+    browser = await launch(headless=True, executablePath=CHROMIUM_EXECUTABLE, args=["--no-sandbox"],
+                           handleSIGINT=False, handleSIGTERM=False,
+                           handleSIGHUP=False, userDataDir=user_data_dir)
     page = await browser.newPage()
-    await page.goto(f'file://{os.path.abspath(html_file)}')
+    await page.goto(f"file://{os.path.abspath(html_file)}")
     await page.screenshot({
-        'path': output_file,
-        'clip': {
-            'x': bounding_box['x'],
-            'y': bounding_box['y'],
-            'width': bounding_box['width'],
-            'height': bounding_box['height']
+        "path": output_file,
+        "clip": {
+            "x": bounding_box["x"],
+            "y": bounding_box["y"],
+            "width": bounding_box["width"],
+            "height": bounding_box["height"]
         }
     })
     await page.close()

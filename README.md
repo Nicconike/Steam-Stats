@@ -12,13 +12,13 @@
 2. **Github API Token:**
 	1. Goto your Github profile -> Settings -> Developer Settings -> Personal Access Tokens -> Tokens(Classic) or just click [here](https://github.com/settings/tokens)
 	2. Generate new token -> Generate new token(classic)
-	3. Select scopes -> repo and workflow ==only==
+	3. Select scopes -> repo and workflow only
 	4. Set a reasonable expiration date
 3. **Markdown Comments:** Update the markdown file by adding the comments where the Steam Stats will be embedded to. Refer [here](#Update-Readme) to learm more.
 4. **Steam ID:** You can get your 64-bit Steam id (SteamID64 - 17 digit number) by clicking on your profile name in the top right corner in steam desktop client, select "Account Details" and your Steam ID will be displayed directly under your account name
 5. **Steam Custom ID:** Open the Steam desktop application, click on your profile name in the top right corner. Select "View Profile" and your custom URL will be displayed in the URL bar. From this url you will know your Steam Custom ID
 
-The Github Actions is set to run on every Monday 12AM IST (UTC+5:30) which you can modify to your own time as per your liking by updating it in the workflow file
+The Github Actions is set to run on every Monday 12 AM IST (UTC+5:30) which you can modify to your own time as per your liking by updating it in the workflow file
 
 ```yml
 schedule:
@@ -47,7 +47,6 @@ schedule:
 	1. Steam Player Summary
 	2. Steam's Recently Played Games in the last 2 weeks
 		1. The Graph plot for recently played games is by default implemented in a fixed scale but if you want you can update it to be in a logarithmic scale by using this flag
-
 			`LOG_SCALE: True`
 
 **Example for Steam User Stats**
@@ -57,8 +56,7 @@ schedule:
 <!-- Steam-Stats end -->
 
 1. Steam Workshop Stats (Optional)
-	1. Workshop Stats Module can be activated/used by adding this flag in the workflow file in the env
-
+	1. Workshop Stats Module can be activated/used by adding this flag in the workflow file in the environment variables
 		`WORKSHOP_STATS: True`
 
 	2. This module displays the total number of Unique Visitors, Subscribers and Favorites
