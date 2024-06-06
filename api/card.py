@@ -47,7 +47,7 @@ def download_and_extract_chromium():
 async def get_element_bounding_box(html_file, selector):
     """Get the bounding box of the specified element using pyppeteer"""
     user_data_dir = tempfile.mkdtemp()
-
+    browser = None
     try:
         # Check if the HTML file exists
         if not os.path.exists(html_file):
@@ -59,6 +59,9 @@ async def get_element_bounding_box(html_file, selector):
         await page.goto(f"file://{os.path.abspath(html_file)}")
         bounding_box = await page.evaluate(f"""() => {{
             var element = document.querySelector("{selector}");
+            if (!element) {{
+                throw new Error("Element not found: {selector}");
+            }}
             var rect = element.getBoundingClientRect();
             return {{x: rect.x, y: rect.y, width: rect.width, height: rect.height}};
         }}""")
@@ -81,6 +84,8 @@ async def get_element_bounding_box(html_file, selector):
         print(f"Network Error: {e}")
     except KeyError as e:
         print(f"Key Error: {e}")
+    except asyncio.TimeoutError as e:
+        print(f"Timeout Error: {e}")
     finally:
         # Ensure the browser is closed in case of an error
         if browser:
@@ -92,6 +97,7 @@ async def get_element_bounding_box(html_file, selector):
 
 async def html_to_png(html_file, output_file, selector):
     """Convert HTML file to PNG using pyppeteer with clipping"""
+    browser = None
     try:
         bounding_box = await get_element_bounding_box(html_file, selector)
         user_data_dir = tempfile.mkdtemp()
