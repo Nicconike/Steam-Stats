@@ -21,9 +21,6 @@ CHROMIUM_DIR = os.path.join(os.getcwd(), "chromium")
 CHROMIUM_EXE = os.path.join(CHROMIUM_DIR, "chrome-win", "chrome.exe")
 MARGIN = 5
 
-# Set the PYPPETEER_HOME environment variable to a directory with appropriate permissions
-os.environ["PYPPETEER_HOME"] = os.path.join(os.getcwd(), "pyppeteer_home")
-
 
 def download_and_extract_chromium():
     """Download and extract Chromium from the provided URL"""
