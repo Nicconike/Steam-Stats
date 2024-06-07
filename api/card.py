@@ -7,8 +7,11 @@ import tempfile
 import zipfile
 from pyppeteer import launch, errors
 import requests
+from dotenv import load_dotenv
 
-REQUEST_TIMEOUT = (10, 15)
+load_dotenv()
+
+REQUEST_TIMEOUT = (25, 30)
 
 CHROMIUM_ZIP_URL = (
     "https://commondatastorage.googleapis.com/chromium-browser-snapshots/Win_x64/1309077/"
@@ -276,6 +279,8 @@ def generate_card_for_played_games(games_data):
     if not games_data:
         return None
 
+    # Check if LOG_SCALE is set to true
+    log_scale = os.getenv("INPUT_LOG_SCALE", "false").lower() == "true"
     max_playtime = games_data["response"]["games"][0]["playtime_2weeks"]
 
     # Generate the progress bars with repeating styles
@@ -286,9 +291,11 @@ def generate_card_for_played_games(games_data):
             playtime = game["playtime_2weeks"]
             img_icon_url = f"https://media.steampowered.com/steamcommunity/public/images/apps/{
                 game["appid"]}/{game["img_icon_url"]}.jpg"
-            normalized_playtime = (playtime / max_playtime) * 100
-            normalized_playtime = math.log1p(playtime) / math.log1p(
-                max(game["playtime_2weeks"] for game in games_data["response"]["games"])) * 100
+            if log_scale is True:
+                normalized_playtime = math.log1p(playtime) / math.log1p(
+                    max(game["playtime_2weeks"] for game in games_data["response"]["games"])) * 100
+            else:
+                normalized_playtime = (playtime / max_playtime) * 100
 
             normalized_playtime = round(normalized_playtime)
             display_time = f"{playtime} mins" if playtime < 60 else f"{
@@ -329,7 +336,7 @@ def generate_card_for_played_games(games_data):
                         "assets/recently_played_games.png", ".card")
 
     return (
-        "![Steam Summary]"
+        "![Recently Played Games]"
         "(https://github.com/Nicconike/Steam-Stats/blob/master/assets/recently_played_games.png)"
     )
 
@@ -417,6 +424,6 @@ def generate_card_for_steam_workshop(workshop_stats):
                         "assets/steam_workshop_stats.png", ".card")
 
     return (
-        "![Steam Summary]"
+        "![Steam Workshop Stats]"
         "(https://github.com/Nicconike/Steam-Stats/blob/master/assets/steam_workshop_stats.png)"
     )

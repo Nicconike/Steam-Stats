@@ -18,8 +18,8 @@ STEAM_API_KEY = os.environ["INPUT_STEAM_API_KEY"]
 STEAM_CUSTOM_ID = os.environ["INPUT_STEAM_CUSTOM_ID"]
 
 # Optional Feature Flags
-WORKSHOP_STATS = os.getenv("WORKSHOP_STATS", "false").lower() == "true"
-LOG_SCALE = os.getenv("LOG_SCALE", "false").lower() == "true"
+WORKSHOP_STATS = os.getenv("INPUT_WORKSHOP_STATS", "false").lower() == "true"
+LOG_SCALE = os.getenv("INPUT_LOG_SCALE", "false").lower() == "true"
 
 
 def update_readme(markdown_data, start_marker, end_marker, readme_path="README.md"):
@@ -65,10 +65,10 @@ if __name__ == "__main__":
         if summary_content and recent_games:
             USER_MARKDOWN_CONTENT += summary_content
             USER_MARKDOWN_CONTENT += recent_games
-            print("Successfully retrieved Steam User Data")
+            print("Retrieved all Steam User Stats")
         else:
             print(
-                "Failed to generate HTML content for Steam Summary or Recently Played Games")
+                "Failed to generate card data for Steam Summary & Recently Played Games")
     else:
         print("Failed to fetch Steam Summary & Games Data")
 
@@ -93,4 +93,10 @@ if __name__ == "__main__":
 
     end_time = time.time()  # End the timer
     total_time = round(end_time-start_time, 3)  # Total time
-    print(f"Total Execution Time: {total_time} seconds")
+    if total_time > 60:
+        minutes = total_time // 60
+        seconds = total_time % 60
+        print(f"Total Execution Time: {int(minutes)
+                                       } minutes and {seconds:.3f} seconds")
+    else:
+        print(f"Total Execution Time: {total_time} seconds")

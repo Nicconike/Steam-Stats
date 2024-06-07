@@ -12,7 +12,7 @@ STEAM_CUSTOM_ID = os.environ["INPUT_STEAM_CUSTOM_ID"]
 
 
 # A reasonable timeout for the request (connection and read timeout)
-REQUEST_TIMEOUT = (10, 15)
+REQUEST_TIMEOUT = (25, 30)
 
 GET_SERVER_INFO_URL = 'https://api.steampowered.com/ISteamWebAPIUtil/GetServerInfo/v1/'
 

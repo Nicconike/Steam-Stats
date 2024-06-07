@@ -10,7 +10,7 @@ STEAM_ID = os.environ["INPUT_STEAM_ID"]
 STEAM_API_KEY = os.environ["INPUT_STEAM_API_KEY"]
 
 # A reasonable timeout for the request (connection and read timeout)
-REQUEST_TIMEOUT = (10, 15)
+REQUEST_TIMEOUT = (25, 30)
 
 # Steam Web API endpoints
 PLAYER_SUMMARIES = "http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/"

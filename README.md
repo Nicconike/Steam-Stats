@@ -25,6 +25,18 @@ schedule:
         - cron: "30 18 * * 0"
 ```
 
+## Samples (From my Steam Account)
+**Example for Steam User Stats**
+<!-- Steam-Stats start -->
+![Steam Summary](https://github.com/Nicconike/Steam-Stats/blob/master/assets/steam_summary.png)
+![Recently Played Games](https://github.com/Nicconike/Steam-Stats/blob/master/assets/recently_played_games.png)
+<!-- Steam-Stats end -->
+
+**Example for Steam Workshop Stats**
+<!-- Steam-Workshop start -->
+![Steam Workshop Stats](https://github.com/Nicconike/Steam-Stats/blob/master/assets/steam_workshop_stats.png)
+<!-- Steam-Workshop end -->
+
 ## Update Readme
 1. Add this comment in your markdown file(Readme.md) which is for Steam User Stats
 	```md
@@ -46,27 +58,14 @@ schedule:
 1. Steam User Stats (Required | Default)
 	1. Steam Player Summary
 	2. Steam's Recently Played Games in the last 2 weeks
-		1. The Graph plot for recently played games is by default implemented in a fixed scale but if you want you can update it to be in a logarithmic scale by using this flag
-
-			`LOG_SCALE: True`
-
-**Example for Steam User Stats**
-<!-- Steam-Stats start -->
-![Steam Summary](https://github.com/Nicconike/Steam-Stats/blob/master/assets/steam_summary.png)
-![Steam Summary](https://github.com/Nicconike/Steam-Stats/blob/master/assets/recently_played_games.png)
-<!-- Steam-Stats end -->
-
-1. Steam Workshop Stats (Optional)
-	1. Workshop Stats Module can be activated/used by adding this flag in the workflow file in the environment variables
-
-		`WORKSHOP_STATS: True`
-
+		1. The Graph plot for recently played games is by default implemented in a fixed scale but if you want you can update it to be in a logarithmic scale by using this flag: `LOG_SCALE: True`
+		2. When `LOG_SCALE` is `False`
+			![Recently Played Games](https://github.com/Nicconike/Steam-Stats/blob/master/assets/recently_played_games(linear).png)
+		3. When `LOG_SCALE` is `True`
+			![Recently Played Games](https://github.com/Nicconike/Steam-Stats/blob/master/assets/recently_played_games(logarithmic).png)
+2. Steam Workshop Stats (Optional)
+	1. Workshop Stats Module can be activated/used by adding this flag in the workflow file in the environment variables: `WORKSHOP_STATS: True`
 	2. This module displays the total number of Unique Visitors, Subscribers and Favorites
-
-**Example for Steam Workshop Stats**
-<!-- Steam-Workshop start -->
-![Steam Summary](https://github.com/Nicconike/Steam-Stats/blob/master/assets/steam_workshop_stats.png)
-<!-- Steam-Workshop end -->
 
 ## Setup with Example
 After completing the steps mentioned in the [Prerequisites](#Prerequisites), you have to save all the mentioned keys(except markdown comments) like github token,api key, steamid, customid as Secrets in your Github repo's settings.
