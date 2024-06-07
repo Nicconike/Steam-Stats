@@ -25,7 +25,7 @@ schedule:
         - cron: "30 18 * * 0"
 ```
 
-## Samples (From my Steam Account)
+## Samples (From my [Steam Account](https://steamcommunity.com/id/nicconike/))
 **Example for Steam User Stats**
 <!-- Steam-Stats start -->
 ![Steam Summary](https://github.com/Nicconike/Steam-Stats/blob/master/assets/steam_summary.png)
@@ -37,8 +37,8 @@ schedule:
 ![Steam Workshop Stats](https://github.com/Nicconike/Steam-Stats/blob/master/assets/steam_workshop_stats.png)
 <!-- Steam-Workshop end -->
 
-## Update Readme
-1. Add this comment in your markdown file(Readme.md) which is for Steam User Stats
+## Update README.md
+1. Add below comment in your markdown file(Readme.md) for Steam User Stats
 	```md
 	<!-- Steam-Stats start -->
 	<!-- Steam-Stats end -->
@@ -48,6 +48,7 @@ schedule:
 	<!-- Steam-Workshop start -->
 	<!-- Steam-Workshop end -->
 	```
+3. Don't forget to add these comments in your readme file or wherever you want to display your steam stats, because without the comments the readme will not get updated
 
 ## Features
 1. Steam Player Summary[^*]
@@ -60,12 +61,14 @@ schedule:
 	2. Steam's Recently Played Games in the last 2 weeks
 		1. The Graph plot for recently played games is by default implemented in a fixed scale but if you want you can update it to be in a logarithmic scale by using this flag: `LOG_SCALE: True`
 		2. When `LOG_SCALE` is `False`
+
 			![Recently Played Games](https://github.com/Nicconike/Steam-Stats/blob/master/assets/recently_played_games(linear).png)
 		3. When `LOG_SCALE` is `True`
+
 			![Recently Played Games](https://github.com/Nicconike/Steam-Stats/blob/master/assets/recently_played_games(logarithmic).png)
 2. Steam Workshop Stats (Optional)
 	1. Workshop Stats Module can be activated/used by adding this flag in the workflow file in the environment variables: `WORKSHOP_STATS: True`
-	2. This module displays the total number of Unique Visitors, Subscribers and Favorites
+	2. This module displays the total number of Unique Visitors, Subscribers and Favorites for your Steam Workshop Items
 
 ## Setup with Example
 After completing the steps mentioned in the [Prerequisites](#Prerequisites), you have to save all the mentioned keys(except markdown comments) like github token,api key, steamid, customid as Secrets in your Github repo's settings.
@@ -74,7 +77,7 @@ After completing the steps mentioned in the [Prerequisites](#Prerequisites), you
 
 If you are new to github secrets then you can checkout this doc [here](https://docs.github.com/en/actions/security-guides/using-secrets-in-github-actions). And from [here](https://docs.github.com/en/actions/security-guides/automatic-token-authentication) you can learn about Github Tokens.
 
-Sample Workflow File
+**Sample Workflow File**
 ```yml
 name: Steam Stats
 
@@ -94,6 +97,8 @@ jobs:
                 STEAM_API_KEY: ${{ secrets.STEAM_API_KEY }}
                 STEAM_ID: ${{ secrets.STEAM_ID }}
                 STEAM_CUSTOM_ID: ${{ secrets.STEAM_CUSTOM_ID }}
+				WORKSHOP_STATS: True
+                LOG_SCALE: True
 ```
 
-[^*]: Unfortunately, Steam API doesn't support Web Sockets so the profile status cannot be updated as soon as it gets updated in steam profile 🥲
+[^*]: Unfortunately, Steam Web API doesn't support Web Sockets so the profile status cannot be updated in real time as it gets updated in steam profile 🥲
