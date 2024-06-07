@@ -8,9 +8,9 @@
 > ### From one Passionate Gamer and Developer to Another 🍻
 
 ## Prerequisites
-1. **Steam Web API Key:** API key is important to fetch your account details and for that you will require a key which you can create for your account <a href="https://steamcommunity.com/dev" target="_blank">here</a>
+1. **Steam Web API Key:** API key is important to fetch your account details and for that you will require a key which you can create for your account [here](https://steamcommunity.com/dev)
 2. **Github API Token:**
-	1. Goto your Github profile -> Settings -> Developer Settings -> Personal Access Tokens -> Tokens(Classic) or just click <a href="https://github.com/settings/tokens" target="_blank">here</a>
+	1. Goto your Github profile -> Settings -> Developer Settings -> Personal Access Tokens -> Tokens(Classic) or just click [here](https://github.com/settings/tokens)
 	2. Generate new token -> Generate new token(classic)
 	3. Select scopes -> repo and workflow only
 	4. Set a reasonable expiration date
@@ -25,7 +25,7 @@ schedule:
         - cron: "30 18 * * 0"
 ```
 
-## Samples (From my <a href="https://steamcommunity.com/id/nicconike/" target="_blank">Steam Account</a>)
+## Samples (From my [Steam Account](https://steamcommunity.com/id/nicconike/))
 **Example for Steam User Stats**
 <!-- Steam-Stats start -->
 ![Steam Summary](https://github.com/Nicconike/Steam-Stats/blob/master/assets/steam_summary.png)
@@ -75,7 +75,7 @@ After completing the steps mentioned in the [Prerequisites](#Prerequisites), you
 
 > Repo Settings -> Security -> Secrets and Variables -> Actions -> Add in Repository Secrets
 
-If you are new to **Github Secrets** then you can checkout this doc <a href="https://docs.github.com/en/actions/security-guides/using-secrets-in-github-actions" target="_blank">here</a>. And from <a href="https://docs.github.com/en/actions/security-guides/automatic-token-authentication" target="_blank">here</a> you can learn about **Github Tokens**.
+If you are new to **Github Secrets** then you can checkout this doc [here](https://docs.github.com/en/actions/security-guides/using-secrets-in-github-actions). And from [here](https://docs.github.com/en/actions/security-guides/automatic-token-authentication) you can learn about **Github Tokens**.
 
 **Sample Workflow File**
 ```yml
