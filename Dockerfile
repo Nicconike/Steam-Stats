@@ -17,7 +17,8 @@ ADD requirements.txt /steam-stats/requirements.txt
 # Install Python dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
 	git \
-	&& pip install --no-cache-dir -r /steam-stats/requirements.txt && pip install Playwright && python -m playwright install firefox \
+	&& pip install --no-cache-dir -r /steam-stats/requirements.txt \
+	&& playwright install firefox\
 	&& apt-get purge -y --auto-remove \
 	&& rm -rf /var/lib/apt/lists/*
 
@@ -26,7 +27,9 @@ RUN git config --global user.email "action@github.com" \
 	&& git config --global user.name "GitHub Action"
 
 # Copy only the necessary application code into the container
-ADD api/* /steam-stats/
+ADD api/ /steam-stats/api/
+ADD assets/ /steam-stats/assets/
+ADD README.md /steam-stats/
 
 # Command to run the application
 CMD ["python", "api/main.py"]
