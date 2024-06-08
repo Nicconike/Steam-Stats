@@ -3,7 +3,6 @@
 [![CodeQL](https://github.com/Nicconike/Steam-Stats/actions/workflows/github-code-scanning/codeql/badge.svg?branch=master)](https://github.com/Nicconike/Steam-Stats/actions/workflows/github-code-scanning/codeql)
 [![Pylint](https://github.com/Nicconike/Steam-Stats/actions/workflows/pylint.yml/badge.svg)](https://github.com/Nicconike/Steam-Stats/actions/workflows/pylint.yml)
 ![pylint](https://img.shields.io/badge/PyLint-10.00-brightgreen?logo=python&logoColor=white)
-![GitHub deployments](https://img.shields.io/github/deployments/nicconike/Steam-Stats/Production)
 ![GitHub License](https://img.shields.io/github/license/nicconike/Steam-Stats)
 [![Visitor Badge](https://badges.pufler.dev/visits/nicconike/steam-stats)](https://badges.pufler.dev)
 
@@ -80,27 +79,6 @@ After completing the steps mentioned in the [Prerequisites](#Prerequisites), you
 If you are new to **Github Secrets** then you can checkout this doc [here](https://docs.github.com/en/actions/security-guides/using-secrets-in-github-actions). And from [here](https://docs.github.com/en/actions/security-guides/automatic-token-authentication) you can learn about **Github Tokens**.
 
 **Sample Workflow File**
-```yml
-name: Steam Stats
 
-on:
-    schedule:
-        # Runs every Monday at 12AM IST (UTC+5:30)
-        - cron: "30 18 * * 0"
-    workflow_dispatch:
-
-jobs:
-    update-readme:
-        name: Steam Stats
-        runs-on: ubuntu-latest
-        steps:
-          - uses: nicconike/steam-stats@master
-            with:
-                STEAM_API_KEY: ${{ secrets.STEAM_API_KEY }}
-                STEAM_ID: ${{ secrets.STEAM_ID }}
-                STEAM_CUSTOM_ID: ${{ secrets.STEAM_CUSTOM_ID }}
-				WORKSHOP_STATS: True
-                LOG_SCALE: True
-```
 
 [^*]: Unfortunately, Steam Web API doesn't support Web Sockets so the profile status cannot be updated in real time as it gets updated in steam profile 🥲
