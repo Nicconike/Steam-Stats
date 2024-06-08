@@ -18,13 +18,13 @@ ADD requirements.txt /steam-stats/requirements.txt
 RUN apt-get update && apt-get install -y --no-install-recommends \
 	git \
 	&& pip install --no-cache-dir -r /steam-stats/requirements.txt \
-	&& playwright install firefox\
+	&& pip install playwright \
+	&& playwright install-deps \
+	&& playwright install firefox \
+	&& git config --global user.email "action@github.com" \
+	&& git config --global user.name "GitHub Action" \
 	&& apt-get purge -y --auto-remove \
 	&& rm -rf /var/lib/apt/lists/*
-
-# Configure git
-RUN git config --global user.email "action@github.com" \
-	&& git config --global user.name "GitHub Action"
 
 # Copy only the necessary application code into the container
 ADD api/ /steam-stats/api/

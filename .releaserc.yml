@@ -1,0 +1,24 @@
+{
+    branches:
+        [
+            { name: "1.1.x", range: "1.1.x", channel: "1.1.x" },
+            { name: "1.2.x", range: "1.2.x", channel: "1.2.x" },
+            { name: "master" },
+            { name: "pre/rc", channel: "pre/rc", prerelease: "rc" },
+            { name: "beta", channel: "beta", prerelease: true },
+        ],
+    plugins:
+        [
+            "@semantic-release/commit-analyzer",
+            "@semantic-release/release-notes-generator",
+            "@semantic-release/changelog",
+            [
+                "@semantic-release/git",
+                {
+                    "assets": ["api/*.py"],
+                    "message": "chore(release): ${nextRelease.version} [skip ci]\n\n${nextRelease.notes}",
+                },
+            ],
+            "@semantic-release/github",
+        ],
+}
