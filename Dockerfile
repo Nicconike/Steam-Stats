@@ -1,5 +1,5 @@
 # Use the official Python image from the Docker Hub
-FROM python:3.12-alpine
+FROM python:3.12-slim-bookworm
 
 # Set environment variables
 ENV PYTHONUNBUFFERED=1
@@ -14,30 +14,19 @@ RUN mkdir -p /steam-stats/assets
 # Copy the requirements file into the container
 ADD requirements.txt /steam-stats/requirements.txt
 
-# Install dependencies and clean up
-RUN apk add --no-cache \
-	gcc \
-	g++ \
-	musl-dev \
-	libffi-dev \
-	libpng-dev \
-	jpeg-dev \
-	zlib-dev \
-	libjpeg \
-	make \
+# Install Python dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
 	git \
-	firefox \
-	&& pip install --no-cache-dir -r /steam-stats/requirements.txt \
-	&& apk del gcc g++ musl-dev libffi-dev make \
-	&& rm -rf /var/cache/apk/*
+	&& pip install --no-cache-dir -r /steam-stats/requirements.txt && pip install Playwright && python -m playwright install firefox \
+	&& apt-get purge -y --auto-remove \
+	&& rm -rf /var/lib/apt/lists/*
 
 # Configure git
-RUN git config --global user.email "action@github.com"
-RUN git config --global user.name "GitHub Action"
+RUN git config --global user.email "action@github.com" \
+	&& git config --global user.name "GitHub Action"
 
-ADD api/ ./api/
-ADD assets/ ./assets/
-ADD README.md ./
+# Copy only the necessary application code into the container
+ADD api/* /steam-stats/
 
 # Command to run the application
 CMD ["python", "api/main.py"]
