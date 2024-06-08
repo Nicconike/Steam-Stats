@@ -13,6 +13,8 @@ jobs:
     update-readme:
         name: Steam Stats
         runs-on: ubuntu-latest
+        container:
+            image: nicconike/steam-stats:latest
         steps:
           - name: Checkout repository
             uses: actions/checkout@v4
@@ -25,6 +27,14 @@ jobs:
             with:
                 python-version: "3.x"
                 cache: "pip"
+
+          - name: Cache pip
+            uses: actions/cache@v4
+            with:
+                path: ~/.cache/pip
+                key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+                restore-keys: |
+                    ${{ runner.os }}-pip-
 
           - name: Install dependencies
             run: |
@@ -40,17 +50,10 @@ jobs:
                 INPUT_WORKSHOP_STATS: True
                 INPUT_LOG_SCALE: True
 
-          - name: Clean up Chromium files
-            run: |
-                ls -R /home/runner/work/Steam-Stats/Steam-Stats
-                rm -rf /home/runner/work/Steam-Stats/Steam-Stats/pyppeteer_home
-
           - name: Commit and Push
             run: |
-                ls -R /home/runner/work/Steam-Stats/Steam-Stats
                 git config --global user.email "action@github.com"
                 git config --global user.name "GitHub Action"
-                git add . ':!chromium'
-                git status
+                git add .
                 git commit -m "Updated Steam Stats" || echo "No changes to commit"
                 git push

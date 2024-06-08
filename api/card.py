@@ -3,70 +3,36 @@ import datetime
 import math
 import os
 import asyncio
-import tempfile
-import zipfile
-from pyppeteer import launch, errors
-import requests
+from playwright.async_api import async_playwright, Error as PlaywrightError
 from dotenv import load_dotenv
 
 load_dotenv()
 
 REQUEST_TIMEOUT = (25, 30)
-
-CHROMIUM_ZIP_URL = (
-    "https://commondatastorage.googleapis.com/chromium-browser-snapshots/Win_x64/1309077/"
-    "chrome-win.zip"
-)
-CHROMIUM_DIR = os.path.join(os.getcwd(), "chromium")
-CHROMIUM_EXE = os.path.join(CHROMIUM_DIR, "chrome-win", "chrome.exe")
-MARGIN = 5
-
-
-def download_and_extract_chromium():
-    """Download and extract Chromium from the provided URL"""
-    if not os.path.exists(CHROMIUM_DIR):
-        os.makedirs(CHROMIUM_DIR)
-    zip_path = os.path.join(CHROMIUM_DIR, "chrome-win.zip")
-    if not os.path.exists(zip_path):
-        print("Downloading Chromium...")
-        response = requests.get(
-            CHROMIUM_ZIP_URL, stream=True, timeout=REQUEST_TIMEOUT)
-        with open(zip_path, "wb") as file:
-            for chunk in response.iter_content(chunk_size=128):
-                file.write(chunk)
-        print("Chromium downloaded successfully")
-    if not os.path.exists(CHROMIUM_EXE):
-        print("Extracting Chromium...")
-        with zipfile.ZipFile(zip_path, "r") as zip_ref:
-            zip_ref.extractall(CHROMIUM_DIR)
-        print("Chromium extracted successfully")
-    # Ensure the Chromium executable has the correct permissions
-    os.chmod(CHROMIUM_EXE, 0o755)
+MARGIN = 10
 
 
 async def get_element_bounding_box(html_file, selector):
-    """Get the bounding box of the specified element using pyppeteer"""
-    user_data_dir = tempfile.mkdtemp()
+    """Get the bounding box of the specified element using Playwright"""
     browser = None
     try:
         # Check if the HTML file exists
         if not os.path.exists(html_file):
             raise FileNotFoundError(f"HTML file not found: {html_file}")
-        browser = await launch(headless=True, executablePath=CHROMIUM_EXE, args=["--no-sandbox"],
-                               handleSIGINT=False, handleSIGTERM=False,
-                               handleSIGHUP=False, userDataDir=user_data_dir)
-        page = await browser.newPage()
-        await page.goto(f"file://{os.path.abspath(html_file)}")
-        bounding_box = await page.evaluate(f"""() => {{
-            var element = document.querySelector("{selector}");
-            if (!element) {{
-                throw new Error("Element not found: {selector}");
-            }}
-            var rect = element.getBoundingClientRect();
-            return {{x: rect.x, y: rect.y, width: rect.width, height: rect.height}};
-        }}""")
-        await page.close()
-        await browser.close()
+
+        async with async_playwright() as p:
+            browser = await p.firefox.launch(headless=True)
+            page = await browser.new_page()
+            await page.goto(f"file://{os.path.abspath(html_file)}")
+            bounding_box = await page.evaluate(f"""() => {{
+                var element = document.querySelector("{selector}");
+                if (!element) {{
+                    throw new Error("Element not found: {selector}");
+                }}
+                var rect = element.getBoundingClientRect();
+                return {{x: rect.x, y: rect.y, width: rect.width, height: rect.height}};
+            }}""")
+            await page.close()
 
         # Add margin to the bounding box
         bounding_box["x"] = max(bounding_box["x"] - MARGIN, 0)
@@ -76,83 +42,51 @@ async def get_element_bounding_box(html_file, selector):
         return bounding_box
     except FileNotFoundError as e:
         print(f"File Not Found Error: {e}")
-    except errors.BrowserError as e:
-        print(f"Browser Error: {e}")
-    except errors.PageError as e:
-        print(f"Page Error: {e}")
-    except errors.NetworkError as e:
-        print(f"Network Error: {e}")
+    except PlaywrightError as e:
+        print(f"Playwright Error: {e}")
     except KeyError as e:
         print(f"Key Error: {e}")
     except asyncio.TimeoutError as e:
         print(f"Timeout Error: {e}")
     finally:
-        # Ensure the browser is closed in case of an error
         if browser:
-            try:
-                await browser.close()
-            except errors.BrowserError as e:
-                print(f"Error closing browser: {e}")
+            await browser.close()
 
 
 async def html_to_png(html_file, output_file, selector):
-    """Convert HTML file to PNG using pyppeteer with clipping"""
+    """Convert HTML file to PNG using Playwright with clipping"""
     browser = None
     try:
         bounding_box = await get_element_bounding_box(html_file, selector)
-        user_data_dir = tempfile.mkdtemp()
-        browser = await launch(headless=True, executablePath=CHROMIUM_EXE, args=["--no-sandbox"],
-                               handleSIGINT=False, handleSIGTERM=False,
-                               handleSIGHUP=False, userDataDir=user_data_dir)
-        page = await browser.newPage()
-        await page.goto(f"file://{os.path.abspath(html_file)}")
-        await page.screenshot({
-            "path": output_file,
-            "clip": {
-                "x": bounding_box["x"],
-                "y": bounding_box["y"],
-                "width": bounding_box["width"],
-                "height": bounding_box["height"]
-            }
-        })
-        await page.close()
-        await browser.close()
+        async with async_playwright() as p:
+            browser = await p.firefox.launch(headless=True)
+            page = await browser.new_page()
+            await page.goto(f"file://{os.path.abspath(html_file)}")
+            await page.screenshot(path=output_file, clip=bounding_box)
+            await page.close()
     except FileNotFoundError as e:
         print(f"File Not Found Error: {e}")
-    except errors.BrowserError as e:
-        print(f"Browser Error: {e}")
-    except errors.PageError as e:
-        print(f"Page Error: {e}")
-    except errors.NetworkError as e:
-        print(f"Network Error: {e}")
+    except PlaywrightError as e:
+        print(f"Playwright Error: {e}")
     except KeyError as e:
         print(f"Key Error: {e}")
     except asyncio.TimeoutError as e:
         print(f"Timeout Error: {e}")
     finally:
-        # Ensure the browser is closed in case of an error
         if browser:
-            try:
-                await browser.close()
-            except errors.BrowserError as e:
-                print(f"Error closing browser: {e}")
+            await browser.close()
 
 
 def convert_html_to_png(html_file, output_file, selector):
-    """Convert HTML file to PNG using pyppeteer with clipping"""
+    """Convert HTML file to PNG using Playwright with clipping"""
     try:
-        download_and_extract_chromium()
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
         loop.run_until_complete(html_to_png(html_file, output_file, selector))
     except FileNotFoundError as e:
         print(f"File Not Found Error: {e}")
-    except errors.BrowserError as e:
-        print(f"Browser Error: {e}")
-    except errors.PageError as e:
-        print(f"Page Error: {e}")
-    except errors.NetworkError as e:
-        print(f"Network Error: {e}")
+    except PlaywrightError as e:
+        print(f"Playwright Error: {e}")
     except KeyError as e:
         print(f"Key Error: {e}")
     except asyncio.TimeoutError as e:
