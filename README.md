@@ -80,5 +80,27 @@ If you are new to **Github Secrets** then you can checkout this doc [here](https
 
 **Sample Workflow File**
 
+```yml
+name: Steam Stats
+
+on:
+    schedule:
+        # Runs every Monday at 12AM IST (UTC+5:30)
+        - cron: "30 18 * * 0"
+    workflow_dispatch:
+
+jobs:
+    update-readme:
+        name: Steam Stats
+        runs-on: ubuntu-latest
+        steps:
+          - uses: nicconike/steam-stats@master
+            with:
+                STEAM_API_KEY: ${{ secrets.STEAM_API_KEY }}
+                STEAM_ID: ${{ secrets.STEAM_ID }}
+                STEAM_CUSTOM_ID: ${{ secrets.STEAM_CUSTOM_ID }}
+				WORKSHOP_STATS: True
+                LOG_SCALE: True
+```
 
 [^*]: Unfortunately, Steam Web API doesn't support Web Sockets so the profile status cannot be updated in real time as it gets updated in steam profile 🥲
