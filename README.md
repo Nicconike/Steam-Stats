@@ -99,8 +99,6 @@ jobs:
                 STEAM_API_KEY: ${{ secrets.STEAM_API_KEY }}
                 STEAM_ID: ${{ secrets.STEAM_ID }}
                 STEAM_CUSTOM_ID: ${{ secrets.STEAM_CUSTOM_ID }}
-				LOG_SCALE: True
-				WORKSHOP_STATS: True
 ```
 
 [^*]: Unfortunately, Steam Web API doesn't support Web Sockets so the profile status cannot be updated in real time as it gets updated in steam profile 🥲
