@@ -24,6 +24,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 	&& git config --global user.email "action@github.com" \
 	&& git config --global user.name "GitHub Action" \
 	&& apt-get purge -y --auto-remove \
+	&& pip uninstall -r /steam-stats/requirements.txt -y \
 	&& rm -rf /var/lib/apt/lists/*
 
 # Copy only the necessary application code into the container
