@@ -5,6 +5,7 @@
             { name: "1.2.x", range: "1.2.x", channel: "1.2.x" },
             { name: "master" },
             { name: "pre/rc", channel: "pre/rc", prerelease: "rc" },
+            { name: "rc", channel: "rc", prerelease: true },
             { name: "beta", channel: "beta", prerelease: true },
         ],
     plugins:
