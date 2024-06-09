@@ -60,7 +60,7 @@ jobs:
                 context: .
                 push: true
                 tags: |
-                    nicconike/steam-stats:${{ env.VERSION }}
+                    nicconike/steam-stats:${{ steps.extract_version.outputs.VERSION }}
 
           - name: Remove dangling images
             run: docker image prune -f
