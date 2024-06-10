@@ -1,4 +1,4 @@
-name: CICD
+name: Docker CICD
 
 on:
     push:

@@ -27,7 +27,6 @@ RUN apt-get update && \
 	apt-get clean && \
 	rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-# Copy only the necessary application code into the container
 ADD api/ /steam-stats/api/
 ADD assets/ /steam-stats/assets/
 ADD README.md /steam-stats/
