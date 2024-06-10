@@ -5,6 +5,7 @@ on:
         branches:
         - master
         paths:
+        - '**/*.yml'
         - '**/*.py'
         - 'Dockerfile'
     pull_request:
@@ -20,8 +21,6 @@ jobs:
         steps:
           - name: Checkout Code
             uses: actions/checkout@v4
-            with:
-                fetch-depth: 1
 
           - name: Detect Changes
             id: changed-files
@@ -42,8 +41,6 @@ jobs:
         steps:
           - name: Checkout Code
             uses: actions/checkout@v4
-            with:
-                fetch-depth: 1
 
           - name: Set up Docker Buildx
             uses: docker/setup-buildx-action@v3
@@ -75,8 +72,6 @@ jobs:
         steps:
           - name: Checkout code
             uses: actions/checkout@v4
-            with:
-                fetch-depth: 1
 
           - name: Extract release date from git tag
             id: release_date

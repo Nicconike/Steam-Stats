@@ -15,14 +15,11 @@ jobs:
     update-readme:
         name: Steam Stats
         runs-on: ubuntu-latest
-        container:
-            image: nicconike/steam-stats:0.1.0
         steps:
           - name: Checkout repository
             uses: actions/checkout@v4
             with:
                 token: ${{ secrets.GH_TOKEN }}
-                fetch-depth: 1
 
           - name: Set up Python
             uses: actions/setup-python@v5
