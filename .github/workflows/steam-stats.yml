@@ -8,6 +8,8 @@ on:
     pull_request:
         branches:
         - master
+        paths:
+        - '**/*.py'
 
 jobs:
     update-readme:

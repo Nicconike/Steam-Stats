@@ -1,13 +1,16 @@
 name: Pylint
 
 on:
-    schedule:
-        # Runs every Monday at 12AM IST (UTC+5:30)
-        - cron: "30 18 * * 0"
-    workflow_dispatch:
+    push:
+        branches:
+        - master
+        paths:
+        - '**/*.py'
     pull_request:
         branches:
         - master
+        paths:
+        - '**/*.py'
 
 jobs:
     build:
