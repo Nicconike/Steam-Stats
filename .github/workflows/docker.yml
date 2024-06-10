@@ -15,32 +15,35 @@ on:
         - 'Dockerfile'
 
 jobs:
-    detect-changes:
+    changed_files:
         runs-on: ubuntu-latest
-        outputs:
-            changes_detected: ${{ steps.detect-changes.outputs.changes_detected }}
         steps:
           - name: Checkout Code
             uses: actions/checkout@v4
+            with:
+                fetch-depth: 1
 
           - name: Detect Changes
-            id: detect-changes
+            id: changed-files
             uses: tj-actions/changed-files@v44
-            with:
-                files: |
-                    **/*.py
-                    Dockerfile
-          - name: Log Changes Detected
+
+          - name: List all Changes
+            env:
+                ALL_CHANGED_FILES: ${{ steps.changed-files.outputs.all_changed_files }}
             run: |
-                echo "Changes detected: ${{ steps.detect-changes.outputs.changes_detected }}"
+                for file in ${ALL_CHANGED_FILES}; do
+                    echo "$file was changed"
+                done
 
     build-and-publish:
         runs-on: ubuntu-latest
-        needs: detect-changes
-        if: needs.detect-changes.outputs.changes_detected == 'true'
+        needs: changed_files
+        if: needs.changed_files.outputs.changed_files == 'true'
         steps:
           - name: Checkout Code
             uses: actions/checkout@v4
+            with:
+                fetch-depth: 1
 
           - name: Set up Docker Buildx
             uses: docker/setup-buildx-action@v3
@@ -73,7 +76,7 @@ jobs:
           - name: Checkout code
             uses: actions/checkout@v4
             with:
-                fetch-depth: 0
+                fetch-depth: 1
 
           - name: Extract release date from git tag
             id: release_date
