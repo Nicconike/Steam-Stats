@@ -8,9 +8,6 @@ from card import (
     generate_card_for_played_games,
     generate_card_for_steam_workshop
 )
-from dotenv import load_dotenv
-
-load_dotenv()
 
 # Required Secrets Configuration
 STEAM_ID = os.environ["INPUT_STEAM_ID"]

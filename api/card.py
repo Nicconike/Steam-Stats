@@ -4,9 +4,6 @@ import math
 import os
 import asyncio
 from playwright.async_api import async_playwright, Error as PlaywrightError
-from dotenv import load_dotenv
-
-load_dotenv()
 
 REQUEST_TIMEOUT = (25, 30)
 MARGIN = 10

@@ -14,18 +14,18 @@ RUN mkdir -p /steam-stats/assets
 # Copy the requirements file into the container
 ADD requirements.txt /steam-stats/requirements.txt
 
-# Install Python dependencies
-RUN apt-get update && apt-get install -y --no-install-recommends \
-	git \
-	&& pip install --no-cache-dir -r /steam-stats/requirements.txt \
-	&& pip install playwright \
-	&& playwright install-deps \
-	&& playwright install firefox \
-	&& git config --global user.email "action@github.com" \
-	&& git config --global user.name "GitHub Action" \
-	&& apt-get purge -y --auto-remove \
-	&& pip uninstall -r /steam-stats/requirements.txt -y \
-	&& rm -rf /var/lib/apt/lists/*
+# Install Python dependencies and necessary tools, then clean up
+RUN apt-get update && \
+	apt-get install -y --no-install-recommends lsb-release git && \
+	pip install --no-cache-dir -r /steam-stats/requirements.txt && \
+	pip install playwright && \
+	playwright install-deps && \
+	playwright install firefox && \
+	git config --global user.email "action@github.com" && \
+	git config --global user.name "GitHub Action" && \
+	apt-get purge -y --auto-remove lsb-release git && \
+	apt-get clean && \
+	rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 # Copy only the necessary application code into the container
 ADD api/ /steam-stats/api/

@@ -1,9 +1,6 @@
 """Retrieves Steam User Data using Steam Web API"""
 import os
 import requests
-from dotenv import load_dotenv
-
-load_dotenv()
 
 # Required Secrets Configuration
 STEAM_ID = os.environ["INPUT_STEAM_ID"]

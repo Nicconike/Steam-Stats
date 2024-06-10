@@ -2,14 +2,10 @@
 import os
 import requests
 from bs4 import BeautifulSoup, Tag
-from dotenv import load_dotenv
-
-load_dotenv()
 
 # Required Secrets Configuration
 STEAM_API_KEY = os.environ["INPUT_STEAM_API_KEY"]
 STEAM_CUSTOM_ID = os.environ["INPUT_STEAM_CUSTOM_ID"]
-
 
 # A reasonable timeout for the request (connection and read timeout)
 REQUEST_TIMEOUT = (25, 30)
