@@ -9,13 +9,11 @@ on:
         branches:
         - master
         paths:
-        - '**/*.yml'
-        - '**/*.py'
+        - '.github/workflows/steam-stats.yml'
+        - 'api/*.py'
     pull_request:
         branches:
         - master
-        paths:
-        - '**/*.py'
 
 jobs:
     update-readme:
