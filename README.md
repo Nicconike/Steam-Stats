@@ -3,6 +3,7 @@
 [![CodeQL](https://github.com/Nicconike/Steam-Stats/actions/workflows/github-code-scanning/codeql/badge.svg?branch=master)](https://github.com/Nicconike/Steam-Stats/actions/workflows/github-code-scanning/codeql)
 [![Pylint](https://github.com/Nicconike/Steam-Stats/actions/workflows/pylint.yml/badge.svg)](https://github.com/Nicconike/Steam-Stats/actions/workflows/pylint.yml)
 ![pylint](https://img.shields.io/badge/PyLint-10.00-brightgreen?logo=python&logoColor=white)
+![GitHub repo size](https://img.shields.io/github/repo-size/nicconike/steam-stats)
 ![GitHub License](https://img.shields.io/github/license/nicconike/Steam-Stats)
 [![Visitor Badge](https://badges.pufler.dev/visits/nicconike/steam-stats)](https://badges.pufler.dev)
 

@@ -5,6 +5,12 @@ on:
         # Runs every Monday at 12AM IST (UTC+5:30)
         - cron: "30 18 * * 0"
     workflow_dispatch:
+    push:
+        branches:
+        - master
+        paths:
+        - '**/*.yml'
+        - '**/*.py'
     pull_request:
         branches:
         - master
@@ -15,6 +21,8 @@ jobs:
     update-readme:
         name: Steam Stats
         runs-on: ubuntu-latest
+        container:
+            image: nicconike/steam-stats:master
         steps:
           - name: Checkout repository
             uses: actions/checkout@v4

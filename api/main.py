@@ -18,6 +18,9 @@ STEAM_CUSTOM_ID = os.environ["INPUT_STEAM_CUSTOM_ID"]
 WORKSHOP_STATS = os.getenv("INPUT_WORKSHOP_STATS", "false").lower() == "true"
 LOG_SCALE = os.getenv("INPUT_LOG_SCALE", "false").lower() == "true"
 
+# Version Identifier for Changelog
+__version__ = "0.1.0"
+
 
 def update_readme(markdown_data, start_marker, end_marker, readme_path="README.md"):
     """Updates the README.md file with the provided Markdown content within specified markers"""
