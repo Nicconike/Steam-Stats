@@ -23,8 +23,10 @@ jobs:
 
           - name: Set up GPG
             run: |
-                gpg --batch --import <(echo "$GPG_PRIVATE_KEY")
-                echo "$GPG_PASSPHRASE" | gpg --batch --yes --passphrase-fd 0 --pinentry-mode loopback --edit-key $GPG_KEY_ID trust quit
+                mkdir -p ~/.gnupg
+                chmod 700 ~/.gnupg
+                echo "$GPG_PRIVATE_KEY" | gpg --batch --import
+                echo "$GPG_PASSPHRASE" | gpg --batch --yes --passphrase-fd 0 --pinentry-mode loopback --import-options import-show --trust-model always --edit-key $GPG_KEY_ID trust quit
             env:
                 GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
                 GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}

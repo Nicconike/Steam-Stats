@@ -29,13 +29,29 @@ jobs:
             run: |
                 latest_run=$(gh run list --workflow=release.yml --branch=master --json conclusion --jq '.[0].conclusion')
                 echo "latest_run=$latest_run" >> $GITHUB_ENV
+                echo "::set-output name=latest_run::$latest_run"
+            env:
+                GH_TOKEN: ${{ secrets.GH_TOKEN }}
+
+    wait-for-release:
+        runs-on: ubuntu-latest
+        needs: check-release
+        if: needs.check-release.outputs.latest_run == 'success' || needs.check-release.outputs.latest_run == 'failure'
+        steps:
+          - name: Wait for release.yml to complete
+            uses: lewagon/wait-on-check-action@v1.3.4
+            with:
+                ref: master
+                check-name: 'Release'
+                repo-token: ${{ secrets.GH_TOKEN }}
+                wait-interval: 10
 
 
     update-readme:
         name: Steam Stats
         runs-on: ubuntu-latest
-        needs: check-release
-        if: needs.check-release.outputs.latest_run == 'success'
+        needs: [check-release, wait-for-release]
+        if: needs.check-release.outputs.latest_run == 'success' || needs.check-release.outputs.latest_run == 'not_triggered'
         container:
             image: nicconike/steam-stats:latest
         steps:
