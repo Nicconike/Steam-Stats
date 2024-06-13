@@ -3,6 +3,7 @@ version_variable = ["api/main.py:__version__"]
 upload_to_release = true
 tag_format = "v{version}"
 changelog_file = "CHANGELOG.md"
+gpg_sign = true
 
 [tool.semantic_release.branches.main]
 match = "master"

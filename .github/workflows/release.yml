@@ -18,6 +18,17 @@ jobs:
         steps:
           - name: Checkout Code
             uses: actions/checkout@v4
+            with:
+                fetch-depth: 0
+
+          - name: Set up GPG
+            run: |
+                gpg --batch --import <(echo "$GPG_PRIVATE_KEY")
+                echo "$GPG_PASSPHRASE" | gpg --batch --yes --passphrase-fd 0 --pinentry-mode loopback --edit-key $GPG_KEY_ID trust quit
+            env:
+                GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
+                GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+                GPG_KEY_ID: ${{ secrets.GPG_KEY_ID }}
 
           - name: Set up Python
             uses: actions/setup-python@v5
@@ -31,7 +42,6 @@ jobs:
 
           - name: Semantic Release
             env:
-                GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-                DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
-                DOCKER_PASSWORD: ${{ secrets.DOCKER_TOKEN }}
+                GH_TOKEN: ${{ secrets.GH_TOKEN }}
+                GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
             run: semantic-release publish
