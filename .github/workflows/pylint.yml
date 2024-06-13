@@ -1,11 +1,13 @@
 name: Pylint
 
 on:
+    workflow_dispatch:
     push:
         branches:
-        - master
+            - master
         paths:
-        - '**/*.py'
+            - '.github/workflows/pylint.yml'
+            - '**/*.py'
     pull_request:
         branches:
         - master

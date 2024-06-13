@@ -7,13 +7,13 @@ on:
     workflow_dispatch:
     push:
         branches:
-        - master
+            - master
         paths:
-        - '.github/workflows/steam-stats.yml'
-        - 'api/*.py'
+            - '.github/workflows/steam-stats.yml'
+            - 'api/*.py'
     pull_request:
         branches:
-        - master
+            - master
 
 jobs:
     update-readme:

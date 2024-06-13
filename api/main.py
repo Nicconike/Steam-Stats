@@ -19,7 +19,7 @@ WORKSHOP_STATS = os.getenv("INPUT_WORKSHOP_STATS", "false").lower() == "true"
 LOG_SCALE = os.getenv("INPUT_LOG_SCALE", "false").lower() == "true"
 
 # Version Identifier for Changelog
-__version__ = "0.1.0"
+__version__ = "0.0.1"
 
 
 def update_readme(markdown_data, start_marker, end_marker, readme_path="README.md"):
