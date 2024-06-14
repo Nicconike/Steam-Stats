@@ -12,7 +12,7 @@ WORKDIR /steam-stats
 RUN mkdir -p /steam-stats/assets
 
 # Copy the requirements file into the container
-ADD requirements.txt /steam-stats/requirements.txt
+COPY requirements.txt /steam-stats/requirements.txt
 
 # Install Python dependencies and necessary tools, then clean up
 RUN apt-get update && \
@@ -22,7 +22,7 @@ RUN apt-get update && \
 	playwright install --with-deps firefox && \
 	git config --global user.email "action@github.com" && \
 	git config --global user.name "GitHub Action" && \
-	apt-get purge -y --auto-remove git && \
+	apt-get purge -y --auto-remove && \
 	apt-get clean && \
 	rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
