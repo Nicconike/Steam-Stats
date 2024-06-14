@@ -38,13 +38,17 @@ jobs:
         needs: check-release
         if: needs.check-release.outputs.latest_run == 'success' || needs.check-release.outputs.latest_run == 'failure'
         steps:
-          - name: Wait for release.yml to complete
-            uses: lewagon/wait-on-check-action@v1.3.4
+          - name: Wait for Release Action to complete
+            uses: kamilchodola/wait-for-workflow-action@1.1.0
             with:
-                ref: master
-                check-name: 'Release'
-                repo-token: ${{ secrets.GH_TOKEN }}
-                wait-interval: 10
+                GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+                workflow_id: 'release.yml'
+                org_name: 'nicconike'
+                repo_name: 'steam-stats'
+                ref: 'refs/heads/master'
+                max_wait_minutes: 10
+                interval: 10
+                timeout: 60
 
 
     update-readme:
