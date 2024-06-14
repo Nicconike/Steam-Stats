@@ -23,5 +23,16 @@ ignore_token_for_push = false
 insecure = false
 
 [tool.semantic_release.publish]
-dist_glob_patterns = ["dist/*"]
+dist_glob_patterns = [
+    "api/**",
+    "assets/**",
+    "!assets/recently_played_games(linear).png",
+    "!assets/recently_played_games(logarithmic).png",
+    "CHANGELOG.md",
+    "CODE_OF_CONDUCT.md",
+    "LICENSE",
+    "README.md",
+    "action.yml",
+    "requirements.txt"
+]
 upload_to_vcs_release = true

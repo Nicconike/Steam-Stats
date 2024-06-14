@@ -155,11 +155,9 @@ cython_debug/
 # Visual Studio Code
 .vscode
 
+# Docs
+COMMITS.md
+
 # Vercel
 vercel.txt
-Pipfile
-Pipfile.lock
 .vercel
-
-#Chromium
-Chromium
