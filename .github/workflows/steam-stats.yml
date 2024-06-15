@@ -28,9 +28,6 @@ jobs:
             with:
                 token: ${{ secrets.GH_TOKEN }}
 
-          - name: Install jq
-            run: sudo apt-get update && sudo apt-get install -y jq
-
           - name: Update Steam Stats in README
             run: python api/main.py
             env:

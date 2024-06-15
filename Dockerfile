@@ -14,8 +14,10 @@ RUN mkdir -p /steam-stats/assets
 # Copy the requirements file into the container
 COPY requirements.txt /steam-stats/requirements.txt
 
-# Install Python dependencies
-RUN pip install --no-cache-dir -r /steam-stats/requirements.txt
+# Install Python dependencies and necessary tools
+RUN apt-get update && \
+	apt-get install -y --no-install-recommends git && \
+	pip install --no-cache-dir -r /steam-stats/requirements.txt
 
 # Copy application code and other necessary files into the container
 COPY api/ /steam-stats/api/
