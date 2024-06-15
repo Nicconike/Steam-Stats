@@ -23,7 +23,7 @@ jobs:
         container:
             image: nicconike/steam-stats:test
         steps:
-          - name: Checkout repository
+          - name: Checkout Repo
             uses: actions/checkout@v4
             with:
                 token: ${{ secrets.GH_TOKEN }}
@@ -38,31 +38,25 @@ jobs:
                 INPUT_LOG_SCALE: True
                 HOME: /root
 
-          - name: Configure GPG
-            run: |
-                mkdir -p ~/.gnupg
-                chmod 700 ~/.gnupg
-                echo "${{ secrets.GPG_PRIVATE_KEY }}" | gpg --batch --import
-                echo "allow-loopback-pinentry" >> ~/.gnupg/gpg-agent.conf
-                echo "use-agent" >> ~/.gnupg/gpg.conf
-                gpgconf --kill gpg-agent
-                gpgconf --launch gpg-agent
-            env:
-                GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
+          - name: Set Git User
+            uses: gotmax23/set-bot-git-user-action@v1.2.0
+            with:
+                global: true
+                bot: github-actions
 
-          - name: Configure Git & Commit Changes
+          - name: Import GPG key
+            uses: crazy-max/ghaction-import-gpg@v6
+            with:
+                gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
+                passphrase: ${{ secrets.GPG_PASSPHRASE }}
+                git_config_global: true
+                git_user_signingkey: true
+                git_commit_gpgsign: true
+                git_push_gpgsign: true
+
+          - name: Configure Git and Commit Changes
             run: |
                 git config --global --add safe.directory /__w/Steam-Stats/Steam-Stats
-                git config --global user.email "action@github.com"
-                git config --global user.name "GitHub Action"
-                git config --global user.signingkey ${{ secrets.GPG_KEY_ID }}
-                git config --global commit.gpgSign true
-                git config --global tag.gpgSign true
-                git config --global push.gpgSign true
-                echo "${{ secrets.GPG_PASSPHRASE }}" | gpg --batch --yes --passphrase-fd 0 --pinentry-mode loopback --import-options import-show --edit-key ${{ secrets.GPG_KEY_ID }} trust quit
                 git add .
                 git commit -S -m "Updated Steam Stats" || echo "No changes to commit"
                 git push
-            env:
-                GPG_KEY_ID: ${{ secrets.GPG_KEY_ID }}
-                GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
