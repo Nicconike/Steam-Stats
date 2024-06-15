@@ -38,6 +38,18 @@ jobs:
                 INPUT_LOG_SCALE: True
                 HOME: /root
 
+          - name: Configure GPG
+            run: |
+                mkdir -p ~/.gnupg
+                chmod 700 ~/.gnupg
+                echo "${{ secrets.GPG_PRIVATE_KEY }}" | gpg --batch --import
+                echo "allow-loopback-pinentry" >> ~/.gnupg/gpg-agent.conf
+                echo "use-agent" >> ~/.gnupg/gpg.conf
+                gpgconf --kill gpg-agent
+                gpgconf --launch gpg-agent
+            env:
+                GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
+
           - name: Configure Git & Commit Changes
             run: |
                 git config --global --add safe.directory /__w/Steam-Stats/Steam-Stats
@@ -47,10 +59,10 @@ jobs:
                 git config --global commit.gpgSign true
                 git config --global tag.gpgSign true
                 git config --global push.gpgSign true
+                echo "${{ secrets.GPG_PASSPHRASE }}" | gpg --batch --yes --passphrase-fd 0 --pinentry-mode loopback --import-options import-show --edit-key ${{ secrets.GPG_KEY_ID }} trust quit
                 git add .
                 git commit -S -m "Updated Steam Stats" || echo "No changes to commit"
                 git push
             env:
                 GPG_KEY_ID: ${{ secrets.GPG_KEY_ID }}
                 GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
-                GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
