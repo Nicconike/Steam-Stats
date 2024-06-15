@@ -16,9 +16,9 @@
 	2. Generate new token -> Generate new token(classic)
 	3. Select scopes -> repo and workflow only
 	4. Set a reasonable expiration date
-3. **Markdown Comments:** Update the markdown file by adding the comments where the Steam Stats will be embedded to. Refer [here](#Update-Readme) to learn more.
+3. **Markdown Comments:** Update the markdown file by adding the comments where the Steam Stats will be embedded to. Refer [here](#updatereadme.md) to learn more.
 4. **Steam ID:** You can get your 64-bit Steam id (SteamID64 - 17 digit number) by clicking on your profile name in the top right corner in steam desktop client, select "Account Details" and your Steam ID will be displayed directly under your account name
-5. **Steam Custom ID:** Open the Steam desktop application, click on your profile name in the top right corner. Select "View Profile" and your custom URL will be displayed in the URL bar. From this url you will know your Steam Custom ID
+5. **Steam Custom ID:** Open the Steam desktop application, click on your profile name in the top right corner. Select _View Profile_ and your custom URL will be displayed in the URL bar. From this url you will know your Steam Custom ID
 
 The Github Actions is set to run on every Monday 12 AM IST (UTC+5:30) which you can modify to your own time as per your liking by updating it in the workflow file
 
@@ -40,7 +40,7 @@ schedule:
 <!-- Steam-Workshop end -->
 
 ## Update README.md
-1. Add below comment in your markdown file(Readme.md) for Steam User Stats
+1. Add below comment in your markdown file for Steam User Stats
 	```md
 	<!-- Steam-Stats start -->
 	<!-- Steam-Stats end -->
