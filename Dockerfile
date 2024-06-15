@@ -19,7 +19,7 @@ RUN apt-get update && \
 	apt-get install -y --no-install-recommends git && \
 	pip install --no-cache-dir -r /steam-stats/requirements.txt && \
 	pip install playwright && \
-	playwright install --with-deps firefox && \
+	playwright install --with-deps firefox --force && \
 	git config --global user.email "action@github.com" && \
 	git config --global user.name "GitHub Action" && \
 	apt-get purge -y --auto-remove && \

@@ -27,6 +27,9 @@ jobs:
             with:
                 token: ${{ secrets.GH_TOKEN }}
 
+          - name: Clear Playwright Cache
+            run: rm -rf /github/home/.cache/ms-playwright
+
           - name: Update Steam Stats in README
             run: python api/main.py
             env:
@@ -36,8 +39,9 @@ jobs:
                 INPUT_WORKSHOP_STATS: True
                 INPUT_LOG_SCALE: True
 
-          - name: Commit and Push
+          - name: Configure Git & Commit Changes
             run: |
+                git config --global --add safe.directory /__w/Steam-Stats/Steam-Stats
                 git config --global user.email "action@github.com"
                 git config --global user.name "GitHub Action"
                 git add .
