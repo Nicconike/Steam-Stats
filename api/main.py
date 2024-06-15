@@ -96,7 +96,8 @@ if __name__ == "__main__":
     if total_time > 60:
         minutes = total_time // 60
         seconds = total_time % 60
-        print(f"Total Execution Time: {int(minutes)
-                                       } minutes and {seconds:.3f} seconds")
+        print("Total Execution Time: " + str(int(minutes)) +
+              " minutes and " + str(seconds) + " seconds")
+
     else:
-        print(f"Total Execution Time: {total_time} seconds")
+        print("Total Execution Time: " + str(total_time) + " seconds")

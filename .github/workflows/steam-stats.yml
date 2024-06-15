@@ -20,7 +20,7 @@ jobs:
         name: Steam Stats
         runs-on: ubuntu-latest
         container:
-            image: nicconike/steam-stats:latest
+            image: nicconike/steam-stats:test
         steps:
           - name: Checkout repository
             uses: actions/checkout@v4

@@ -48,6 +48,7 @@ jobs:
                 pip install python-semantic-release
 
           - name: Semantic Release
-            uses: python-semantic-release/python-semantic-release@master
-            with:
-                github_token: ${{ secrets.GH_TOKEN }}
+            run: python -m semantic_release publish
+            env:
+                GH_TOKEN: ${{ secrets.GH_TOKEN }}
+                GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
