@@ -12,6 +12,7 @@ on:
         paths:
             - '.github/workflows/steam-stats.yml'
             - 'api/*.py'
+            - 'Dockerfile'
     pull_request:
         branches:
             - master
