@@ -39,7 +39,7 @@ jobs:
                 HOME: /root
 
           - name: Set Git User
-            uses: gotmax23/set-bot-git-user-action@v1.2.0
+            uses: gotmax23/set-bot-git-user-action@main
             with:
                 global: true
                 bot: github-actions
