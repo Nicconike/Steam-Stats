@@ -16,8 +16,11 @@ COPY requirements.txt /steam-stats/requirements.txt
 
 # Install Python dependencies and necessary tools
 RUN apt-get update && \
-	apt-get install -y --no-install-recommends jq git && \
-	pip install --no-cache-dir -r /steam-stats/requirements.txt
+	apt-get install -y --no-install-recommends git && \
+	pip install --no-cache-dir -r /steam-stats/requirements.txt && \
+	apt-get purge -y --auto-remove && \
+	apt-get clean && \
+	rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 # Copy application code and other necessary files into the container
 COPY api/ /steam-stats/api/
