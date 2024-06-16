@@ -6,14 +6,10 @@ on:
         - cron: "30 18 * * 0"
     workflow_dispatch:
     push:
-        branches:
-            - master
         paths:
             - '.github/workflows/steam-stats.yml'
             - 'api/*.py'
     pull_request:
-        branches:
-            - master
 
 jobs:
     update-readme:
@@ -46,4 +42,4 @@ jobs:
                 git config --global user.name "GitHub Action"
                 git add .
                 git commit -m "Updated Steam Stats" || echo "No changes to commit"
-                git push
+                git push origin HEAD:${{ github.ref_name }}
