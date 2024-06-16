@@ -232,14 +232,16 @@ def generate_card_for_played_games(games_data):
                 normalized_playtime = (playtime / max_playtime) * 100
 
             normalized_playtime = round(normalized_playtime)
-            display_time = str(
-                playtime) + " mins" if playtime < 60 else str(playtime / 60) + " hrs"
+            if playtime < 60:
+                display_time = str(playtime) + " mins"
+            else:
+                display_time = str(round(playtime / 60, 2)) + " hrs"
             progress_bars += f"""
             <div class="bar-container">
                 <img src="{img_icon_url}" alt="{name}" class="game-icon">
                 <progress class="progress-style-{(i % 6) + 1}" value="{normalized_playtime}"
                 max="100"></progress>
-                <span class="game-info"><b>{name} ({display_time})</b></span>
+                <span class="game-info">{name} ({display_time})</span>
             </div>
             """
 
