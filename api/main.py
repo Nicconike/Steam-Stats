@@ -16,7 +16,6 @@ STEAM_CUSTOM_ID = os.environ["INPUT_STEAM_CUSTOM_ID"]
 
 # Optional Feature Flags
 WORKSHOP_STATS = os.getenv("INPUT_WORKSHOP_STATS", "false").lower() == "true"
-LOG_SCALE = os.getenv("INPUT_LOG_SCALE", "false").lower() == "true"
 
 # Version Identifier for Changelog
 __version__ = "0.1.0"
@@ -29,17 +28,19 @@ def update_readme(markdown_data, start_marker, end_marker, readme_path="README.m
         readme_content = file.read()
 
     # Find the start and end index for the section to update
-    start_index = readme_content.find(start_marker) + len(start_marker)
-    end_index = readme_content.find(end_marker)
+    start_index = readme_content.find(start_marker)
+    if start_index == -1:
+        print("Error: Start marker not found in README.md")
+        return
 
-    # Check if both markers are found
-    if start_index == -1 or end_index == -1 or start_index >= end_index:
-        print("Error: Markers not found in README.md")
+    end_index = readme_content.find(end_marker, start_index)
+    if end_index == -1:
+        print("Error: End marker not found in README.md")
         return
 
     # Construct the new README content with the updated section
     new_readme_content = (
-        readme_content[:start_index] + "\n" +
+        readme_content[:start_index + len(start_marker)] + "\n" +
         markdown_data + "\n" + readme_content[end_index:]
     )
 
@@ -55,6 +56,7 @@ if __name__ == "__main__":
 
     player_summary = get_player_summaries()
     recently_played_games = get_recently_played_games()
+    links = fetch_workshop_item_links(STEAM_CUSTOM_ID, STEAM_API_KEY)
 
     USER_MARKDOWN_CONTENT = ""
     if player_summary and recently_played_games:
@@ -65,29 +67,31 @@ if __name__ == "__main__":
         if summary_content and recent_games:
             USER_MARKDOWN_CONTENT += summary_content
             USER_MARKDOWN_CONTENT += recent_games
-            print("Retrieved all Steam User Stats")
+            print("Retrieved Steam User Stats")
         else:
             print(
                 "Failed to generate card data for Steam Summary & Recently Played Games")
-    else:
-        print("Failed to fetch Steam Summary & Games Data")
 
-    if USER_MARKDOWN_CONTENT:
-        update_readme(USER_MARKDOWN_CONTENT,
-                      "<!-- Steam-Stats start -->", "<!-- Steam-Stats end -->")
-        print("README.md has been successfully updated with Steam User Stats")
+        if USER_MARKDOWN_CONTENT:
+            update_readme(USER_MARKDOWN_CONTENT,
+                          "<!-- Steam-Stats start -->", "<!-- Steam-Stats end -->")
+            print("README.md has been successfully updated with Steam Stats")
+        else:
+            print("Failed to update README with latest Steam Stats")
+    else:
+        print("Failed to fetch Steam User Summary & Games Data")
 
     if WORKSHOP_STATS is True:
         WORKSHOP_MARKDOWN_CONTENT = ""
-        links = fetch_workshop_item_links(STEAM_CUSTOM_ID, STEAM_API_KEY)
         if links:
             workshop_data = fetch_all_workshop_stats(links)
             WORKSHOP_MARKDOWN_CONTENT += generate_card_for_steam_workshop(
                 workshop_data)
-            print("Retrieved all Workshop Stats")
-            update_readme(WORKSHOP_MARKDOWN_CONTENT,
-                          "<!-- Steam-Workshop start -->", "<!-- Steam-Workshop end -->")
-            print("README.md has been successfully updated with Steam Workshop Stats")
+            print("Retrieved Workshop Stats")
+            if WORKSHOP_MARKDOWN_CONTENT:
+                update_readme(WORKSHOP_MARKDOWN_CONTENT,
+                              "<!-- Steam-Workshop start -->", "<!-- Steam-Workshop end -->")
+                print("README.md has been successfully updated with Workshop Stats")
         else:
             print("No workshop content was found")
 
@@ -96,7 +100,7 @@ if __name__ == "__main__":
     if total_time > 60:
         minutes = total_time // 60
         seconds = total_time % 60
-        print(f"Total Execution Time: {int(minutes)
-                                       } minutes and {seconds:.3f} seconds")
+        print("Total Execution Time: " + str(int(minutes)) +
+              " minutes and " + str(seconds) + " seconds")
     else:
-        print(f"Total Execution Time: {total_time} seconds")
+        print("Total Execution Time: " + str(total_time) + " seconds")

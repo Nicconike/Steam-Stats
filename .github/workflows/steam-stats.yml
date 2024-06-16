@@ -6,14 +6,10 @@ on:
         - cron: "30 18 * * 0"
     workflow_dispatch:
     push:
-        branches:
-            - master
         paths:
             - '.github/workflows/steam-stats.yml'
             - 'api/*.py'
     pull_request:
-        branches:
-            - master
 
 jobs:
     update-readme:
@@ -22,13 +18,10 @@ jobs:
         container:
             image: nicconike/steam-stats:latest
         steps:
-          - name: Checkout repository
+          - name: Checkout Repo
             uses: actions/checkout@v4
             with:
                 token: ${{ secrets.GH_TOKEN }}
-
-          - name: Clear Playwright Cache
-            run: rm -rf /github/home/.cache/ms-playwright
 
           - name: Update Steam Stats in README
             run: python api/main.py
@@ -38,6 +31,10 @@ jobs:
                 INPUT_STEAM_CUSTOM_ID: ${{ secrets.STEAM_CUSTOM_ID }}
                 INPUT_WORKSHOP_STATS: True
                 INPUT_LOG_SCALE: True
+                HOME: /root
+                GITHUB_REPOSITORY: ${{ github.repository }}
+                GITHUB_REF_NAME: ${{ github.ref_name }}
+                GITHUB_HEAD_REF: ${{ github.head_ref }}
 
           - name: Configure Git & Commit Changes
             run: |
@@ -46,4 +43,10 @@ jobs:
                 git config --global user.name "GitHub Action"
                 git add .
                 git commit -m "Updated Steam Stats" || echo "No changes to commit"
-                git push
+                if [ "${{ github.event_name }}" = "pull_request" ]; then
+                    git pull --rebase origin ${{ github.head_ref }}
+                    git push origin HEAD:${{ github.head_ref }}
+                else
+                    git pull --rebase origin ${{ github.ref_name }}
+                    git push origin HEAD:${{ github.ref_name }}
+                fi

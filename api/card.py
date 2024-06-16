@@ -8,6 +8,10 @@ from playwright.async_api import async_playwright, Error as PlaywrightError
 REQUEST_TIMEOUT = (25, 30)
 MARGIN = 10
 
+# Get Github Repo's Details where the action is being ran
+repo_owner, repo_name = os.environ["GITHUB_REPOSITORY"].split('/')
+branch_name = os.environ["GITHUB_REF_NAME"]
+
 
 async def get_element_bounding_box(html_file, selector):
     """Get the bounding box of the specified element using Playwright"""
@@ -15,20 +19,25 @@ async def get_element_bounding_box(html_file, selector):
     try:
         # Check if the HTML file exists
         if not os.path.exists(html_file):
-            raise FileNotFoundError(f"HTML file not found: {html_file}")
+            raise FileNotFoundError("HTML file not found:" + str(html_file))
 
         async with async_playwright() as p:
             browser = await p.firefox.launch(headless=True)
             page = await browser.new_page()
-            await page.goto(f"file://{os.path.abspath(html_file)}")
-            bounding_box = await page.evaluate(f"""() => {{
-                var element = document.querySelector("{selector}");
-                if (!element) {{
-                    throw new Error("Element not found: {selector}");
-                }}
-                var rect = element.getBoundingClientRect();
-                return {{x: rect.x, y: rect.y, width: rect.width, height: rect.height}};
-            }}""")
+            await page.goto("file://" + os.path.abspath(html_file))
+            bounding_box = await page.evaluate(
+                "() => {"
+                "    var element = document.querySelector(\"" +
+                selector + "\");"
+                "    if (!element) {"
+                "        throw new Error(\"Element not found: " +
+                selector + "\");"
+                "    }"
+                "    var rect = element.getBoundingClientRect();"
+                "    return {x: rect.x, y: rect.y, width: rect.width, height: rect.height};"
+                "}"
+            )
+
             await page.close()
 
         # Add margin to the bounding box
@@ -38,13 +47,13 @@ async def get_element_bounding_box(html_file, selector):
         bounding_box["height"] += 2 * MARGIN
         return bounding_box
     except FileNotFoundError as e:
-        print(f"File Not Found Error: {e}")
+        print("File Not Found Error:" + str(e))
     except PlaywrightError as e:
-        print(f"Playwright Error: {e}")
+        print("Playwright Error:" + str(e))
     except KeyError as e:
-        print(f"Key Error: {e}")
+        print("Key Error:" + str(e))
     except asyncio.TimeoutError as e:
-        print(f"Timeout Error: {e}")
+        print("Timeout Error:" + str(e))
     finally:
         if browser:
             await browser.close()
@@ -58,17 +67,17 @@ async def html_to_png(html_file, output_file, selector):
         async with async_playwright() as p:
             browser = await p.firefox.launch(headless=True)
             page = await browser.new_page()
-            await page.goto(f"file://{os.path.abspath(html_file)}")
+            await page.goto("file://" + os.path.abspath(html_file))
             await page.screenshot(path=output_file, clip=bounding_box)
             await page.close()
     except FileNotFoundError as e:
-        print(f"File Not Found Error: {e}")
+        print("File Not Found Error:" + str(e))
     except PlaywrightError as e:
-        print(f"Playwright Error: {e}")
+        print("Playwright Error:" + str(e))
     except KeyError as e:
-        print(f"Key Error: {e}")
+        print("Key Error:" + str(e))
     except asyncio.TimeoutError as e:
-        print(f"Timeout Error: {e}")
+        print("Timeout Error:" + str(e))
     finally:
         if browser:
             await browser.close()
@@ -81,13 +90,13 @@ def convert_html_to_png(html_file, output_file, selector):
         asyncio.set_event_loop(loop)
         loop.run_until_complete(html_to_png(html_file, output_file, selector))
     except FileNotFoundError as e:
-        print(f"File Not Found Error: {e}")
+        print("File Not Found Error:" + str(e))
     except PlaywrightError as e:
-        print(f"Playwright Error: {e}")
+        print("Playwright Error:" + str(e))
     except KeyError as e:
-        print(f"Key Error: {e}")
+        print("Key Error:" + str(e))
     except asyncio.TimeoutError as e:
-        print(f"Timeout Error: {e}")
+        print("Timeout Error:" + str(e))
 
 
 def format_unix_time(unix_time):
@@ -198,7 +207,8 @@ def generate_card_for_player_summary(player_data):
 
     return (
         "![Steam Summary]"
-        "(https://github.com/Nicconike/Steam-Stats/blob/master/assets/steam_summary.png)\n"
+        "(https://github.com/" + repo_owner + "/" + repo_name +
+        "/blob/" + branch_name + "/assets/steam_summary.png)\n"
     )
 
 
@@ -217,8 +227,9 @@ def generate_card_for_played_games(games_data):
         if "name" in game and "playtime_2weeks" in game:
             name = game["name"]
             playtime = game["playtime_2weeks"]
-            img_icon_url = f"https://media.steampowered.com/steamcommunity/public/images/apps/{
-                game["appid"]}/{game["img_icon_url"]}.jpg"
+            img_icon_url = "https://media.steampowered.com/steamcommunity/public/images/apps/" + \
+                str(game["appid"]) + "/" + game["img_icon_url"] + ".jpg"
+
             if log_scale is True:
                 normalized_playtime = math.log1p(playtime) / math.log1p(
                     max(game["playtime_2weeks"] for game in games_data["response"]["games"])) * 100
@@ -226,14 +237,16 @@ def generate_card_for_played_games(games_data):
                 normalized_playtime = (playtime / max_playtime) * 100
 
             normalized_playtime = round(normalized_playtime)
-            display_time = f"{playtime} mins" if playtime < 60 else f"{
-                playtime / 60:.2f} hrs"
+            if playtime < 60:
+                display_time = str(playtime) + " mins"
+            else:
+                display_time = str(round(playtime / 60, 2)) + " hrs"
             progress_bars += f"""
             <div class="bar-container">
                 <img src="{img_icon_url}" alt="{name}" class="game-icon">
                 <progress class="progress-style-{(i % 6) + 1}" value="{normalized_playtime}"
                 max="100"></progress>
-                <span class="game-info"><b>{name} ({display_time})</b></span>
+                <span class="game-info">{name} ({display_time})</span>
             </div>
             """
 
@@ -265,7 +278,8 @@ def generate_card_for_played_games(games_data):
 
     return (
         "![Recently Played Games]"
-        "(https://github.com/Nicconike/Steam-Stats/blob/master/assets/recently_played_games.png)"
+        "(https://github.com/" + repo_owner + "/" + repo_name +
+        "/blob/" + branch_name + "/assets/recently_played_games.png)"
     )
 
 
@@ -353,5 +367,6 @@ def generate_card_for_steam_workshop(workshop_stats):
 
     return (
         "![Steam Workshop Stats]"
-        "(https://github.com/Nicconike/Steam-Stats/blob/master/assets/steam_workshop_stats.png)"
+        "(https://github.com/" + repo_owner + "/" + repo_name +
+        "/blob/" + branch_name + "/assets/steam_workshop_stats.png)"
     )
