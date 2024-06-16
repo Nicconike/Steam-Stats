@@ -1,9 +1,12 @@
 # 🛠️Work in Progress 🚧|🚧 Please come back later⚒️
 [![Steam Stats](https://github.com/Nicconike/Steam-Stats/actions/workflows/steam-stats.yml/badge.svg)](https://github.com/Nicconike/Steam-Stats/actions/workflows/steam-stats.yml)
+[![Release](https://github.com/Nicconike/Steam-Stats/actions/workflows/release.yml/badge.svg)](https://github.com/Nicconike/Steam-Stats/actions/workflows/release.yml)
 [![CodeQL](https://github.com/Nicconike/Steam-Stats/actions/workflows/github-code-scanning/codeql/badge.svg?branch=master)](https://github.com/Nicconike/Steam-Stats/actions/workflows/github-code-scanning/codeql)
-[![Pylint](https://github.com/Nicconike/Steam-Stats/actions/workflows/pylint.yml/badge.svg)](https://github.com/Nicconike/Steam-Stats/actions/workflows/pylint.yml)
 ![pylint](https://img.shields.io/badge/PyLint-10.00-brightgreen?logo=python&logoColor=white)
-![GitHub repo size](https://img.shields.io/github/repo-size/nicconike/steam-stats)
+![Docker Image Size](https://img.shields.io/docker/image-size/nicconike/steam-stats?logo=docker&logoSize=auto&label=Docker%20Image&link=https%3A%2F%2Fhub.docker.com%2Fr%2Fnicconike%2Fsteam-stats%2Ftags)
+![Docker Pulls](https://img.shields.io/docker/pulls/nicconike/steam-stats?logo=docker&label=Docker%20Pulls)
+![GitHub Tag](https://img.shields.io/github/v/tag/nicconike/steam-stats?sort=semver&logo=github&label=Release&color=blue)
+![GitHub repo size](https://img.shields.io/github/repo-size/nicconike/steam-stats?logo=github&label=Repo%20Size)
 ![GitHub License](https://img.shields.io/github/license/nicconike/Steam-Stats)
 [![Visitor Badge](https://badges.pufler.dev/visits/nicconike/steam-stats)](https://badges.pufler.dev)
 
