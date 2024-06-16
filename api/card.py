@@ -206,9 +206,9 @@ def generate_card_for_player_summary(player_data):
                         "assets/steam_summary.png", ".card")
 
     return (
-        f"![Steam Summary]"
-        f"(https://github.com/{repo_owner}/{repo_name}/blob/{
-            branch_name}/assets/steam_summary.png)\n"
+        "![Steam Summary]"
+        "(https://github.com/" + repo_owner + "/" + repo_name +
+        "/blob/" + branch_name + "/assets/steam_summary.png)\n"
     )
 
 
@@ -277,9 +277,9 @@ def generate_card_for_played_games(games_data):
                         "assets/recently_played_games.png", ".card")
 
     return (
-        f"![Recently Played Games]"
-        f"(https://github.com/{repo_owner}/{repo_name}/blob/{
-            branch_name}/assets/recently_played_games.png)"
+        "![Recently Played Games]"
+        "(https://github.com/" + repo_owner + "/" + repo_name +
+        "/blob/" + branch_name + "/assets/recently_played_games.png)"
     )
 
 
@@ -366,7 +366,7 @@ def generate_card_for_steam_workshop(workshop_stats):
                         "assets/steam_workshop_stats.png", ".card")
 
     return (
-        f"![Steam Workshop Stats]"
-        f"(https://github.com/{repo_owner}/{repo_name}/blob/{
-            branch_name}/assets/steam_workshop_stats.png)"
+        "![Steam Workshop Stats]"
+        "(https://github.com/" + repo_owner + "/" + repo_name +
+        "/blob/" + branch_name + "/assets/steam_workshop_stats.png)"
     )
