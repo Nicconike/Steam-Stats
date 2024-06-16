@@ -33,6 +33,6 @@ jobs:
                 pip install python-semantic-release
 
           - name: Semantic Release
-            uses: python-semantic-release/python-semantic-release@v9.8.1
+            uses: python-semantic-release/python-semantic-release@master
             with:
                 github_token: ${{ secrets.GH_TOKEN }}
