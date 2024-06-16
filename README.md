@@ -30,13 +30,13 @@ schedule:
 ## Samples (From my [Steam Account](https://steamcommunity.com/id/nicconike/))
 **Example for Steam User Stats**
 <!-- Steam-Stats start -->
-![Steam Summary](https://github.com/Nicconike/Steam-Stats/blob/master/assets/steam_summary.png)
-![Recently Played Games](https://github.com/Nicconike/Steam-Stats/blob/master/assets/recently_played_games.png)
+![Steam Summary](https://github.com/Nicconike/Steam-Stats/blob/test-playwright/assets/steam_summary.png)
+![Recently Played Games](https://github.com/Nicconike/Steam-Stats/blob/test-playwright/assets/recently_played_games.png)
 <!-- Steam-Stats end -->
 
 **Example for Steam Workshop Stats**
 <!-- Steam-Workshop start -->
-![Steam Workshop Stats](https://github.com/Nicconike/Steam-Stats/blob/master/assets/steam_workshop_stats.png)
+![Steam Workshop Stats](https://github.com/Nicconike/Steam-Stats/blob/test-playwright/assets/steam_workshop_stats.png)
 <!-- Steam-Workshop end -->
 
 ## Update README
