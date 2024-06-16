@@ -37,6 +37,8 @@ jobs:
                 INPUT_WORKSHOP_STATS: True
                 INPUT_LOG_SCALE: True
                 HOME: /root
+                GITHUB_REPOSITORY: ${{ github.repository }}
+                GITHUB_REF_NAME: ${{ github.ref_name }}
 
           - name: Configure Git & Commit Changes
             run: |

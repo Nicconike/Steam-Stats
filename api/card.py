@@ -8,6 +8,10 @@ from playwright.async_api import async_playwright, Error as PlaywrightError
 REQUEST_TIMEOUT = (25, 30)
 MARGIN = 10
 
+# Get Github Repo's Details where the action is being ran
+repo_owner, repo_name = os.environ["GITHUB_REPOSITORY"].split('/')
+branch_name = os.environ["GITHUB_REF_NAME"]
+
 
 async def get_element_bounding_box(html_file, selector):
     """Get the bounding box of the specified element using Playwright"""
@@ -202,8 +206,9 @@ def generate_card_for_player_summary(player_data):
                         "assets/steam_summary.png", ".card")
 
     return (
-        "![Steam Summary]"
-        "(https://github.com/Nicconike/Steam-Stats/blob/master/assets/steam_summary.png)\n"
+        f"![Steam Summary]"
+        f"(https://github.com/{repo_owner}/{repo_name}/blob/{
+            branch_name}/assets/steam_summary.png)\n"
     )
 
 
@@ -272,8 +277,9 @@ def generate_card_for_played_games(games_data):
                         "assets/recently_played_games.png", ".card")
 
     return (
-        "![Recently Played Games]"
-        "(https://github.com/Nicconike/Steam-Stats/blob/master/assets/recently_played_games.png)"
+        f"![Recently Played Games]"
+        f"(https://github.com/{repo_owner}/{repo_name}/blob/{
+            branch_name}/assets/recently_played_games.png)"
     )
 
 
@@ -360,6 +366,7 @@ def generate_card_for_steam_workshop(workshop_stats):
                         "assets/steam_workshop_stats.png", ".card")
 
     return (
-        "![Steam Workshop Stats]"
-        "(https://github.com/Nicconike/Steam-Stats/blob/master/assets/steam_workshop_stats.png)"
+        f"![Steam Workshop Stats]"
+        f"(https://github.com/{repo_owner}/{repo_name}/blob/{
+            branch_name}/assets/steam_workshop_stats.png)"
     )
