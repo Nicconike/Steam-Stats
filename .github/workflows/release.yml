@@ -25,18 +25,6 @@ jobs:
             with:
                 fetch-depth: 0
 
-          - name: Setup GPG key
-            uses: crazy-max/ghaction-import-gpg@v6
-            with:
-                git_config_global: true
-                gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
-                passphrase: ${{ secrets.GPG_PASSPHRASE }}
-                trust_level: 5
-                git_user_signingkey: true
-                git_commit_gpgsign: true
-                git_tag_gpgsign: true
-                git_push_gpgsign: true
-
           - name: Set up Python
             uses: actions/setup-python@v5
             with:
@@ -51,4 +39,3 @@ jobs:
             run: python -m semantic_release publish
             env:
                 GH_TOKEN: ${{ secrets.GH_TOKEN }}
-                GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
