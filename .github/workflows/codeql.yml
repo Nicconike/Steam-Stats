@@ -5,7 +5,7 @@ on:
         branches: [ "master" ]
         paths:
             - '.github/workflows/codeql.yml'
-            - '**/*.py'
+            - 'api/*.py'
     pull_request:
         branches: [ "master" ]
     workflow_dispatch:
@@ -18,15 +18,16 @@ jobs:
         name: Analyze (${{ matrix.language }})
         runs-on: ubuntu-latest
         permissions:
+            actions: read
+            contents: read
             security-events: write
-            packages: read
 
         strategy:
             fail-fast: false
             matrix:
                 include:
                   - language: python
-                    build-mode: auto
+
         steps:
           - name: Checkout repository
             uses: actions/checkout@v4
@@ -35,7 +36,7 @@ jobs:
             uses: github/codeql-action/init@v3
             with:
                 languages: ${{ matrix.language }}
-                queries: security-extended
+                queries: +security-extended
 
           - name: Autobuild
             uses: github/codeql-action/autobuild@v3

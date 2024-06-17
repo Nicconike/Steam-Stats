@@ -27,4 +27,4 @@ COPY api/ /steam-stats/api/
 COPY README.md /steam-stats/
 
 # Command to run the application
-CMD ["python3", "api/main.py"]
+CMD ["python", "api/main.py"]
