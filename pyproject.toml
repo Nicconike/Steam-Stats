@@ -1,9 +1,10 @@
 [tool.semantic_release]
 version_variable = ["api/main.py:__version__"]
+branch = "master"
 upload_to_release = true
+commit_message = "{version}\n\nNew Version Release"
 tag_format = "v{version}"
 changelog_file = "CHANGELOG.md"
-gpg_sign = true
 
 [tool.semantic_release.branches.main]
 match = "master"

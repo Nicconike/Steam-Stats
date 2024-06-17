@@ -1,0 +1,78 @@
+name: "Code Analysis"
+
+on:
+    push:
+        branches: [ "master" ]
+        paths:
+            - '.github/workflows/codeql.yml'
+            - '**/*.py'
+    pull_request:
+        branches: [ "master" ]
+    workflow_dispatch:
+    schedule:
+        # Runs every Monday at 12AM IST (UTC+5:30)
+        - cron: "30 18 * * 0"
+
+jobs:
+    codeql-analysis:
+        name: Analyze (${{ matrix.language }})
+        runs-on: ubuntu-latest
+        permissions:
+            security-events: write
+            packages: read
+
+        strategy:
+            fail-fast: false
+            matrix:
+                include:
+                  - language: python
+                    build-mode: auto
+        steps:
+          - name: Checkout repository
+            uses: actions/checkout@v4
+
+          - name: Initialize CodeQL
+            uses: github/codeql-action/init@v3
+            with:
+                languages: ${{ matrix.language }}
+                queries: security-extended
+
+          - name: Autobuild
+            uses: github/codeql-action/autobuild@v2
+
+          - name: Perform CodeQL Analysis
+            uses: github/codeql-action/analyze@v3
+            with:
+                category: "/language:${{matrix.language}}"
+
+    pylint:
+        name: Pylint
+        runs-on: ubuntu-latest
+        needs: codeql-analysis
+        steps:
+          - name: Checkout Code
+            uses: actions/checkout@v4
+
+          - name: Set up Python
+            uses: actions/setup-python@v5
+            with:
+                python-version: '3.x'
+                cache: "pip"
+
+          - name: Install dependencies
+            run: |
+                python -m pip install --upgrade pip
+                pip install -r requirements.txt
+
+          - name: Pylint Scan & Badge
+            uses: Silleellie/pylint-github-action@v2
+            with:
+                lint-path: api
+                python-version: 3.x
+                requirements-path: requirements.txt
+                readme-path: README.md
+                badge-text: PyLint
+                color-bad-score: red
+                color-ok-score: orange
+                color-good-score: yellow
+                color-perfect-score: brightgreen
