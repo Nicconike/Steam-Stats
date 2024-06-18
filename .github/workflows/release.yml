@@ -13,19 +13,34 @@ jobs:
     release:
         runs-on: ubuntu-latest
         concurrency: release
+        if: github.repository == 'nicconike/steam-stats'
         permissions:
             id-token: write
             contents: write
+        outputs:
+            released: ${{ steps.github-release.outputs.released }}
+            new_release_version: ${{ steps.github-release.outputs.new_release_version }}
         steps:
+          - name: GitHub App Token
+            uses: actions/create-github-app-token@v1
+            id: app-token
+            with:
+                app-id: ${{ vars.APP_ID }}
+                private-key: ${{ secrets.APP_PRIVATE_KEY }}
+
           - name: Checkout Code
             uses: actions/checkout@v4
             with:
                 fetch-depth: 0
+                token: ${{ steps.app-token.outputs.token }}
+                ref: ${{ github.head_ref }}
+                persist-credentials: false
 
           - name: Set up Python
             uses: actions/setup-python@v5
             with:
                 python-version: '3.12'
+                cache: "pip"
 
           - name: Install Dependencies
             run: |
@@ -33,6 +48,47 @@ jobs:
                 pip install python-semantic-release
 
           - name: Semantic Release
+            id: github-release
             uses: python-semantic-release/python-semantic-release@master
             with:
-                github_token: ${{ secrets.GH_TOKEN }}
+                github_token: ${{ steps.app-token.outputs.token }}
+                ssh_public_signing_key: ${{ secrets.GPG_PUBLIC_KEY }}
+                ssh_private_signing_key: ${{ secrets.GPG_PRIVATE_KEY }}
+            env:
+                GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
+
+    docker:
+        runs-on: ubuntu-latest
+        concurrency: docker
+        needs: release
+        if: needs.release.outputs.released == 'true'
+        steps:
+          - name: Checkout Code
+            uses: actions/checkout@v4
+            with:
+                fetch-depth: 0
+
+          - name: Set up Docker Buildx
+            uses: docker/setup-buildx-action@v3
+
+          - name: Log in to Docker Hub
+            uses: docker/login-action@v3
+            with:
+                username: ${{ vars.DOCKER_USERNAME }}
+                password: ${{ secrets.DOCKER_TOKEN }}
+
+          - name: Extract Docker Metadata
+            id: meta
+            uses: docker/metadata-action@v5
+            with:
+                images: ${{ vars.DOCKER_USERNAME }}/steam-stats
+
+          - name: Build & Push Docker Image
+            uses: docker/build-push-action@v6
+            with:
+                context: .
+                push: true
+                tags: |
+                    ${{ vars.DOCKER_USERNAME }}/steam-stats:latest
+                    ${{ vars.DOCKER_USERNAME }}/steam-stats:${{ needs.release.outputs.new_release_version }}
+                labels: ${{ steps.meta.outputs.labels }}

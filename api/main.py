@@ -1,6 +1,7 @@
 """Main Runner Script"""
 import os
 import time
+from setuptools import setup
 from steam_stats import get_player_summaries, get_recently_played_games
 from steam_workshop import fetch_workshop_item_links, fetch_all_workshop_stats
 from card import (
@@ -18,7 +19,10 @@ STEAM_CUSTOM_ID = os.environ["INPUT_STEAM_CUSTOM_ID"]
 WORKSHOP_STATS = os.getenv("INPUT_WORKSHOP_STATS", "false").lower() == "true"
 
 # Version Identifier for Changelog
-__version__ = "0.1.0"
+__version__ = "0.1.2"
+
+setup(name="steam-stats",
+      version=__version__,)
 
 
 def update_readme(markdown_data, start_marker, end_marker, readme_path="README.md"):

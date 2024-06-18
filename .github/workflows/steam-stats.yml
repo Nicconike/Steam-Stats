@@ -27,8 +27,8 @@ jobs:
             run: python api/main.py
             env:
                 INPUT_STEAM_API_KEY: ${{ secrets.STEAM_API_KEY }}
-                INPUT_STEAM_ID: ${{ secrets.STEAM_ID }}
-                INPUT_STEAM_CUSTOM_ID: ${{ secrets.STEAM_CUSTOM_ID }}
+                INPUT_STEAM_ID: ${{ vars.STEAM_ID }}
+                INPUT_STEAM_CUSTOM_ID: ${{ vars.STEAM_CUSTOM_ID }}
                 INPUT_WORKSHOP_STATS: True
                 INPUT_LOG_SCALE: True
                 HOME: /root

@@ -1,27 +1,22 @@
 [tool.semantic_release]
-version_variable = ["api/main.py:__version__"]
+version_variables = ["api/main.py:__version__"]
 branch = "master"
 upload_to_release = true
 commit_message = "{version}\n\nNew Version Release"
 tag_format = "v{version}"
 changelog_file = "CHANGELOG.md"
+template_dir = "templates"
 
-[tool.semantic_release.branches.main]
-match = "master"
-prerelease_token = "rc"
-prerelease = false
+[tool.semantic_release.branches]
+main = { match = "master", prerelease_token = "rc", prerelease = false }
 
 [tool.semantic_release.commit_parser_options]
 allowed_tags = ["build", "chore", "ci", "docs", "feat", "fix", "perf", "style", "refactor", "test"]
 minor_tags = ["feat"]
 patch_tags = ["fix", "perf"]
+minor_tag = ":sparkles:"
+patch_tag = ":nut_and_bolt:"
 default_bump_level = 0
-
-[tool.semantic_release.remote]
-name = "origin"
-type = "github"
-ignore_token_for_push = false
-insecure = false
 
 [tool.semantic_release.publish]
 dist_glob_patterns = [
@@ -41,8 +36,7 @@ upload_to_vcs_release = true
 [tool.semantic_release.plugins]
 verify_conditions = [
     "@semantic-release/git",
-    "@semantic-release/github",
-    "@semantic-release/exec"
+    "@semantic-release/github"
 ]
 analyze_commits = [
     "@semantic-release/commit-analyzer"
@@ -55,8 +49,7 @@ prepare = [
     "@semantic-release/git"
 ]
 publish = [
-    "@semantic-release/github",
-    "@semantic-release/exec"
+    "@semantic-release/github"
 ]
 success = [
     "@semantic-release/github"
@@ -64,7 +57,3 @@ success = [
 fail = [
     "@semantic-release/github"
 ]
-
-[tool.semantic_release.exec]
-prepare_cmd = "docker build -t nicconike/steam-stats:${nextRelease.version} . && docker build -t nicconike/steam-stats:latest ."
-publish_cmd = "docker push nicconike/steam-stats:${nextRelease.version} && docker tag nicconike/steam-stats:${nextRelease.version} nicconike/steam-stats:latest && docker push nicconike/steam-stats:latest"

@@ -8,10 +8,6 @@ on:
             - 'api/*.py'
     pull_request:
         branches: [ "master" ]
-    workflow_dispatch:
-    schedule:
-        # Runs every Monday at 12AM IST (UTC+5:30)
-        - cron: "30 18 * * 0"
 
 jobs:
     codeql-analysis:
@@ -46,6 +42,13 @@ jobs:
             with:
                 category: "/language:${{matrix.language}}"
 
+          - name: Upload CodeQL Results
+            if: always()
+            uses: actions/upload-artifact@v4
+            with:
+                name: codeql-results
+                path: codeql-results/
+
     pylint:
         name: Pylint
         runs-on: ubuntu-latest
@@ -77,3 +80,16 @@ jobs:
                 color-ok-score: orange
                 color-good-score: yellow
                 color-perfect-score: brightgreen
+
+          - name: Run Pylint and Save Results
+            if: always()
+            run: |
+                mkdir -p pylint-results
+                pylint api > pylint-results/pylint-report.txt
+
+          - name: Upload Pylint Results
+            if: always()
+            uses: actions/upload-artifact@v4
+            with:
+                name: pylint-results
+                path: pylint-results/

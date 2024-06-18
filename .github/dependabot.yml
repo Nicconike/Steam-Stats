@@ -6,13 +6,38 @@ updates:
       directory: "/"
       schedule:
           interval: "weekly"
+      commit-message:
+          prefix: "build"
+          include: "scope"
+      labels:
+          - dependencies
+          - dependabot
+      rebase-strategy: auto
+      versioning-strategy: "increase-if-necessary"
 
     - package-ecosystem: "github-actions"
       directory: "/"
       schedule:
           interval: "weekly"
+      commit-message:
+          prefix: "ci"
+      labels:
+          - dependencies
+          - dependabot
+      rebase-strategy: auto
+      groups:
+          github-actions:
+              patterns:
+                  - "*"
 
     - package-ecosystem: "docker"
       directory: "/"
       schedule:
           interval: "weekly"
+      commit-message:
+          prefix: "build"
+          include: "scope"
+      labels:
+          - dependencies
+          - dependabot
+      rebase-strategy: auto
