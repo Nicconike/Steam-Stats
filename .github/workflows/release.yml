@@ -8,6 +8,9 @@ on:
             - '.github/workflows/release.yml'
             - '**/*.py'
             - 'Dockerfile'
+    pull_request:
+        branches:
+            - master
 
 jobs:
     release:
@@ -21,7 +24,7 @@ jobs:
             pull-requests: write
         outputs:
             released: ${{ steps.github-release.outputs.released }}
-            new_release_version: ${{ steps.github-release.outputs.new_release_version }}
+            new_release_version: ${{ steps.github-release.outputs.next_version }}
         steps:
           - name: GitHub App Token
             uses: actions/create-github-app-token@v1
@@ -35,8 +38,6 @@ jobs:
             with:
                 fetch-depth: 0
                 token: ${{ steps.app-token.outputs.token }}
-                ref: ${{ github.head_ref }}
-                persist-credentials: false
 
           - name: Set up Python
             uses: actions/setup-python@v5
@@ -54,8 +55,6 @@ jobs:
             uses: python-semantic-release/python-semantic-release@master
             with:
                 github_token: ${{ steps.app-token.outputs.token }}
-            env:
-                GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
 
     docker:
         runs-on: ubuntu-latest

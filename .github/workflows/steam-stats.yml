@@ -6,10 +6,14 @@ on:
         - cron: "30 18 * * 0"
     workflow_dispatch:
     push:
+        branches:
+            - master
         paths:
             - '.github/workflows/steam-stats.yml'
             - 'api/*.py'
     pull_request:
+        branches:
+            - master
 
 jobs:
     update-readme:
@@ -24,7 +28,7 @@ jobs:
                 token: ${{ secrets.GH_TOKEN }}
 
           - name: Update Steam Stats in README
-            run: python api/main.py
+            run: python3 api/main.py
             env:
                 INPUT_STEAM_API_KEY: ${{ secrets.STEAM_API_KEY }}
                 INPUT_STEAM_ID: ${{ vars.STEAM_ID }}
