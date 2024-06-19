@@ -42,17 +42,12 @@ jobs:
             with:
                 category: "/language:${{matrix.language}}"
 
-          - name: Upload SARIF to GitHub
-            uses: github/codeql-action/upload-sarif@v2
-            with:
-                sarif_file: ${{ github.workspace }}/codeql-results/${{ matrix.language }}.sarif
-
-          - name: Upload CodeQL Results as Artifact
+          - name: Upload CodeQL Results
             if: always()
             uses: actions/upload-artifact@v4
             with:
                 name: codeql-results
-                path: ${{ github.workspace }}/codeql-results/
+                path: codeql-report.sarif
 
     pylint:
         name: Pylint
@@ -94,7 +89,7 @@ jobs:
           - name: Checkout code
             uses: actions/checkout@v4
 
-          - name: Set uo Python
+          - name: Set up Python
             uses: actions/setup-python@v5
             with:
                 python-version: 3.12
