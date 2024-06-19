@@ -24,7 +24,6 @@ jobs:
             pull-requests: write
         outputs:
             released: ${{ steps.github-release.outputs.released }}
-            new_release_version: ${{ steps.github-release.outputs.next_version }}
         steps:
           - name: GitHub App Token
             uses: actions/create-github-app-token@v1
@@ -81,13 +80,44 @@ jobs:
             uses: docker/metadata-action@v5
             with:
                 images: ${{ vars.DOCKER_USERNAME }}/steam-stats
+                tags: |
+                    type=ref,event=branch
+                    type=ref,event=pr
+                    type=semver,pattern={{version}}
+                    type=semver,pattern={{major}}.{{minor}}.{{patch}}
+                    type=semver,pattern={{major}}
+                    type=sha
 
           - name: Build & Push Docker Image
             uses: docker/build-push-action@v6
             with:
                 context: .
-                push: true
+                sbom: ${{ github.event_name != 'pull_request' }}
+                push: ${{ github.event_name != 'pull_request' }}
+                load: ${{ github.event_name == 'pull_request' }}
                 tags: |
                     ${{ vars.DOCKER_USERNAME }}/steam-stats:latest
-                    ${{ vars.DOCKER_USERNAME }}/steam-stats:${{ needs.release.outputs.new_release_version }}
+                    ${{ vars.DOCKER_USERNAME }}/steam-stats:${{ steps.meta.outputs.tags }}
                 labels: ${{ steps.meta.outputs.labels }}
+                cache-from: type=gha
+                cache-to: type=gha,mode=max
+                file: Dockerfile
+
+          - name: Docker Scout Scan
+            uses: docker/scout-action@v1.9.3
+            with:
+                command: quickview, cves
+                image: ${{ steps.meta.outputs.tags }}
+                to: ${{ vars.DOCKER_USERNAME }}/steam-stats:latest
+                only-severities: critical, high
+                only-fixed: true
+                write-comment: true
+                github-token: ${{ secrets.GITHUB_TOKEN }}
+                sarif-file: docker-scout-results.sarif
+
+          - name: Upload Scout Scan Results
+            if: always()
+            uses: actions/upload-artifact@v4
+            with:
+                name: docker-scout-results
+                path: docker-scout-results.sarif

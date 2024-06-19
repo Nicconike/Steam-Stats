@@ -42,12 +42,17 @@ jobs:
             with:
                 category: "/language:${{matrix.language}}"
 
-          - name: Upload CodeQL Results
+          - name: Upload SARIF to GitHub
+            uses: github/codeql-action/upload-sarif@v2
+            with:
+                sarif_file: ${{ github.workspace }}/codeql-results/${{ matrix.language }}.sarif
+
+          - name: Upload CodeQL Results as Artifact
             if: always()
             uses: actions/upload-artifact@v4
             with:
                 name: codeql-results
-                path: codeql-results/
+                path: ${{ github.workspace }}/codeql-results/
 
     pylint:
         name: Pylint
@@ -81,15 +86,29 @@ jobs:
                 color-good-score: yellow
                 color-perfect-score: brightgreen
 
-          - name: Run Pylint and Save Results
-            if: always()
-            run: |
-                mkdir -p pylint-results
-                pylint api > pylint-results/pylint-report.txt
+    sast_scan: # Static Application Security Testing
+        name: Run Bandit Scan
+        runs-on: ubuntu-latest
 
-          - name: Upload Pylint Results
+        steps:
+          - name: Checkout code
+            uses: actions/checkout@v4
+
+          - name: Set uo Python
+            uses: actions/setup-python@v5
+            with:
+                python-version: 3.12
+
+          - name: Install Bandit
+            run: pip install bandit
+
+          - name: Run Bandit Scan
+            # Ignore Low Severity Issues
+            run: bandit -ll -ii -r . -f json -o bandit-report.json
+
+          - name: Upload Bandit Scan Results
             if: always()
             uses: actions/upload-artifact@v4
             with:
-                name: pylint-results
-                path: pylint-results/
+                name: bandit-scan-results
+                path: bandit-report.json
