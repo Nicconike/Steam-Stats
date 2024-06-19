@@ -20,16 +20,16 @@ default_bump_level = 0
 
 [tool.semantic_release.publish]
 dist_glob_patterns = [
-    "api/**",
-    "assets/**",
-    "!assets/recently_played_games(linear).png",
-    "!assets/recently_played_games(logarithmic).png",
-    "CHANGELOG.md",
-    "CODE_OF_CONDUCT.md",
-    "LICENSE",
-    "README.md",
-    "action.yml",
-    "requirements.txt"
+    "dist/api/**",
+    "dist/assets/**",
+    "!dist/assets/recently_played_games(linear).png",
+    "!dist/assets/recently_played_games(logarithmic).png",
+    "dist/CHANGELOG.md",
+    "dist/CODE_OF_CONDUCT.md",
+    "dist/LICENSE",
+    "dist/README.md",
+    "dist/action.yml",
+    "dist/requirements.txt"
 ]
 upload_to_vcs_release = true
 

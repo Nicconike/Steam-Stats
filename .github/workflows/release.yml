@@ -17,6 +17,8 @@ jobs:
         permissions:
             id-token: write
             contents: write
+            issues: write
+            pull-requests: write
         outputs:
             released: ${{ steps.github-release.outputs.released }}
             new_release_version: ${{ steps.github-release.outputs.new_release_version }}
@@ -52,8 +54,6 @@ jobs:
             uses: python-semantic-release/python-semantic-release@master
             with:
                 github_token: ${{ steps.app-token.outputs.token }}
-                ssh_public_signing_key: ${{ secrets.GPG_PUBLIC_KEY }}
-                ssh_private_signing_key: ${{ secrets.GPG_PRIVATE_KEY }}
             env:
                 GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
 
