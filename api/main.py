@@ -19,7 +19,7 @@ STEAM_CUSTOM_ID = os.environ["INPUT_STEAM_CUSTOM_ID"]
 WORKSHOP_STATS = os.getenv("INPUT_WORKSHOP_STATS", "false").lower() == "true"
 
 # Version Identifier for Changelog
-__version__ = "0.1.2"
+__version__ = "0.1.3"
 
 setup(name="steam-stats",
       version=__version__,)
