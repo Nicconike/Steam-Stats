@@ -5,6 +5,39 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## v0.1.4 (2024-06-20)
+
+### Chore
+
+* chore: update dependencies (#3)
+
+Merge ([`99d0f2e`](https://github.com/Nicconike/Steam-Stats/commit/99d0f2ed378f052dc66b882fcd5cb40ea5ffc91e))
+
+
+### Ci
+
+* ci: Update workflow to upload reports correctly ([`721ec76`](https://github.com/Nicconike/Steam-Stats/commit/721ec76b8e0345816fc9fd2ee7ab445ee98cbb59))
+
+* ci: Update workflows ([`b648032`](https://github.com/Nicconike/Steam-Stats/commit/b648032537ea8b667054a3d65ee5e4a2149cc46c))
+
+
+### Documentation
+
+* docs: Add issue templates ([`cffa8f9`](https://github.com/Nicconike/Steam-Stats/commit/cffa8f9e6b02afab0593c3aa86bf7c79e47d56e0))
+
+
+### Fix
+
+* fix: update main python script to remvoe setup ([`ebfd9e0`](https://github.com/Nicconike/Steam-Stats/commit/ebfd9e01ac097efba2f507f8948084888da51a91))
+
+
+### Unknown
+
+* Create FUNDING.yml
+
+Signed-off-by: Nicco &lt;38905025+Nicconike@users.noreply.github.com&gt; ([`274096d`](https://github.com/Nicconike/Steam-Stats/commit/274096da2e090a9b8eedeb49e609296a458410df))
+
+
 ## v0.1.3 (2024-06-19)
 
 ### Ci
