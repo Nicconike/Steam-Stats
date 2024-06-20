@@ -29,7 +29,7 @@ The Github Actions is set to run on every Monday 12 AM IST (UTC+5:30) which you 
 schedule:
         - cron: "30 18 * * 0"
 ```
-> [!WARNING]
+> [!IMPORTANT]
 > Please don't forget any of the steps mentioned in the prerequisites else the Github Action will not work.
 
 ## Samples (From my [Steam Account](https://steamcommunity.com/id/nicconike/))

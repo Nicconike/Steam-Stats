@@ -88,7 +88,7 @@ def fetch_workshop_item_links(steam_id, api_key):
             workshop_items = soup.find_all("div", class_="workshopItem")
 
             if not workshop_items:
-                print("No workshop items found on page" + str(page_number))
+                print("No workshop items found on page " + str(page_number))
                 break
 
             item_links.extend(extract_links(workshop_items))

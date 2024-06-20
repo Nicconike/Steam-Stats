@@ -11,25 +11,20 @@ template_dir = "templates"
 main = { match = "master", prerelease_token = "rc", prerelease = false }
 
 [tool.semantic_release.commit_parser_options]
-allowed_tags = ["build", "chore", "ci", "docs", "feat", "fix", "perf", "style", "refactor", "test"]
+allowed_tags = ["build", "chore", "ci", "docs", "feat", "fix", "perf", "style", "refactor", "test", "revert"]
 minor_tags = ["feat"]
 patch_tags = ["fix", "perf"]
-minor_tag = ":sparkles:"
-patch_tag = ":nut_and_bolt:"
 default_bump_level = 0
 
 [tool.semantic_release.publish]
 dist_glob_patterns = [
-    "dist/api/**",
-    "dist/assets/**",
-    "!dist/assets/recently_played_games(linear).png",
-    "!dist/assets/recently_played_games(logarithmic).png",
-    "dist/CHANGELOG.md",
-    "dist/CODE_OF_CONDUCT.md",
-    "dist/LICENSE",
-    "dist/README.md",
-    "dist/action.yml",
-    "dist/requirements.txt"
+    "api/*.py",
+    "assets/*.png",
+    "![l].png",
+    "*.md",
+    "LICENSE",
+    "action.yml",
+    "requirements.txt"
 ]
 upload_to_vcs_release = true
 
