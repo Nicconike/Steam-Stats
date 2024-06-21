@@ -1,0 +1,17 @@
+name: Question
+description: Ask a question about this project
+title: "[QUESTION] "
+labels: ["question"]
+assignees: "nicconike"
+body:
+    - type: markdown
+      attributes:
+          value: |
+              Please fill out the sections below to properly describe your question
+    - type: textarea
+      id: description
+      attributes:
+          label: Describe the question
+          placeholder: How is this feature implemented? What does this script do?
+      validations:
+          required: true

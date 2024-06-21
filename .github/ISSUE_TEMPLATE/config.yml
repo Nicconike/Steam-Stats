@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+    - name: Questions
+      url: https://discord.gg/UbetHfu
+      about: You can join or create new discussions on Discord.
+    - name: Script does not work
+      url: https://github.com/nicconike/steam-stats/blob/master/CONTRIBUTING.md
+      about: Before opening a new issue, please make sure to read CONTRIBUTING.md

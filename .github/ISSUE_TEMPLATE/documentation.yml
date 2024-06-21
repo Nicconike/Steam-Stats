@@ -1,0 +1,17 @@
+name: Documentation
+description: Suggest improvements or report issues with the documentation
+title: "[DOC] "
+labels: ["documentation"]
+assignees: "nicconike"
+body:
+    - type: markdown
+      attributes:
+          value: |
+              Please fill out the sections below to properly describe the new change that you are suggesting for the documentation
+    - type: textarea
+      id: description
+      attributes:
+          label: Describe the documentation change
+          placeholder: This change will help improve the users understand the doc in a better way
+      validations:
+          required: true

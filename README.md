@@ -103,8 +103,10 @@ jobs:
           - uses: nicconike/steam-stats@master
             with:
                 STEAM_API_KEY: ${{ secrets.STEAM_API_KEY }}
-                STEAM_ID: ${{ secrets.STEAM_ID }}
-                STEAM_CUSTOM_ID: ${{ secrets.STEAM_CUSTOM_ID }}
+                STEAM_ID: ${{ vars.STEAM_ID }}
+                STEAM_CUSTOM_ID: ${{ vars.STEAM_CUSTOM_ID }}
 ```
+
+Created with Game Sense & ❤️ by [Nicco](https://github.com/Nicconike)
 
 [^*]: Unfortunately, Steam Web API doesn't support Web Sockets so the profile status cannot be updated in real time as it gets updated in steam profile 🥲

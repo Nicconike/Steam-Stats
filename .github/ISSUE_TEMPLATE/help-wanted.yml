@@ -1,0 +1,17 @@
+name: Help Wanted
+description: Request help for a specific issue or concern
+title: "[HELP WANTED] "
+labels: ["help wanted"]
+assignees: "nicconike"
+body:
+    - type: markdown
+      attributes:
+          value: |
+              Please fill out the sections below to properly describe the new issue
+    - type: textarea
+      id: description
+      attributes:
+          label: Describe the scenario
+          placeholder: I am unable to do this, need help!
+      validations:
+          required: true
