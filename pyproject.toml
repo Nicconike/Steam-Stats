@@ -2,7 +2,7 @@
 version_variables = ["api/main.py:__version__"]
 branch = "master"
 upload_to_release = true
-commit_message = "{version}\n\nNew Version Release"
+commit_message = "{version}\n\nVersion Release\n\nCo-authored-by: Nicconike <38905025+Nicconike@users.noreply.github.com>"
 tag_format = "v{version}"
 changelog_file = "CHANGELOG.md"
 template_dir = "templates"

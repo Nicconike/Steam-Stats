@@ -28,7 +28,7 @@ jobs:
                 token: ${{ secrets.GH_TOKEN }}
 
           - name: Update Steam Stats in README
-            run: python3 api/main.py
+            run: python api/main.py
             env:
                 INPUT_STEAM_API_KEY: ${{ secrets.STEAM_API_KEY }}
                 INPUT_STEAM_ID: ${{ vars.STEAM_ID }}

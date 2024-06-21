@@ -5,21 +5,26 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-{% for version, release in context.history.released.items() -%}
-## {{ version.as_tag() }} ({{ release.tagged_date.strftime("%Y-%m-%d") }})
-{% for type_, commits in release["elements"] | dictsort %}
+## [{{ context.version }}] - {{ context.tag_date.strftime("%Y-%m-%d") }}
+
+{% set commit_count = 0 %}
+{% for type_, commits in context.history.released[context.version]["elements"] | dictsort %}
 ### {{ type_ | capitalize }}
-{% for commit in commits %}
+{% for commit in commits if commit.commit.parents | length == 1 %}
 * {{ commit.commit.message.rstrip() }} ([`{{ commit.commit.hexsha[:7] }}`]({{ commit.commit.hexsha | commit_hash_url }}))
+{% set commit_count = commit_count + 1 %}
 {% endfor %}
 {% endfor %}
-{% endfor %}
+
+{% if commit_count > 5 %}
+*... and more. [See the full Changelog](https://github.com/{{ context.repo_owner }}/{{ context.repo_name }}/releases/tag/{{ context.version }})
+{% endif %}
 
 {% if context.history.unreleased | length > 0 -%}
 ## Unreleased
 {% for type_, commits in context.history.unreleased | dictsort %}
 ### {{ type_ | capitalize }}
-{% for commit in commits %}
+{% for commit in commits if commit.commit.parents | length == 1 %}
 * {{ commit.commit.message.rstrip() }} ([`{{ commit.commit.hexsha[:7] }}`]({{ commit.commit.hexsha | commit_hash_url }}))
 {% endfor %}
 {% endfor %}
