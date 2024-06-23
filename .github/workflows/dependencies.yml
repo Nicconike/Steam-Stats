@@ -1,0 +1,36 @@
+name: Dependency Upgrade
+
+on:
+    schedule:
+        # Runs every Monday at 12AM IST (UTC+5:30)
+        - cron: "30 18 * * 0"
+    workflow_dispatch:
+
+jobs:
+    upgrade:
+        runs-on: ubuntu-latest
+        steps:
+          - name: Checkout code
+            uses: actions/checkout@v4
+
+          - name: Set up Python
+            uses: actions/setup-python@v5
+            with:
+                python-version: '3.x'
+                cache: 'pip'
+
+          - name: Upgrade dependencies
+            run: |
+                python -m venv venv
+                source venv/bin/activate
+                pip install --upgrade pip
+                pip install --upgrade -r requirements.txt
+                pipdeptree | grep -P '^\w' | awk '{print $1}' | sed 's/==.*//' > requirements.txt
+
+          - name: Configure Git & Commit Changes
+            run: |
+                git config --global --add safe.directory /__w/Steam-Stats/Steam-Stats
+                git config --global user.email "action@github.com"
+                git config --global user.name "GitHub Action"
+                git add .
+                git commit -m "Upgrade Python Dependencies\n\nCo-authored-by: Nicconike <38905025+Nicconike@users.noreply.github.com>"

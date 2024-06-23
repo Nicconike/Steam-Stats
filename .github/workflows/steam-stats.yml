@@ -46,7 +46,7 @@ jobs:
                 git config --global user.email "action@github.com"
                 git config --global user.name "GitHub Action"
                 git add .
-                git commit -m "Updated Steam Stats" || echo "No changes to commit"
+                git commit -m "Updated Steam Stats\n\nCo-authored-by: Nicconike <38905025+Nicconike@users.noreply.github.com>"
                 if [ "${{ github.event_name }}" = "pull_request" ]; then
                     git pull --rebase origin ${{ github.head_ref }}
                     git push origin HEAD:${{ github.head_ref }}

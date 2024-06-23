@@ -17,15 +17,6 @@ patch_tags = ["fix", "perf"]
 default_bump_level = 0
 
 [tool.semantic_release.publish]
-dist_glob_patterns = [
-    "api/*.py",
-    "assets/*.png",
-    "![l].png",
-    "*.md",
-    "LICENSE",
-    "action.yml",
-    "requirements.txt"
-]
 upload_to_vcs_release = true
 
 [tool.semantic_release.plugins]
