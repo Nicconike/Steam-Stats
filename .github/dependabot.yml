@@ -3,17 +3,24 @@
 version: 2
 updates:
     - package-ecosystem: "pip"
-      directory: "/"
+      directory: "requirements.txt"
       schedule:
           interval: "weekly"
       commit-message:
-          prefix: "build"
+          prefix: "chore"
           include: "scope"
       labels:
           - dependencies
           - dependabot
       rebase-strategy: auto
       versioning-strategy: "increase-if-necessary"
+      open-pull-requests-limit: 10
+      groups:
+          python-packages:
+              patterns:
+                  - "*"
+      reviewers:
+          - "nicconike"
 
     - package-ecosystem: "github-actions"
       directory: "/"
@@ -25,6 +32,9 @@ updates:
           - dependencies
           - dependabot
       rebase-strategy: auto
+      open-pull-requests-limit: 10
+      reviewers:
+          - "nicconike"
       groups:
           github-actions:
               patterns:
@@ -41,3 +51,6 @@ updates:
           - dependencies
           - dependabot
       rebase-strategy: auto
+      open-pull-requests-limit: 10
+      reviewers:
+          - "nicconike"
