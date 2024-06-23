@@ -1,3 +1,21 @@
+[build-system]
+requires = ["setuptools >= 70"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "steam-stats"
+dynamic = ["version"]
+dependencies = [
+    bs4==0.0.2,
+    DateTime==5.5,
+    pipdeptree==2.23.0,
+    playwright==1.44.0,
+    python-semantic-release==9.8.3,
+]
+requires-python = ">= 3.12"
+readme = "README.md"
+license = {file = "LICENSE"}
+
 [tool.semantic_release]
 version_variables = ["api/main.py:__version__"]
 branch = "master"
