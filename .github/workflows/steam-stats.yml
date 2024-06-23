@@ -17,6 +17,7 @@ on:
 
 jobs:
     update-readme:
+        if: github.actor != 'dependabot[bot]' && github.actor != 'protected-auto-commits[bot]'
         name: Steam Stats
         runs-on: ubuntu-latest
         container:
