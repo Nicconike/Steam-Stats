@@ -3,11 +3,11 @@
 version: 2
 updates:
     - package-ecosystem: "pip"
-      directory: "requirements.txt"
+      directory: "/api"
       schedule:
           interval: "weekly"
       commit-message:
-          prefix: "chore"
+          prefix: ":dependabot: chore"
           include: "scope"
       labels:
           - dependencies
@@ -27,7 +27,7 @@ updates:
       schedule:
           interval: "weekly"
       commit-message:
-          prefix: "ci"
+          prefix: ":dependabot: ci"
       labels:
           - dependencies
           - dependabot
@@ -45,7 +45,7 @@ updates:
       schedule:
           interval: "weekly"
       commit-message:
-          prefix: "build"
+          prefix: ":dependabot: build"
           include: "scope"
       labels:
           - dependencies

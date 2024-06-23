@@ -17,6 +17,7 @@ on:
 
 jobs:
     update-readme:
+        if: github.actor != 'dependabot[bot]' && github.actor != 'protected-auto-commits[bot]'
         name: Steam Stats
         runs-on: ubuntu-latest
         container:
@@ -46,11 +47,15 @@ jobs:
                 git config --global user.email "action@github.com"
                 git config --global user.name "GitHub Action"
                 git add .
-                git commit -m "Updated Steam Stats"
-                if [ "${{ github.event_name }}" = "pull_request" ]; then
-                    git pull --rebase origin ${{ github.head_ref }}
-                    git push origin HEAD:${{ github.head_ref }}
+                if ! git diff-index --quiet HEAD; then
+                    git commit -m "Updated Steam Stats"
+                    if [ "${{ github.event_name }}" = "pull_request" ]; then
+                        git pull --rebase origin ${{ github.head_ref }}
+                        git push origin HEAD:${{ github.head_ref }}
+                    else
+                        git pull --rebase origin ${{ github.ref_name }}
+                        git push origin HEAD:${{ github.ref_name }}
+                    fi
                 else
-                    git pull --rebase origin ${{ github.ref_name }}
-                    git push origin HEAD:${{ github.ref_name }}
+                    echo "No changes to commit"
                 fi

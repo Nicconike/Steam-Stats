@@ -14,9 +14,9 @@ on:
 
 jobs:
     release:
+        if: github.actor != 'dependabot[bot]' && github.actor != 'protected-auto-commits[bot]' && github.repository == 'nicconike/steam-stats'
         runs-on: ubuntu-latest
         concurrency: release
-        if: github.repository == 'nicconike/steam-stats'
         permissions:
             id-token: write
             contents: write
@@ -48,7 +48,7 @@ jobs:
             uses: actions/cache@v4
             with:
                 path: ~/.cache/pip
-                key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+                key: ${{ runner.os }}-pip-${{ hashFiles('api/requirements.txt') }}
                 restore-keys: |
                     ${{ runner.os }}-pip-
 
