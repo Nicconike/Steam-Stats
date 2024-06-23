@@ -109,7 +109,7 @@ jobs:
                 file: Dockerfile
 
           - name: Docker Scout Scan
-            uses: docker/scout-action@v1.9.3
+            uses: docker/scout-action@v1.10.0
             with:
                 command: quickview, cves
                 image: ${{ steps.meta.outputs.tags }}
