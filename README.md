@@ -31,6 +31,8 @@ schedule:
 ```
 > [!IMPORTANT]
 > Please don't forget any of the steps mentioned in the prerequisites else the Github Action will not work.
+>
+> You can refer the [Steam Stats Wiki](https://github.com/Nicconike/Steam-Stats/wiki) if you have any questions related to any of the steps mentioned in [Prerequisites](#Prerequisites).
 
 ## Samples (From my [Steam Account](https://steamcommunity.com/id/nicconike/))
 **Example for Steam User Stats**
@@ -106,6 +108,32 @@ jobs:
                 STEAM_ID: ${{ vars.STEAM_ID }}
                 STEAM_CUSTOM_ID: ${{ vars.STEAM_CUSTOM_ID }}
 ```
+
+## Contributing
+
+Please refer [Contributing.md](https://github.com/Nicconike/Steam-Stats/blob/master/.github/CONTRIBUTING.md) to get to know how to contribute to this project.
+And thank you for considering to contribute.
+
+## Credits
+
+- **GitHub Actions**
+	- [Checkout](https://github.com/actions/checkout)
+	- [Setup-Python](https://github.com/actions/setup-python)
+	- [Cache](https://github.com/actions/cache)
+	- [Upload-Artifact](https://github.com/actions/upload-artifact)
+	- [Create-Github-App-Token](https://github.com/actions/create-github-app-token)
+	- [CodeQL-Action](https://github.com/github/codeql-action)
+	- [Pylint-Github-Action](https://github.com/Silleellie/pylint-github-action)
+	- [Python-Semantic-Release](https://github.com/python-semantic-release/python-semantic-release)
+	- [Setup-Buildx-Action](https://github.com/docker/setup-buildx-action)
+	- [Login-Action](https://github.com/docker/login-action)
+	- [Metadata-Action](https://github.com/docker/metadata-action)
+	- [Build-Push-Action](https://github.com/docker/build-push-action)
+	- [Scout-Action](https://github.com/docker/scout-action)
+- **Styles**
+	- [Progress Bar Design](https://github.com/Nicconike/Steam-Stats/blob/master/assets/style.css) - [Ana Tudor](https://codepen.io/thebabydino)
+
+
 
 Created with Game Sense & ❤️ by [Nicco](https://github.com/Nicconike)
 
