@@ -41,6 +41,7 @@ jobs:
             uses: github/codeql-action/analyze@v3
             with:
                 category: "/language:${{matrix.language}}"
+                output: codeql-report.sarif
 
           - name: Upload CodeQL Results
             if: always()

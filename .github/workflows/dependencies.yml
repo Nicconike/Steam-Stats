@@ -4,6 +4,10 @@ on:
     schedule:
         # Runs every Monday at 12AM IST (UTC+5:30)
         - cron: "30 18 * * 0"
+    push:
+        branches: [ "master" ]
+        paths:
+            - '.github/workflows/dependencies.yml'
     workflow_dispatch:
 
 jobs:
