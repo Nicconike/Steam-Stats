@@ -78,8 +78,4 @@ Please see the docs of how to [Privately reporting a security vulnerability](htt
 | > 0.1.3 | :white_check_mark: |
 | < 0.1.2 | :x:                |
 
-## Additional Information
-
-For more information about our security practices, please visit our [Security Documentation](link-to-your-security-docs).
-
-Thank you for helping to keep our project secure!
+Thank you for helping to keep the project **secure!**
