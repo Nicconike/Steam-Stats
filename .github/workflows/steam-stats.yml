@@ -17,7 +17,7 @@ on:
 
 jobs:
     update-readme:
-        if: github.actor != 'dependabot[bot]' && github.actor != 'protected-auto-commits[bot]'
+        if: github.actor != 'dependabot[bot]' && github.actor != 'protected-auto-commits[bot]' && github.base_ref == 'master'
         name: Steam Stats
         runs-on: ubuntu-latest
         container:
@@ -38,8 +38,6 @@ jobs:
                 INPUT_LOG_SCALE: True
                 HOME: /root
                 GITHUB_REPOSITORY: ${{ github.repository }}
-                GITHUB_REF_NAME: ${{ github.ref_name }}
-                GITHUB_HEAD_REF: ${{ github.head_ref }}
 
           - name: Configure Git & Commit Changes
             run: |
@@ -49,12 +47,11 @@ jobs:
                 git add .
                 if ! git diff-index --quiet HEAD; then
                     git commit -m "Updated Steam Stats"
-                    if [ "${{ github.event_name }}" = "pull_request" ]; then
-                        git pull --rebase origin ${{ github.head_ref }}
-                        git push origin HEAD:${{ github.head_ref }}
+                    if [ "${{ github.ref }}" = "refs/heads/master" ]; then
+                        git pull --rebase origin master
+                        git push origin HEAD:master
                     else
-                        git pull --rebase origin ${{ github.ref_name }}
-                        git push origin HEAD:${{ github.ref_name }}
+                        echo "Not on master branch, skipping push"
                     fi
                 else
                     echo "No changes to commit"
