@@ -8,7 +8,7 @@ Thank you for improving the security of the project. I take security vulnerabili
 
 Instead, please report them to me by following the steps below:
 
-1. **Email**: Send an email to [38905025+Nicconike@users.noreply.github.com] with the subject "Security Vulnerability Report: Steam-Stats".
+1. **Email**: Send an email to **github.flavorful732@passinbox.com** with the subject "Security Vulnerability Report: Steam-Stats".
 2. **Discord**: If you do not prefer the email method, then please reach out to me via [Discord](https://discord.com/) @nicconike, @Nicco#1741 or the [Discord Server](https://discord.gg/UbetHfu)
 3. **Open PGP Key**: If possible, encrypt your message with my GPG key. You can download the GPG key from [here](https://keyserver.ubuntu.com/).
 4. **Information to Include**:
