@@ -1,4 +1,6 @@
 # https://docs.github.com/code-security/dependabot/dependabot-version-updates/configuration-options-for-the-dependabot.yml-file
+# pipdeptree | Select-String -Pattern '^\w' | ForEach-Object { $_.Line.Split('==')[0] } > requirements.txt
+# pipdeptree | Select-String -Pattern '^\w' | ForEach-Object { $_.Line } > requirements.txt
 
 version: 2
 updates:
@@ -7,7 +9,7 @@ updates:
       schedule:
           interval: "weekly"
       commit-message:
-          prefix: ":dependabot: chore"
+          prefix: "chore"
           include: "scope"
       labels:
           - dependencies
@@ -27,7 +29,7 @@ updates:
       schedule:
           interval: "weekly"
       commit-message:
-          prefix: ":dependabot: ci"
+          prefix: "ci"
       labels:
           - dependencies
           - dependabot
@@ -45,7 +47,7 @@ updates:
       schedule:
           interval: "weekly"
       commit-message:
-          prefix: ":dependabot: build"
+          prefix: "build"
           include: "scope"
       labels:
           - dependencies
