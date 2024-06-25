@@ -58,22 +58,22 @@ def main():
     recently_played_games = get_recently_played_games()
     links = fetch_workshop_item_links(STEAM_CUSTOM_ID, STEAM_API_KEY)
 
-    USER_MARKDOWN_CONTENT = ""
+    user_markdown_content = ""
     if player_summary and recently_played_games:
         summary_content = generate_card_for_player_summary(player_summary)
         recent_games = generate_card_for_played_games(
             recently_played_games)
 
         if summary_content and recent_games:
-            USER_MARKDOWN_CONTENT += summary_content
-            USER_MARKDOWN_CONTENT += recent_games
+            user_markdown_content += summary_content
+            user_markdown_content += recent_games
             print("Retrieved Steam User Stats")
         else:
             print(
                 "Failed to generate card data for Steam Summary & Recently Played Games")
 
-        if USER_MARKDOWN_CONTENT:
-            update_readme(USER_MARKDOWN_CONTENT,
+        if user_markdown_content:
+            update_readme(user_markdown_content,
                           "<!-- Steam-Stats start -->", "<!-- Steam-Stats end -->")
             print("README.md has been successfully updated with Steam Stats")
         else:
@@ -82,14 +82,14 @@ def main():
         print("Failed to fetch Steam User Summary & Games Data")
 
     if WORKSHOP_STATS is True:
-        WORKSHOP_MARKDOWN_CONTENT = ""
+        workshop_markdown_content = ""
         if links:
             workshop_data = fetch_all_workshop_stats(links)
-            WORKSHOP_MARKDOWN_CONTENT += generate_card_for_steam_workshop(
+            workshop_markdown_content += generate_card_for_steam_workshop(
                 workshop_data)
             print("Retrieved Workshop Stats")
-            if WORKSHOP_MARKDOWN_CONTENT:
-                update_readme(WORKSHOP_MARKDOWN_CONTENT,
+            if workshop_markdown_content:
+                update_readme(workshop_markdown_content,
                               "<!-- Steam-Workshop start -->", "<!-- Steam-Workshop end -->")
                 print("README.md has been successfully updated with Workshop Stats")
         else:
