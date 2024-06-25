@@ -28,13 +28,14 @@ jobs:
 
           - name: Run tests with coverage
             run: |
-                pytest --cov=api.main --cov=api.steam_stats --cov=api.steam_workshop --cov-report=xml --cov-report=term
+                pytest --cov=api.main --cov=api.steam_stats --cov=api.steam_workshop --cov=api.card --cov-report=xml --cov-report=term
             env:
                 INPUT_STEAM_API_KEY: ${{ secrets.STEAM_API_KEY }}
                 INPUT_STEAM_ID: ${{ vars.STEAM_ID }}
                 INPUT_STEAM_CUSTOM_ID: ${{ vars.STEAM_CUSTOM_ID }}
                 INPUT_WORKSHOP_STATS: True
                 INPUT_LOG_SCALE: True
+                GITHUB_REPOSITORY: ${{ github.repository }}
 
           - name: Upload coverage to Codecov
             uses: codecov/codecov-action@v4

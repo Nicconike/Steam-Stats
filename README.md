@@ -3,6 +3,7 @@
 [![Release](https://github.com/Nicconike/Steam-Stats/actions/workflows/release.yml/badge.svg)](https://github.com/Nicconike/Steam-Stats/actions/workflows/release.yml)
 [![Code Analysis](https://github.com/Nicconike/Steam-Stats/actions/workflows/codeql.yml/badge.svg)](https://github.com/Nicconike/Steam-Stats/actions/workflows/codeql.yml)
 ![pylint](https://img.shields.io/badge/PyLint-10.00-brightgreen?logo=python&logoColor=white)
+[![codecov](https://codecov.io/gh/Nicconike/Steam-Stats/graph/badge.svg?token=SC5P7CS1BW)](https://codecov.io/gh/Nicconike/Steam-Stats)
 ![Docker Image Size](https://img.shields.io/docker/image-size/nicconike/steam-stats?logo=docker&label=Docker%20Image&link=https%3A%2F%2Fhub.docker.com%2Fr%2Fnicconike%2Fsteam-stats)
 ![Docker Pulls](https://img.shields.io/docker/pulls/nicconike/steam-stats?logo=docker&label=Docker%20Pulls&link=https%3A%2F%2Fhub.docker.com%2Fr%2Fnicconike%2Fsteam-stats)
 ![GitHub Release](https://img.shields.io/github/v/release/nicconike/steam-stats)
