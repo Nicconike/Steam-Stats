@@ -28,6 +28,7 @@ jobs:
 
           - name: Run tests with coverage
             run: |
+                playwright install --with-deps firefox
                 pytest --cov=api.main --cov=api.steam_stats --cov=api.steam_workshop --cov=api.card --cov-report=xml --cov-report=term
             env:
                 INPUT_STEAM_API_KEY: ${{ secrets.STEAM_API_KEY }}
