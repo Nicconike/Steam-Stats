@@ -4,14 +4,14 @@ on:
     push:
         branches: [ "master" ]
         paths:
-            - '.github/workflows/codeql.yml'
-            - 'api/*.py'
+            - ".github/workflows/codeql.yml"
+            - "api/*.py"
     pull_request:
         branches: [ "master" ]
 
 jobs:
     codeql:
-        if: github.actor != 'dependabot[bot]' && github.actor != 'protected-auto-commits[bot]'
+        if: github.actor != 'dependabot[bot]' || github.actor != 'protected-auto-commits[bot]'
         name: Analyze (${{ matrix.language }})
         runs-on: ubuntu-latest
         permissions:
@@ -62,7 +62,7 @@ jobs:
           - name: Set up Python
             uses: actions/setup-python@v5
             with:
-                python-version: '3.x'
+                python-version: "3.x"
                 cache: "pip"
 
           - name: Cache Dependencies
@@ -76,7 +76,9 @@ jobs:
           - name: Pylint Scan & Badge
             uses: Silleellie/pylint-github-action@v2
             with:
-                lint-path: api
+                lint-path: |
+                    api
+                    tests
                 python-version: 3.x
                 requirements-path: requirements.txt
                 readme-path: README.md
@@ -98,8 +100,8 @@ jobs:
           - name: Set up Python
             uses: actions/setup-python@v5
             with:
-                python-version: '3.x'
-                cache: 'pip'
+                python-version: "3.x"
+                cache: "pip"
 
           - name: Install Bandit
             run: pip install bandit

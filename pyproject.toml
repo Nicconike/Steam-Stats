@@ -19,11 +19,16 @@ requires-python = ">= 3.8"
 readme = "README.md"
 license = {file = "LICENSE"}
 
+[project.urls]
+Changelog = "https://github.com/Nicconike/Steam-Stats/blob/master/CHANGELOG.md"
+Documentation = "https://github.com/Nicconike/Steam-Stats/blob/master/README.md"
+Wiki = "https://github.com/Nicconike/Steam-Stats/wiki"
+
 [tool.semantic_release]
 version_variables = ["api/main.py:__version__"]
 branch = "master"
 upload_to_release = true
-commit_message = "{version} Version Release\n\nCo-authored-by: Nicconike <38905025+Nicconike@users.noreply.github.com>"
+commit_message = "Version Release: v{version}\n\nCo-authored-by: Nicconike <38905025+Nicconike@users.noreply.github.com>"
 tag_format = "v{version}"
 changelog_file = "CHANGELOG.md"
 template_dir = "templates"

@@ -1,108 +1,63 @@
 """Test Steam Stats Script"""
-from unittest.mock import patch, MagicMock
 import pytest
 import requests
 from api import steam_stats
 
 
-@pytest.fixture
-def mock_requests_get():
-    """Mock requests.get"""
-    with patch('api.steam_stats.requests.get') as mock_get:
-        yield mock_get
+@pytest.fixture(autouse=True)
+def mock_env_vars(monkeypatch):
+    """Mock environment variables"""
+    monkeypatch.setenv("INPUT_STEAM_API_KEY", "dummy_api_key")
+    monkeypatch.setenv("INPUT_STEAM_ID", "dummy_steam_id")
 
 
-@pytest.fixture
-def mock_summary_response(mock_requests_get):
-    """Mock the response to simulate a successful API call for player summaries"""
-    mock_response = MagicMock()
-    mock_response.raise_for_status.return_value = None
-    mock_response.json.return_value = {"response": {"players": []}}
-    mock_requests_get.return_value = mock_response
-    return mock_requests_get
-
-
-@pytest.fixture
-def mock_http_error_response(mock_requests_get):
-    """Mock the response to simulate an HTTP error for player summaries"""
-    mock_response = MagicMock()
-    mock_response.raise_for_status.side_effect = requests.exceptions.HTTPError(
-        "HTTP Error")
-    mock_requests_get.return_value = mock_response
-    return mock_requests_get
-
-
-@pytest.fixture
-def mock_request_exception_response(mock_requests_get):
-    """Mock the response to simulate a request exception for player summaries"""
-    mock_requests_get.side_effect = requests.exceptions.RequestException(
-        "Request Exception")
-    return mock_requests_get
-
-
-@pytest.fixture
-def mock_games_response(mock_requests_get):
-    """Mock the response to simulate a successful API call for recently played games"""
-    mock_response = MagicMock()
-    mock_response.raise_for_status.return_value = None
-    mock_response.json.return_value = {"response": {"games": []}}
-    mock_requests_get.return_value = mock_response
-    return mock_requests_get
-
-
-@pytest.fixture
-def mock_games_http_error_response(mock_requests_get):
-    """Mock the response to simulate an HTTP error for recently played games"""
-    mock_response = MagicMock()
-    mock_response.raise_for_status.side_effect = requests.exceptions.HTTPError(
-        "HTTP Error")
-    mock_requests_get.return_value = mock_response
-    return mock_requests_get
-
-
-@pytest.fixture
-def mock_games_request_exception_response(mock_requests_get):
-    """Mock the response to simulate a request exception for recently played games"""
-    mock_requests_get.side_effect = requests.exceptions.RequestException(
-        "Request Exception")
-    return mock_requests_get
-
-
-def test_get_player_summaries_success(mock_summary_response):
+def test_get_player_summaries_success(requests_mock):
     """Test successful retrieval of player summaries"""
+    requests_mock.get('http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/',
+                      json={"response": {"players": []}})
     result = steam_stats.get_player_summaries()
     assert result is not None
     assert "response" in result
     assert "players" in result["response"]
 
 
-def test_get_player_summaries_http_error(mock_http_error_response):
+def test_get_player_summaries_http_error(requests_mock):
     """Test HTTP error handling for player summaries"""
+    requests_mock.get(
+        'http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/', status_code=404)
     result = steam_stats.get_player_summaries()
     assert result is None
 
 
-def test_get_player_summaries_request_exception(mock_request_exception_response):
+def test_get_player_summaries_request_exception(requests_mock):
     """Test request exception handling for player summaries"""
+    requests_mock.get('http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/',
+                      exc=requests.exceptions.RequestException)
     result = steam_stats.get_player_summaries()
     assert result is None
 
 
-def test_get_recently_played_games_success(mock_games_response):
+def test_get_recently_played_games_success(requests_mock):
     """Test successful retrieval of recently played games"""
+    requests_mock.get('http://api.steampowered.com/IPlayerService/GetRecentlyPlayedGames/v0001/',
+                      json={"response": {"games": []}})
     result = steam_stats.get_recently_played_games()
     assert result is not None
     assert "response" in result
     assert "games" in result["response"]
 
 
-def test_get_recently_played_games_http_error(mock_games_http_error_response):
+def test_get_recently_played_games_http_error(requests_mock):
     """Test HTTP error handling for recently played games"""
+    requests_mock.get(
+        'http://api.steampowered.com/IPlayerService/GetRecentlyPlayedGames/v0001/', status_code=404)
     result = steam_stats.get_recently_played_games()
     assert result is None
 
 
-def test_get_recently_played_games_request_exception(mock_games_request_exception_response):
+def test_get_recently_played_games_request_exception(requests_mock):
     """Test request exception handling for recently played games"""
+    requests_mock.get('http://api.steampowered.com/IPlayerService/GetRecentlyPlayedGames/v0001/',
+                      exc=requests.exceptions.RequestException)
     result = steam_stats.get_recently_played_games()
     assert result is None

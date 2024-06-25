@@ -1,85 +1,62 @@
 """Test Steam Workshop Script"""
-import os
-from unittest.mock import patch, MagicMock
+from unittest.mock import MagicMock, patch
 import pytest
 import requests
 from api import steam_workshop
-from dotenv import load_dotenv
-
-load_dotenv()
-
-STEAM_ID = os.environ["INPUT_STEAM_ID"]
-STEAM_API_KEY = os.environ["INPUT_STEAM_API_KEY"]
 
 
-@pytest.fixture
-def mock_requests_get():
-    """Mock requests.get"""
-    with patch('api.steam_workshop.requests.get') as mock_get:
-        yield mock_get
+@pytest.fixture(autouse=True)
+def mock_env_vars(monkeypatch):
+    """Mock environment variables"""
+    monkeypatch.setenv("INPUT_STEAM_API_KEY", "dummy_api_key")
+    monkeypatch.setenv("INPUT_STEAM_CUSTOM_ID", "dummy_id")
 
 
-@pytest.fixture
-def mock_server_info_response(mock_requests_get):
-    """Mock the response to simulate a successful API call for server info"""
-    mock_response = MagicMock()
-    mock_response.raise_for_status.return_value = None
-    mock_response.json.return_value = {"servertime": 1234567890}
-    mock_requests_get.return_value = mock_response
-    return mock_requests_get
-
-
-@pytest.fixture
-def mock_http_error_response(mock_requests_get):
-    """Mock the response to simulate an HTTP error"""
-    mock_response = MagicMock()
-    mock_response.raise_for_status.side_effect = requests.exceptions.HTTPError(
-        "HTTP Error")
-    mock_requests_get.return_value = mock_response
-    return mock_requests_get
-
-
-@pytest.fixture
-def mock_request_exception_response(mock_requests_get):
-    """Mock the response to simulate a request exception"""
-    mock_requests_get.side_effect = requests.exceptions.RequestException(
-        "Request Exception")
-    return mock_requests_get
-
-
-def test_get_server_info_success(mock_server_info_response):
+def test_get_server_info_success(requests_mock):
     """Test successful retrieval of server info"""
+    requests_mock.get('https://api.steampowered.com/ISteamWebAPIUtil/GetServerInfo/v1/',
+                      json={"servertime": 1234567890})
     result = steam_workshop.get_server_info("dummy_api_key")
     assert result is not None
     assert "servertime" in result
 
 
-def test_get_server_info_http_error(mock_http_error_response):
+def test_get_server_info_http_error(requests_mock):
     """Test HTTP error handling for server info"""
+    requests_mock.get(
+        'https://api.steampowered.com/ISteamWebAPIUtil/GetServerInfo/v1/', status_code=404)
     result = steam_workshop.get_server_info("dummy_api_key")
     assert result is None
 
 
-def test_get_server_info_request_exception(mock_request_exception_response):
+def test_get_server_info_request_exception(requests_mock):
     """Test request exception handling for server info"""
+    requests_mock.get('https://api.steampowered.com/ISteamWebAPIUtil/GetServerInfo/v1/',
+                      exc=requests.exceptions.RequestException)
     result = steam_workshop.get_server_info("dummy_api_key")
     assert result is None
 
 
-def test_is_server_online_success(mock_server_info_response):
+def test_is_server_online_success(requests_mock):
     """Test server online check"""
+    requests_mock.get('https://api.steampowered.com/ISteamWebAPIUtil/GetServerInfo/v1/',
+                      json={"servertime": 1234567890})
     result = steam_workshop.is_server_online("dummy_api_key")
     assert result is True
 
 
-def test_is_server_online_http_error(mock_http_error_response):
+def test_is_server_online_http_error(requests_mock):
     """Test server online check with HTTP error"""
+    requests_mock.get(
+        'https://api.steampowered.com/ISteamWebAPIUtil/GetServerInfo/v1/', status_code=404)
     result = steam_workshop.is_server_online("dummy_api_key")
     assert result is False
 
 
-def test_is_server_online_request_exception(mock_request_exception_response):
+def test_is_server_online_request_exception(requests_mock):
     """Test server online check with request exception"""
+    requests_mock.get('https://api.steampowered.com/ISteamWebAPIUtil/GetServerInfo/v1/',
+                      exc=requests.exceptions.RequestException)
     result = steam_workshop.is_server_online("dummy_api_key")
     assert result is False
 
@@ -89,11 +66,13 @@ def test_extract_links():
     mock_item = MagicMock()
     mock_link_tag = MagicMock()
     mock_link_tag.attrs = {
-        "href": "https://steamcommunity.com/sharedfiles/filedetails/?id=2986231133"}
+        "href": "https://steamcommunity.com/id/nicconike/myworkshopfiles/"}
     mock_item.find.return_value = mock_link_tag
+    mock_link_tag.__getitem__.return_value = (
+        "https://steamcommunity.com/id/nicconike/myworkshopfiles/")
     result = steam_workshop.extract_links([mock_item])
     assert result == [
-        "https://steamcommunity.com/sharedfiles/filedetails/?id=2986231133"]
+        "https://steamcommunity.com/id/nicconike/myworkshopfiles/"]
 
 
 def test_has_next_page():
@@ -113,46 +92,37 @@ def test_handle_request_exception():
             "Connection error occurred. Please check your network connection")
 
 
-def test_fetch_workshop_item_links_success(mock_server_info_response, mock_requests_get):
+def test_fetch_workshop_item_links_success(requests_mock):
     """Test successful fetching of workshop item links"""
-    mock_response = MagicMock()
-    mock_response.raise_for_status.return_value = None
-    mock_response.content = (
-        b'<div class="workshopItem"><a class="ugc"'
-        b'href="https://steamcommunity.com/sharedfiles/filedetails/?id=2984474065"></a></div>'
-    )
-    mock_requests_get.return_value = mock_response
-
+    requests_mock.get('https://steamcommunity.com/id/dummy_id/myworkshopfiles/?p=1',
+                      text='<div class="workshopItem"><a class="ugc"'
+                      'href="https://steamcommunity.com/sharedfiles/filedetails/?id=2984474065">'
+                      '</a></div>')
+    requests_mock.get('https://api.steampowered.com/ISteamWebAPIUtil/GetServerInfo/v1/',
+                      json={"servertime": 1234567890})
     result = steam_workshop.fetch_workshop_item_links(
         "dummy_id", "dummy_api_key")
     assert result == [
         "https://steamcommunity.com/sharedfiles/filedetails/?id=2984474065"]
 
 
-def test_fetch_individual_workshop_stats_success(mock_requests_get):
+def test_fetch_individual_workshop_stats_success(requests_mock):
     """Test successful fetching of individual workshop stats"""
-    mock_response = MagicMock()
-    mock_response.raise_for_status.return_value = None
-    mock_response.content = (
-        b'<table class="stats_table"><tr><td>1,000</td><td>Unique Visitors</td></tr></table>')
-    mock_requests_get.return_value = mock_response
-
+    requests_mock.get('http://example.com',
+                      text='<table class="stats_table"><tr><td>1,000</td>'
+                      '<td>Unique Visitors</td></tr></table>')
     result = steam_workshop.fetch_individual_workshop_stats(
-        "https://steamcommunity.com/sharedfiles/filedetails/?id=2984474065")
+        "http://example.com")
     assert result == {"unique_visitors": 1000,
                       "current_subscribers": 0, "current_favorites": 0}
 
 
-def test_fetch_all_workshop_stats_success(mock_requests_get):
+def test_fetch_all_workshop_stats_success(requests_mock):
     """Test successful fetching of all workshop stats"""
-    mock_response = MagicMock()
-    mock_response.raise_for_status.return_value = None
-    mock_response.content = (
-        b'<table class="stats_table"><tr><td>1,000</td><td>Unique Visitors</td></tr></table>')
-    mock_requests_get.return_value = mock_response
-
-    result = steam_workshop.fetch_all_workshop_stats(
-        ["https://steamcommunity.com/sharedfiles/filedetails/?id=2984474065"])
+    requests_mock.get('http://example.com',
+                      text='<table class="stats_table"><tr><td>1,000</td>'
+                      '<td>Unique Visitors</td></tr></table>')
+    result = steam_workshop.fetch_all_workshop_stats(["http://example.com"])
     assert result["total_unique_visitors"] == 1000
     assert result["total_current_subscribers"] == 0
     assert result["total_current_favorites"] == 0
