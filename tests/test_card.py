@@ -1,5 +1,5 @@
 """Test Card Generation Script"""
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch, MagicMock, AsyncMock
 import pytest
 from api.card import (
     get_element_bounding_box,
@@ -15,7 +15,7 @@ from api.card import (
 @pytest.fixture(autouse=True)
 def mock_env_vars(monkeypatch):
     """Mock environment variables"""
-    monkeypatch.setenv("GITHUB_REPOSITORY", "nicconike/steam-stats")
+    monkeypatch.setenv("GITHUB_REPOSITORY", "owner/repo")
     monkeypatch.setenv("GITHUB_REF_NAME", "master")
 
 
@@ -29,7 +29,7 @@ async def test_get_element_bounding_box():
     with patch("api.card.async_playwright") as mock_playwright:
         mock_browser = MagicMock()
         mock_page = MagicMock()
-        mock_page.evaluate.return_value = bounding_box
+        mock_page.evaluate = AsyncMock(return_value=bounding_box)
         mock_playwright.return_value.__aenter__.return_value.firefox.launch.return_value = (
             mock_browser)
         mock_browser.new_page.return_value = mock_page
@@ -46,7 +46,8 @@ async def test_html_to_png():
     selector = ".test-element"
     bounding_box = {"x": 10, "y": 20, "width": 100, "height": 200}
 
-    with patch("api.card.get_element_bounding_box", return_value=bounding_box), \
+    with patch("api.card.get_element_bounding_box", new_callable=AsyncMock,
+               return_value=bounding_box), \
             patch("api.card.async_playwright") as mock_playwright:
         mock_browser = MagicMock()
         mock_page = MagicMock()
@@ -65,7 +66,7 @@ def test_convert_html_to_png():
     output_file = "output.png"
     selector = ".test-element"
 
-    with patch("api.card.html_to_png") as mock_html_to_png:
+    with patch("api.card.html_to_png", new_callable=AsyncMock) as mock_html_to_png:
         convert_html_to_png(html_file, output_file, selector)
         mock_html_to_png.assert_called_once_with(
             html_file, output_file, selector)
