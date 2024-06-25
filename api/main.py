@@ -1,9 +1,9 @@
 """Main Runner Script"""
 import os
 import time
-from steam_stats import get_player_summaries, get_recently_played_games
-from steam_workshop import fetch_workshop_item_links, fetch_all_workshop_stats
-from card import (
+from api.steam_stats import get_player_summaries, get_recently_played_games
+from api.steam_workshop import fetch_workshop_item_links, fetch_all_workshop_stats
+from api.card import (
     generate_card_for_player_summary,
     generate_card_for_played_games,
     generate_card_for_steam_workshop
@@ -49,8 +49,8 @@ def update_readme(markdown_data, start_marker, end_marker, readme_path="README.m
         file.write(new_readme_content)
 
 
-# Entry Code
-if __name__ == "__main__":
+def main():
+    """Main function to run the script"""
     # Start the timer
     start_time = time.time()
 
@@ -104,3 +104,7 @@ if __name__ == "__main__":
               " minutes and " + str(seconds) + " seconds")
     else:
         print("Total Execution Time: " + str(total_time) + " seconds")
+
+
+if __name__ == "__main__":
+    main()
