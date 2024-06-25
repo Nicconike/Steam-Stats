@@ -28,7 +28,7 @@ def mock_requests_get(requests_mock):
 
 @pytest.fixture
 def mock_functions():
-    """Mock functions from other modules"""
+    """Mock functions from steam modules"""
     with patch('api.main.get_player_summaries',
                return_value={"response": {"players": []}}) as mock_get_player_summaries, \
             patch('api.main.get_recently_played_games',

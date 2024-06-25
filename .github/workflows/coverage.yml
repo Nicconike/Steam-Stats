@@ -33,6 +33,8 @@ jobs:
                 INPUT_STEAM_API_KEY: ${{ secrets.STEAM_API_KEY }}
                 INPUT_STEAM_ID: ${{ vars.STEAM_ID }}
                 INPUT_STEAM_CUSTOM_ID: ${{ vars.STEAM_CUSTOM_ID }}
+                INPUT_WORKSHOP_STATS: True
+                INPUT_LOG_SCALE: True
 
           - name: Upload coverage to Codecov
             uses: codecov/codecov-action@v4
