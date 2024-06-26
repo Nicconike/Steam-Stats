@@ -3,9 +3,6 @@ import os
 import logging
 import requests
 from bs4 import BeautifulSoup, Tag
-from dotenv import load_dotenv
-
-load_dotenv()
 
 # Configure logging
 logging.basicConfig(level=logging.INFO,

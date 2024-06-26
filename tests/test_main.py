@@ -1,4 +1,6 @@
 """Test Main Runner Script"""
+# Disable pylint warnings for false positives
+# pylint: disable=redefined-outer-name,unused-argument
 from unittest.mock import patch
 import pytest
 from api import main

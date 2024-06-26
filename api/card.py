@@ -1,9 +1,16 @@
 """Generate Cards for Steam Stats"""
 import datetime
+import logging
 import math
 import os
 import asyncio
 from playwright.async_api import async_playwright, Error as PlaywrightError
+
+# Configure logging
+logging.basicConfig(level=logging.INFO,
+                    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+logger = logging.getLogger(__name__)
+
 
 REQUEST_TIMEOUT = (25, 30)
 MARGIN = 10
@@ -20,26 +27,21 @@ async def get_element_bounding_box(html_file, selector):
         # Check if the HTML file exists
         if not os.path.exists(html_file):
             raise FileNotFoundError("HTML file not found:" + str(html_file))
-
         async with async_playwright() as p:
             browser = await p.firefox.launch(headless=True)
             page = await browser.new_page()
             await page.goto("file://" + os.path.abspath(html_file))
             bounding_box = await page.evaluate(
                 "() => {"
-                "    var element = document.querySelector(\"" +
-                selector + "\");"
-                "    if (!element) {"
-                "        throw new Error(\"Element not found: " +
-                selector + "\");"
-                "    }"
-                "    var rect = element.getBoundingClientRect();"
-                "    return {x: rect.x, y: rect.y, width: rect.width, height: rect.height};"
+                " var element = document.querySelector(\"" + selector + "\");"
+                " if (!element) {"
+                " throw new Error(\"Element not found: " + selector + "\");"
+                " }"
+                " var rect = element.getBoundingClientRect();"
+                " return {x: rect.x, y: rect.y, width: rect.width, height: rect.height};"
                 "}"
             )
-
             await page.close()
-
         # Add margin to the bounding box
         bounding_box["x"] = max(bounding_box["x"] - MARGIN, 0)
         bounding_box["y"] = max(bounding_box["y"] - MARGIN, 0)
@@ -47,13 +49,13 @@ async def get_element_bounding_box(html_file, selector):
         bounding_box["height"] += 2 * MARGIN
         return bounding_box
     except FileNotFoundError as e:
-        print("File Not Found Error:" + str(e))
+        logger.error("File Not Found Error: %s", str(e))
     except PlaywrightError as e:
-        print("Playwright Error:" + str(e))
+        logger.error("Playwright Error: %s", str(e))
     except KeyError as e:
-        print("Key Error:" + str(e))
+        logger.error("Key Error: %s", str(e))
     except asyncio.TimeoutError as e:
-        print("Timeout Error:" + str(e))
+        logger.error("Timeout Error: %s", str(e))
     finally:
         if browser:
             await browser.close()
@@ -71,13 +73,13 @@ async def html_to_png(html_file, output_file, selector):
             await page.screenshot(path=output_file, clip=bounding_box)
             await page.close()
     except FileNotFoundError as e:
-        print("File Not Found Error:" + str(e))
+        logger.error("File Not Found Error: %s", str(e))
     except PlaywrightError as e:
-        print("Playwright Error:" + str(e))
+        logger.error("Playwright Error: %s", str(e))
     except KeyError as e:
-        print("Key Error:" + str(e))
+        logger.error("Key Error: %s", str(e))
     except asyncio.TimeoutError as e:
-        print("Timeout Error:" + str(e))
+        logger.error("Timeout Error: %s", str(e))
     finally:
         if browser:
             await browser.close()
@@ -90,13 +92,13 @@ def convert_html_to_png(html_file, output_file, selector):
         asyncio.set_event_loop(loop)
         loop.run_until_complete(html_to_png(html_file, output_file, selector))
     except FileNotFoundError as e:
-        print("File Not Found Error:" + str(e))
+        logger.error("File Not Found Error: %s", str(e))
     except PlaywrightError as e:
-        print("Playwright Error:" + str(e))
+        logger.error("Playwright Error: %s", str(e))
     except KeyError as e:
-        print("Key Error:" + str(e))
+        logger.error("Key Error: %s", str(e))
     except asyncio.TimeoutError as e:
-        print("Timeout Error:" + str(e))
+        logger.error("Timeout Error: %s", str(e))
 
 
 def format_unix_time(unix_time):
@@ -199,11 +201,11 @@ def generate_card_for_player_summary(player_data):
 </body>
 </html>
     """
-    with open("../assets/steam_summary.html", "w", encoding="utf-8") as file:
+    with open("assets/steam_summary.html", "w", encoding="utf-8") as file:
         file.write(html_content)
 
-    convert_html_to_png("../assets/steam_summary.html",
-                        "../assets/steam_summary.png", ".card")
+    convert_html_to_png("assets/steam_summary.html",
+                        "assets/steam_summary.png", ".card")
 
     return (
         "![Steam Summary]"
@@ -214,8 +216,9 @@ def generate_card_for_player_summary(player_data):
 
 def generate_card_for_played_games(games_data):
     """Generate HTML Card for recently played games in last 2 weeks"""
-    if not games_data or "games" not in games_data["response"]:
-        return "<div class='recently-played-games'><p>No games played recently</p></div>"
+    if not games_data or "games" not in games_data["response"
+                                                   ] or games_data["response"]["total_count"] == 0:
+        return "<div class='recently-played-games'><p>No games played recently.</p></div>"
 
     # Check if LOG_SCALE is set to true
     log_scale = os.getenv("INPUT_LOG_SCALE", "false").lower() == "true"
@@ -270,11 +273,11 @@ def generate_card_for_played_games(games_data):
 </html>
     """
 
-    with open("../assets/recently_played_games.html", "w", encoding="utf-8") as file:
+    with open("assets/recently_played_games.html", "w", encoding="utf-8") as file:
         file.write(html_content)
 
-    convert_html_to_png("../assets/recently_played_games.html",
-                        "../assets/recently_played_games.png", ".card")
+    convert_html_to_png("assets/recently_played_games.html",
+                        "assets/recently_played_games.png", ".card")
 
     return (
         "![Recently Played Games]"
@@ -359,11 +362,11 @@ def generate_card_for_steam_workshop(workshop_stats):
 </body>
 </html>
     """
-    with open("../assets/steam_workshop_stats.html", "w", encoding="utf-8") as file:
+    with open("assets/steam_workshop_stats.html", "w", encoding="utf-8") as file:
         file.write(html_content)
 
-    convert_html_to_png("../assets/steam_workshop_stats.html",
-                        "../assets/steam_workshop_stats.png", ".card")
+    convert_html_to_png("assets/steam_workshop_stats.html",
+                        "assets/steam_workshop_stats.png", ".card")
 
     return (
         "![Steam Workshop Stats]"
