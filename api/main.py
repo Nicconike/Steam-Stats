@@ -20,8 +20,9 @@ STEAM_ID = os.environ["INPUT_STEAM_ID"]
 STEAM_API_KEY = os.environ["INPUT_STEAM_API_KEY"]
 STEAM_CUSTOM_ID = os.environ["INPUT_STEAM_CUSTOM_ID"]
 
-# Optional Feature Flags
-WORKSHOP_STATS = os.getenv("INPUT_WORKSHOP_STATS", "false").lower() == "true"
+# Optional Feature Flag
+WORKSHOP_STATS = os.getenv("INPUT_WORKSHOP_STATS",
+                           "false").lower() in ("true", "1", "t")
 
 # Version Identifier for Changelog
 __version__ = "0.1.4"
@@ -55,52 +56,77 @@ def update_readme(markdown_data, start_marker, end_marker, readme_path="README.m
         file.write(new_readme_content)
 
 
+def generate_steam_stats():
+    """Generate Steam Stats and return markdown content"""
+    user_markdown_content = ""
+    player_summary = get_player_summaries()
+    if player_summary:
+        logger.info("Retrieved Steam User Data")
+        summary_content = generate_card_for_player_summary(player_summary)
+        if summary_content:
+            user_markdown_content += summary_content
+            logger.info("Generated Card for Steam User Data")
+        else:
+            logger.error("Failed to generate card for Steam Summary")
+    else:
+        logger.info("No Steam User Summary data found")
+
+    recently_played_games = get_recently_played_games()
+    if recently_played_games:
+        logger.info("Retrieved Recently Played Games Data")
+        recent_games = generate_card_for_played_games(recently_played_games)
+        if recent_games:
+            user_markdown_content += recent_games
+            logger.info("Generated Card for Recently Played Games")
+        else:
+            logger.info("No Games data found, skipping card generation")
+    else:
+        logger.info("No Recently Played Games data found")
+
+    return user_markdown_content
+
+
+def generate_workshop_stats():
+    """Generate Workshop Stats and return markdown content"""
+    workshop_markdown_content = ""
+    links = fetch_workshop_item_links(STEAM_CUSTOM_ID, STEAM_API_KEY)
+    if links:
+        workshop_data = fetch_all_workshop_stats(links)
+        workshop_content = generate_card_for_steam_workshop(workshop_data)
+        if workshop_content:
+            workshop_markdown_content += workshop_content
+            logger.info("Generated Card for Workshop Stats")
+        else:
+            logger.error("Failed to generate card data for Workshop Stats")
+    else:
+        logger.error("No workshop content was found")
+
+    return workshop_markdown_content
+
+
 def main():
     """Main function to run the script"""
     # Start the timer
     start_time = time.time()
 
-    player_summary = get_player_summaries()
-    recently_played_games = get_recently_played_games()
-    links = fetch_workshop_item_links(STEAM_CUSTOM_ID, STEAM_API_KEY)
+    user_markdown_content = generate_steam_stats()
+    if user_markdown_content:
+        update_readme(user_markdown_content,
+                      "<!-- Steam-Stats start -->", "<!-- Steam-Stats end -->")
+        logger.info("README.md successfully updated with Steam Stats")
+    else:
+        logger.error("Failed to update README with latest Steam Stats")
 
-    user_markdown_content = ""
-    if player_summary and recently_played_games:
-        summary_content = generate_card_for_player_summary(player_summary)
-        recent_games = generate_card_for_played_games(recently_played_games)
-
-        if summary_content and recent_games:
-            user_markdown_content += summary_content
-            user_markdown_content += recent_games
-            logger.info("Retrieved Steam User Stats")
+    if WORKSHOP_STATS:
+        workshop_markdown_content = generate_workshop_stats()
+        if workshop_markdown_content:
+            update_readme(workshop_markdown_content,
+                          "<!-- Steam-Workshop start -->", "<!-- Steam-Workshop end -->")
+            logger.info(
+                "README.md successfully updated with Workshop Stats")
         else:
             logger.error(
-                "Failed to generate card data for Steam Summary & Recently Played Games")
-
-        if user_markdown_content:
-            update_readme(user_markdown_content,
-                          "<!-- Steam-Stats start -->", "<!-- Steam-Stats end -->")
-            logger.info(
-                "README.md has been successfully updated with Steam Stats")
-        else:
-            logger.error("Failed to update README with latest Steam Stats")
-    else:
-        logger.error("Failed to fetch Steam User Summary & Games Data")
-
-    if WORKSHOP_STATS is True:
-        workshop_markdown_content = ""
-        if links:
-            workshop_data = fetch_all_workshop_stats(links)
-            workshop_markdown_content += generate_card_for_steam_workshop(
-                workshop_data)
-            logger.info("Retrieved Workshop Stats")
-            if workshop_markdown_content:
-                update_readme(workshop_markdown_content,
-                              "<!-- Steam-Workshop start -->", "<!-- Steam-Workshop end -->")
-                logger.info(
-                    "README.md has been successfully updated with Workshop Stats")
-        else:
-            logger.error("No workshop content was found")
+                "Failed to update README with latest Workshop Stats")
 
     end_time = time.time()  # End the timer
     total_time = round(end_time - start_time, 3)  # Total time

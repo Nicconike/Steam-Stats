@@ -216,12 +216,12 @@ def generate_card_for_player_summary(player_data):
 
 def generate_card_for_played_games(games_data):
     """Generate HTML Card for recently played games in last 2 weeks"""
-    if not games_data or "games" not in games_data["response"
-                                                   ] or games_data["response"]["total_count"] == 0:
-        return "<div class='recently-played-games'><p>No games played recently.</p></div>"
+    if not games_data:
+        return None
 
-    # Check if LOG_SCALE is set to true
-    log_scale = os.getenv("INPUT_LOG_SCALE", "false").lower() == "true"
+    # Check if LOG_SCALE is set to true(Optional Feature Flag)
+    log_scale = os.getenv(
+        "INPUT_LOG_SCALE", "false").lower() in ("true", "1", "t")
     max_playtime = games_data["response"]["games"][0]["playtime_2weeks"]
 
     # Generate the progress bars with repeating styles
