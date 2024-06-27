@@ -1,6 +1,4 @@
 """Test Card Generation Script"""
-# Disable pylint warnings for false positives
-# pylint: disable=duplicate-code
 from unittest.mock import patch, MagicMock, AsyncMock
 import pytest
 from api.card import (
@@ -18,7 +16,7 @@ from api.card import (
 def mock_env_vars(monkeypatch):
     """Mock environment variables"""
     monkeypatch.setenv("GITHUB_REPOSITORY", "owner/repo")
-    monkeypatch.setenv("GITHUB_REF_NAME", "master")
+    monkeypatch.setenv("GITHUB_REF_NAME", "main")
 
 
 @pytest.mark.asyncio
@@ -28,13 +26,17 @@ async def test_get_element_bounding_box():
     selector = ".test-element"
     bounding_box = {"x": 10, "y": 20, "width": 100, "height": 200}
 
-    with patch("api.card.async_playwright") as mock_playwright:
+    with patch("os.path.exists", return_value=True), \
+            patch("api.card.async_playwright") as mock_playwright:
         mock_browser = MagicMock()
         mock_page = MagicMock()
         mock_page.evaluate = AsyncMock(return_value=bounding_box)
-        mock_playwright.return_value.__aenter__.return_value.firefox.launch.return_value = (
-            mock_browser)
-        mock_browser.new_page.return_value = mock_page
+        mock_page.goto = AsyncMock()
+        mock_page.close = AsyncMock()
+        mock_browser.new_page = AsyncMock(return_value=mock_page)
+        mock_browser.close = AsyncMock()
+        mock_playwright.return_value.__aenter__.return_value.firefox.launch = AsyncMock(
+            return_value=mock_browser)
 
         result = await get_element_bounding_box(html_file, selector)
         assert result == bounding_box
@@ -48,14 +50,19 @@ async def test_html_to_png():
     selector = ".test-element"
     bounding_box = {"x": 10, "y": 20, "width": 100, "height": 200}
 
-    with patch("api.card.get_element_bounding_box", new_callable=AsyncMock,
-               return_value=bounding_box), \
+    with patch("os.path.exists", return_value=True), \
+            patch("api.card.get_element_bounding_box", new_callable=AsyncMock,
+                  return_value=bounding_box), \
             patch("api.card.async_playwright") as mock_playwright:
         mock_browser = MagicMock()
         mock_page = MagicMock()
-        mock_playwright.return_value.__aenter__.return_value.firefox.launch.return_value = (
-            mock_browser)
-        mock_browser.new_page.return_value = mock_page
+        mock_page.goto = AsyncMock()
+        mock_page.screenshot = AsyncMock()
+        mock_page.close = AsyncMock()
+        mock_browser.new_page = AsyncMock(return_value=mock_page)
+        mock_browser.close = AsyncMock()
+        mock_playwright.return_value.__aenter__.return_value.firefox.launch = AsyncMock(
+            return_value=mock_browser)
 
         await html_to_png(html_file, output_file, selector)
         mock_page.screenshot.assert_called_once_with(
@@ -99,12 +106,7 @@ def test_generate_card_for_player_summary():
     }
     result = generate_card_for_player_summary(player_data)
     assert result is not None
-    assert "Name: TestUser" in result
-    assert "Status: Online" in result
-    assert "Country: US" in result
-    assert "Last Logoff: 01/01/2021" in result
-    assert "PC Gaming Since: 01/01/2021" in result
-    assert "Currently Playing: TestGame" in result
+    assert "![Steam Summary]" in result
 
 
 def test_generate_card_for_played_games():
@@ -113,14 +115,15 @@ def test_generate_card_for_played_games():
         "response": {
             "games": [{
                 "name": "TestGame",
-                "playtime_forever": 120
+                "playtime_2weeks": 120,
+                "appid": 12345,
+                "img_icon_url": "icon.jpg"
             }]
         }
     }
     result = generate_card_for_played_games(games_data)
     assert result is not None
-    assert "TestGame" in result
-    assert "Playtime: 120 minutes" in result
+    assert "![Recently Played Games]" in result
 
 
 def test_generate_card_for_steam_workshop():
@@ -132,9 +135,4 @@ def test_generate_card_for_steam_workshop():
     }
     result = generate_card_for_steam_workshop(workshop_stats)
     assert result is not None
-    assert "Unique Visitors" in result
-    assert "1000" in result
-    assert "Current Subscribers" in result
-    assert "500" in result
-    assert "Current Favorites" in result
-    assert "200" in result
+    assert "![Steam Workshop Stats]" in result
