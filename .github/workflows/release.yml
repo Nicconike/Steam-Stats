@@ -6,7 +6,7 @@ on:
             - master
         paths:
             - '.github/workflows/release.yml'
-            - '**/*.py'
+            - 'api/*.py'
             - 'pyproject.toml'
             - 'Dockerfile'
     pull_request:
