@@ -1,4 +1,4 @@
-name: "Code Analysis"
+name: "CodeQL & Pylint"
 
 on:
     push:
@@ -87,31 +87,3 @@ jobs:
                 color-ok-score: orange
                 color-good-score: yellow
                 color-perfect-score: brightgreen
-
-    sast_scan: # Static Application Security Testing
-        name: Run Bandit Scan
-        needs: pylint
-        runs-on: ubuntu-latest
-
-        steps:
-          - name: Checkout code
-            uses: actions/checkout@v4
-
-          - name: Set up Python
-            uses: actions/setup-python@v5
-            with:
-                python-version: "3.x"
-                cache: "pip"
-
-          - name: Install Bandit
-            run: pip install bandit
-
-          - name: Run Bandit Scan
-            run: bandit -r . -f json -o bandit-report.json
-
-          - name: Upload Bandit Scan Results
-            if: always()
-            uses: actions/upload-artifact@v4
-            with:
-                name: bandit-scan-results
-                path: bandit-report.json

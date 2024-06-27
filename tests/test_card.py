@@ -1,4 +1,6 @@
 """Test Card Generation Script"""
+# Disable pylint warnings for false positives
+# pylint: disable=duplicate-code
 from unittest.mock import patch, MagicMock, AsyncMock
 import pytest
 from api.card import (
