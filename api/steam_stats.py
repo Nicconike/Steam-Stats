@@ -1,4 +1,6 @@
 """Retrieves Steam User Stats using Steam Web API"""
+# Disable pylint warnings for false positives
+# pylint: disable=duplicate-code
 import os
 import logging
 import requests

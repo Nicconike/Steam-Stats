@@ -1,4 +1,6 @@
 """Main Runner Script"""
+# Disable pylint warnings for false positives
+# pylint: disable=duplicate-code
 import logging
 import os
 import time

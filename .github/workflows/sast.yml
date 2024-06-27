@@ -12,7 +12,7 @@ on:
 
 jobs:
     sast_scan:
-        name: Run Bandit Scan
+        name: Bandit Scan
         runs-on: ubuntu-latest
 
         steps:
