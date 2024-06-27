@@ -1,7 +1,13 @@
 """Scrape Steam Workshop Data"""
 import os
+import logging
 import requests
 from bs4 import BeautifulSoup, Tag
+
+# Configure logging
+logging.basicConfig(level=logging.INFO,
+                    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+logger = logging.getLogger(__name__)
 
 # Required Secrets Configuration
 STEAM_API_KEY = os.environ["INPUT_STEAM_API_KEY"]
@@ -21,7 +27,7 @@ def get_server_info(api_key):
         response.raise_for_status()
         return response.json()
     except requests.exceptions.RequestException as e:
-        print("Error fetching server info:" + str(e))
+        logger.error("Error fetching server info: %s", str(e))
         return None
 
 
@@ -56,16 +62,17 @@ def has_next_page(soup):
 def handle_request_exception(e):
     """Handle request exceptions"""
     if isinstance(e, requests.exceptions.ConnectionError):
-        print("Connection error occurred. Please check your network connection")
+        logger.error(
+            "Connection error occurred. Please check your network connection")
     elif isinstance(e, requests.exceptions.Timeout):
-        print("Request timed out. Please try again later")
+        logger.error("Request timed out. Please try again later")
     elif isinstance(e, requests.exceptions.TooManyRedirects):
-        print("Too many redirects. Check the URL and try again")
+        logger.error("Too many redirects. Check the URL and try again")
     elif isinstance(e, requests.exceptions.HTTPError):
-        print("HTTP error occurred: " + str(e.response.status_code) +
-              " - " + str(e.response.reason))
+        logger.error("HTTP error occurred: %s - %s",
+                     str(e.response.status_code), str(e.response.reason))
     else:
-        print("An error occurred:" + str(e))
+        logger.error("An error occurred: %s", str(e))
 
 
 def fetch_workshop_item_links(steam_id, api_key):
@@ -88,7 +95,7 @@ def fetch_workshop_item_links(steam_id, api_key):
             workshop_items = soup.find_all("div", class_="workshopItem")
 
             if not workshop_items:
-                print("No workshop items found on page " + str(page_number))
+                logger.info("No workshop items found on page %d", page_number)
                 break
 
             item_links.extend(extract_links(workshop_items))
@@ -102,8 +109,8 @@ def fetch_workshop_item_links(steam_id, api_key):
             handle_request_exception(e)
             break
         except AttributeError as e:
-            print("Parsing error: " + str(e) +
-                  ". The structure of the page might have changed")
+            logger.error(
+                "Parsing error: %s. The structure of the page might have changed", str(e))
             break
 
     if not item_links and page_number == 1:
@@ -131,24 +138,26 @@ def fetch_individual_workshop_stats(item_url):
                     try:
                         stats[key] = int(value) if value else 0
                     except ValueError:
-                        print("Could not convert value to int:" + str(value))
+                        logger.error(
+                            "Could not convert value to int: %s", str(value))
                         stats[key] = 0
         else:
-            print("Could not find stats table at" + str(item_url))
+            logger.info("Could not find stats table at %s", str(item_url))
     except requests.exceptions.ConnectionError:
-        print("Connection error occurred. Please check your network connection")
+        logger.error(
+            "Connection error occurred. Please check your network connection")
     except requests.exceptions.Timeout:
-        print("Request timed out. Please try again later")
+        logger.error("Request timed out. Please try again later")
     except requests.exceptions.TooManyRedirects:
-        print("Too many redirects. Check the URL and try again")
+        logger.error("Too many redirects. Check the URL and try again")
     except requests.exceptions.HTTPError as e:
-        print("HTTP error occurred: " + str(e.response.status_code) +
-              " - " + str(e.response.reason))
+        logger.error("HTTP error occurred: %s - %s",
+                     str(e.response.status_code), str(e.response.reason))
     except requests.exceptions.RequestException as e:
-        print("Request failed:"+str(e))
+        logger.error("Request failed: %s", str(e))
     except AttributeError as e:
-        print("Parsing error: " + str(e) +
-              ". The structure of the page might have changed")
+        logger.error(
+            "Parsing error: %s. The structure of the page might have changed", str(e))
 
     # Ensure all expected stats are present, even if they are zero
     stats["unique_visitors"] = stats.get("unique_visitors", 0)
@@ -168,19 +177,21 @@ def fetch_all_workshop_stats(item_links):
             if stats:
                 all_stats.append(stats)
         except requests.exceptions.ConnectionError:
-            print("Connection error occurred while fetching stats for " +
-                  str(link) + ". Please check your network connection.")
+            logger.error(
+                "Connection error occurred while fetching stats for %s."
+                "Please check your network connection.", str(link))
         except requests.exceptions.Timeout:
-            print("Request timed out while fetching stats for " +
-                  str(link) + ". Please try again later.")
+            logger.error(
+                "Request timed out while fetching stats for %s. Please try again later.", str(link))
         except requests.exceptions.TooManyRedirects:
-            print("Too many redirects while fetching stats for " +
-                  str(link) + ". Check the URL and try again.")
+            logger.error(
+                "Too many redirects while fetching stats for %s."
+                "Check the URL and try again.", str(link))
         except requests.exceptions.HTTPError as e:
-            print("HTTP error occurred while fetching stats for " + str(link) +
-                  ": " + str(e.response.status_code) + " - " + str(e.response.reason))
+            logger.error("HTTP error occurred while fetching stats for %s: %s - %s",
+                         str(link), str(e.response.status_code), str(e.response.reason))
         except requests.exceptions.RequestException as e:
-            print("Request failed for " + str(link) + ": " + str(e))
+            logger.error("Request failed for %s: %s", str(link), str(e))
 
     # Calculate the totals
     total_unique_visitors = sum(item.get("unique_visitors", 0)

@@ -1,6 +1,14 @@
-"""Retrieves Steam User Data using Steam Web API"""
+"""Retrieves Steam User Stats using Steam Web API"""
+# Disable pylint warnings for false positives
+# pylint: disable=duplicate-code
 import os
+import logging
 import requests
+
+# Configure logging
+logging.basicConfig(level=logging.INFO,
+                    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+logger = logging.getLogger(__name__)
 
 # Required Secrets Configuration
 STEAM_ID = os.environ["INPUT_STEAM_ID"]
@@ -25,10 +33,10 @@ def get_player_summaries():
         data = response.json()
         return data
     except requests.exceptions.HTTPError as err:
-        print("HTTP error occurred:" + str(err))
+        logger.error("HTTP error occurred: %s", err)
         return None
     except requests.exceptions.RequestException as err:
-        print("An error occurred:" + str(err))
+        logger.error("An error occurred: %s", err)
         return None
 
 
@@ -36,14 +44,17 @@ def get_recently_played_games():
     """Fetch a list of games a player has played in the last two weeks"""
     url = RECENTLY_PLAYED_GAMES + "?key=" + STEAM_API_KEY + \
         "&steamid=" + STEAM_ID + "&format=json"
-    response = requests.get(url, timeout=REQUEST_TIMEOUT)
     try:
+        response = requests.get(url, timeout=REQUEST_TIMEOUT)
         response.raise_for_status()
         data = response.json()
+        if data["response"].get("total_count", 0) == 0:
+            return None
+        logger.info("Successfully fetched recently played games")
         return data
     except requests.exceptions.HTTPError as err:
-        print("HTTP error occurred:" + str(err))
+        logger.error("HTTP error occurred: %s", err)
         return None
     except requests.exceptions.RequestException as err:
-        print("An error occurred:" + str(err))
+        logger.error("An error occurred: %s", err)
         return None

@@ -1,17 +1,20 @@
 # 🛠️Work in Progress 🚧|🚧 Please come back later⚒️
 [![Steam Stats](https://github.com/Nicconike/Steam-Stats/actions/workflows/steam-stats.yml/badge.svg)](https://github.com/Nicconike/Steam-Stats/actions/workflows/steam-stats.yml)
 [![Release](https://github.com/Nicconike/Steam-Stats/actions/workflows/release.yml/badge.svg)](https://github.com/Nicconike/Steam-Stats/actions/workflows/release.yml)
-[![Code Analysis](https://github.com/Nicconike/Steam-Stats/actions/workflows/codeql.yml/badge.svg)](https://github.com/Nicconike/Steam-Stats/actions/workflows/codeql.yml)
+[![CodeQL & Pylint](https://github.com/Nicconike/Steam-Stats/actions/workflows/codeql.yml/badge.svg)](https://github.com/Nicconike/Steam-Stats/actions/workflows/codeql-pylint.yml)
+[![Bandit](https://github.com/Nicconike/Steam-Stats/actions/workflows/sast.yml/badge.svg)](https://github.com/Nicconike/Steam-Stats/actions/workflows/sast.yml)
 ![pylint](https://img.shields.io/badge/PyLint-10.00-brightgreen?logo=python&logoColor=white)
+[![codecov](https://codecov.io/gh/Nicconike/Steam-Stats/graph/badge.svg?token=SC5P7CS1BW)](https://codecov.io/gh/Nicconike/Steam-Stats)
 ![Docker Image Size](https://img.shields.io/docker/image-size/nicconike/steam-stats?logo=docker&label=Docker%20Image&link=https%3A%2F%2Fhub.docker.com%2Fr%2Fnicconike%2Fsteam-stats)
 ![Docker Pulls](https://img.shields.io/docker/pulls/nicconike/steam-stats?logo=docker&label=Docker%20Pulls&link=https%3A%2F%2Fhub.docker.com%2Fr%2Fnicconike%2Fsteam-stats)
-![GitHub Tag](https://img.shields.io/github/v/tag/nicconike/steam-stats?sort=semver&logo=github&label=Release&color=blue)
+![GitHub Release](https://img.shields.io/github/v/release/nicconike/steam-stats)
+![Python Version from PEP 621 TOML](https://img.shields.io/python/required-version-toml?tomlFilePath=https%3A%2F%2Fgithub.com%2FNicconike%2FSteam-Stats%2Fblob%2Fmaster%2Fpyproject.toml%3Fraw%3Dtrue)
 ![GitHub repo size](https://img.shields.io/github/repo-size/nicconike/steam-stats?logo=github&label=Repo%20Size)
 ![GitHub License](https://img.shields.io/github/license/nicconike/Steam-Stats)
 [![Visitor Badge](https://badges.pufler.dev/visits/nicconike/steam-stats)](https://badges.pufler.dev)
 
 > ### From one Passionate Gamer and Developer to Another 🍻
-
+***
 ## Prerequisites
 1. **Steam Web API Key:** API key is important to fetch your account details and for that you will require a key which you can create for your account [here](https://steamcommunity.com/dev)
 2. **Github API Token:**
@@ -33,7 +36,7 @@ schedule:
 > Please don't forget any of the steps mentioned in the prerequisites else the Github Action will not work.
 >
 > You can refer the [Steam Stats Wiki](https://github.com/Nicconike/Steam-Stats/wiki) if you have any questions related to any of the steps mentioned in [Prerequisites](#Prerequisites).
-
+***
 ## Samples (From my [Steam Account](https://steamcommunity.com/id/nicconike/))
 **Example for Steam User Stats**
 <!-- Steam-Stats start -->
@@ -43,9 +46,9 @@ schedule:
 
 **Example for Steam Workshop Stats**
 <!-- Steam-Workshop start -->
-![Steam Workshop Stats](https://github.com/Nicconike/Steam-Stats/blob/master/assets/steam_workshop_stats.png)
+![Steam Workshop Stats](https://github.com/nicconike/steam-stats/blob/master/assets/steam_workshop_stats.png)
 <!-- Steam-Workshop end -->
-
+***
 ## Update README
 1. Add below comment in your markdown file for Steam User Stats
 	```md
@@ -58,7 +61,7 @@ schedule:
 	<!-- Steam-Workshop end -->
 	```
 3. Don't forget to add these comments in your readme file or wherever you want to display your steam stats, because without the comments the readme will not get updated
-
+***
 ## Features
 1. Steam Player Summary[^*]
 2. Recently Played Games from Steam in the Last 2 Weeks
@@ -78,7 +81,7 @@ schedule:
 2. Steam Workshop Stats (Optional)
 	1. Workshop Stats Module can be activated/used by adding this flag in the workflow file in the environment variables: `WORKSHOP_STATS: True`
 	2. This module displays the total number of Unique Visitors, Subscribers and Favorites for your Steam Workshop Items
-
+***
 ## Setup with Example
 After completing the steps mentioned in the [Prerequisites](#Prerequisites), you have to save all the mentioned keys(except markdown comments) like Github Token,API Key, Steam-ID, Custom-ID as Secrets in your Github repo's settings.
 
@@ -108,12 +111,13 @@ jobs:
                 STEAM_ID: ${{ vars.STEAM_ID }}
                 STEAM_CUSTOM_ID: ${{ vars.STEAM_CUSTOM_ID }}
 ```
-
+***
 ## Contributing
 
 Please refer [Contributing.md](https://github.com/Nicconike/Steam-Stats/blob/master/.github/CONTRIBUTING.md) to get to know how to contribute to this project.
 And thank you for considering to contribute.
 
+***
 ## Credits
 
 - **GitHub Actions**
@@ -133,8 +137,7 @@ And thank you for considering to contribute.
 - **Styles**
 	- [Progress Bar Design](https://github.com/Nicconike/Steam-Stats/blob/master/assets/style.css) - [Ana Tudor](https://codepen.io/thebabydino)
 
-
-
+***
 Created with Game Sense & ❤️ by [Nicco](https://github.com/Nicconike)
 
 [^*]: Unfortunately, Steam Web API doesn't support Web Sockets so the profile status cannot be updated in real time as it gets updated in steam profile 🥲

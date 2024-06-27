@@ -15,15 +15,20 @@ dependencies = [
     "playwright==1.44.0",
     "python-semantic-release==9.8.3"
 ]
-requires-python = ">= 3.12"
+requires-python = ">= 3.8"
 readme = "README.md"
 license = {file = "LICENSE"}
+
+[project.urls]
+Changelog = "https://github.com/Nicconike/Steam-Stats/blob/master/CHANGELOG.md"
+Documentation = "https://github.com/Nicconike/Steam-Stats/blob/master/README.md"
+Wiki = "https://github.com/Nicconike/Steam-Stats/wiki"
 
 [tool.semantic_release]
 version_variables = ["api/main.py:__version__"]
 branch = "master"
 upload_to_release = true
-commit_message = "{version} Version Release\n\nCo-authored-by: Nicconike <38905025+Nicconike@users.noreply.github.com>"
+commit_message = "Version Release: v{version}\n\nCo-authored-by: Nicconike <38905025+Nicconike@users.noreply.github.com>"
 tag_format = "v{version}"
 changelog_file = "CHANGELOG.md"
 template_dir = "templates"
@@ -39,6 +44,30 @@ default_bump_level = 0
 
 [tool.semantic_release.publish]
 upload_to_vcs_release = true
+
+[tool.semantic_release.dist_glob_patterns]
+include = [
+    ".github/**",
+    "api/*",
+    "assets/*",
+    "tests/*",
+    ".env.example",
+    "action.yml",
+    "README.md",
+    "CHANGELOG.md",
+    "LICENSE",
+    "requirements.txt",
+]
+exclude = [
+    ".github/workflows/*",
+    "assets/recently_played_games(linear).png",
+    "assets/recently_played_games(logarithmic).png",
+    "templates/*",
+    ".dockerignore",
+    ".gitignore",
+    "Dockerfile",
+    "pyproject.toml",
+]
 
 [tool.semantic_release.plugins]
 verify_conditions = [

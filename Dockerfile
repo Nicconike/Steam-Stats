@@ -12,12 +12,12 @@ WORKDIR /steam-stats
 RUN mkdir -p /steam-stats/assets
 
 # Copy the requirements file into the container
-COPY api/requirements.txt /steam-stats/api/requirements.txt
+COPY requirements.txt /steam-stats/requirements.txt
 
 # Install Python dependencies and necessary tools
 RUN apt-get update && \
 	apt-get install -y --no-install-recommends git && \
-	pip install --no-cache-dir -r /steam-stats/api/requirements.txt && \
+	pip install --no-cache-dir -r /steam-stats/requirements.txt && \
 	apt-get purge -y --auto-remove && \
 	playwright uninstall chromium webkit && \
 	apt-get clean && \

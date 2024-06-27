@@ -17,7 +17,7 @@ on:
 
 jobs:
     update-readme:
-        if: github.actor != 'dependabot[bot]' && github.actor != 'protected-auto-commits[bot]' && github.base_ref == 'master'
+        if: github.actor != 'dependabot[bot]' || github.actor != 'protected-auto-commits[bot]' && github.base_ref == 'master'
         name: Steam Stats
         runs-on: ubuntu-latest
         container:
@@ -29,7 +29,9 @@ jobs:
                 token: ${{ secrets.GH_TOKEN }}
 
           - name: Update Steam Stats in README
-            run: python api/main.py
+            run: |
+                export PYTHONPATH=$(pwd)
+                python api/main.py
             env:
                 INPUT_STEAM_API_KEY: ${{ secrets.STEAM_API_KEY }}
                 INPUT_STEAM_ID: ${{ vars.STEAM_ID }}
