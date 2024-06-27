@@ -1,4 +1,6 @@
 """Test Main Runner Script"""
+# Disable pylint warnings for false positives
+# pylint: disable=duplicate-code
 from unittest.mock import patch, ANY
 import pytest
 from api import main

@@ -1,4 +1,6 @@
 """Test Steam Workshop Script"""
+# Disable pylint warnings for false positives
+# pylint: disable=duplicate-code
 from unittest.mock import MagicMock, patch
 import pytest
 import requests

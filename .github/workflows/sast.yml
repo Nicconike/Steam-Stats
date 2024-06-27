@@ -5,7 +5,7 @@ on:
     push:
         branches: [ "master" ]
         paths:
-            - ".github/workflows/codeql.yml"
+            - ".github/workflows/sast.yml"
             - "api/*.py"
     pull_request:
         branches: [ "master" ]

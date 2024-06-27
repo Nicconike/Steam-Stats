@@ -1,4 +1,6 @@
 """Test Steam Stats Script"""
+# Disable pylint warnings for false positives
+# pylint: disable=duplicate-code
 import pytest
 import requests
 from api.steam_stats import get_player_summaries, get_recently_played_games
