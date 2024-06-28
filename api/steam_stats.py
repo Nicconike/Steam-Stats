@@ -50,7 +50,6 @@ def get_recently_played_games():
         data = response.json()
         if data["response"].get("total_count", 0) == 0:
             return None
-        logger.info("Successfully fetched recently played games")
         return data
     except requests.exceptions.HTTPError as err:
         logger.error("HTTP error occurred: %s", err)
