@@ -7,6 +7,7 @@ on:
             - '.github/workflows/release.yml'
             - '**/*.py'
             - 'pyproject.toml'
+            - 'CHANGELOG.md.j2'
             - 'Dockerfile'
     pull_request:
         branches: [ "master" ]
