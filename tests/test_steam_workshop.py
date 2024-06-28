@@ -30,8 +30,8 @@ def test_get_server_info_success(requests_mock):
         json={"servertime": 1234567890}
     )
     result = get_server_info("dummy_api_key")
-    if result is not None:
-        raise AssertionError("Result should be None")
+    if result is None:
+        raise AssertionError("Expected result to be not None")
     if result is None or "servertime" not in result:
         raise AssertionError("Expected 'servertime' to be in result")
 
