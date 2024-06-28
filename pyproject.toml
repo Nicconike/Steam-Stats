@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools >= 70"]
+requires = ["setuptools ~= 70"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -11,28 +11,33 @@ dynamic = "version_variables"
 dependencies = [
     "bs4==0.0.2",
     "DateTime==5.5",
-    "pipdeptree==2.23.0",
     "playwright==1.44.0",
-    "pylint==3.2.3",
-    "pytest-asyncio==0.23.7",
-    "pytest-cov==5.0.0",
-    "python-semantic-release==9.8.3",
-    "requests-mock==1.12.1"
+    "python-semantic-release==9.8.3"
 ]
 requires-python = ">= 3.8"
 readme = "README.md"
 license = {file = "LICENSE"}
 
 [project.urls]
-Changelog = "https://github.com/Nicconike/Steam-Stats/blob/master/CHANGELOG.md"
-Documentation = "https://github.com/Nicconike/Steam-Stats/blob/master/README.md"
-Wiki = "https://github.com/Nicconike/Steam-Stats/wiki"
+changelog = "https://github.com/Nicconike/Steam-Stats/blob/master/CHANGELOG.md"
+documentation = "https://github.com/Nicconike/Steam-Stats/blob/master/README.md"
+wiki = "https://github.com/Nicconike/Steam-Stats/wiki"
+
+[project.optional-dependencies]
+test = [
+    "pytest-asyncio==0.23.7",
+    "pytest-cov==5.0.0",
+    "requests-mock==1.12.1"
+]
+dev = [
+    "pipdeptree==2.23.0",
+    "pylint==3.2.3"
+]
 
 [tool.semantic_release]
 version_variables = ["api/main.py:__version__"]
 branch = "master"
-upload_to_release = true
-commit_message = "Version Release: v{version}\n\nCo-authored-by: Nicconike <38905025+Nicconike@users.noreply.github.com>"
+commit_message = "chore: Version Release v{version}"
 tag_format = "v{version}"
 changelog_file = "CHANGELOG.md"
 template_dir = "templates"
@@ -46,32 +51,24 @@ minor_tags = ["feat"]
 patch_tags = ["fix", "perf"]
 default_bump_level = 0
 
+[tool.semantic_release.remote]
+type = "github"
+token = { env = "GH_TOKEN" }
+
 [tool.semantic_release.publish]
 upload_to_vcs_release = true
+dist_glob_patterns = [
+    "dist/*",
+    "!tests/*",
+    "!templates/*",
+    "!*.dockerignore",
+    "!*.env.example",
+    "!*.gitignore",
+    "!**/.github/workflows/*"
+]
 
-[tool.semantic_release.dist_glob_patterns]
-include = [
-    ".github/**",
-    "api/*",
-    "assets/*",
-    "tests/*",
-    ".env.example",
-    "action.yml",
-    "README.md",
-    "CHANGELOG.md",
-    "LICENSE",
-    "requirements.txt",
-]
-exclude = [
-    ".github/workflows/*",
-    "assets/recently_played_games(linear).png",
-    "assets/recently_played_games(logarithmic).png",
-    "templates/*",
-    ".dockerignore",
-    ".gitignore",
-    "Dockerfile",
-    "pyproject.toml",
-]
+[tool.semantic_release.changelog.environment]
+trim_blocks = true
 
 [tool.semantic_release.plugins]
 verify_conditions = [
