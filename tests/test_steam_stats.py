@@ -20,9 +20,12 @@ def test_get_player_summaries_success(requests_mock):
         json={"response": {"players": []}}
     )
     result = get_player_summaries()
-    assert result is not None
-    assert "response" in result
-    assert "players" in result["response"]
+    if result is None:
+        raise AssertionError("Expected result to be not None")
+    if result is None or "response" not in result:
+        raise AssertionError("Expected 'response' to be in result")
+    if "players" not in result["response"]:
+        raise AssertionError("Expected 'players' to be in result['response']")
 
 
 def test_get_player_summaries_http_error(requests_mock):
@@ -32,7 +35,8 @@ def test_get_player_summaries_http_error(requests_mock):
         status_code=404
     )
     result = get_player_summaries()
-    assert result is None
+    if result is not None:
+        raise AssertionError("Expected result to be None")
 
 
 def test_get_player_summaries_request_exception(requests_mock):
@@ -42,7 +46,8 @@ def test_get_player_summaries_request_exception(requests_mock):
         exc=requests.exceptions.RequestException
     )
     result = get_player_summaries()
-    assert result is None
+    if result is not None:
+        raise AssertionError("Expected result to be None")
 
 
 def test_get_recently_played_games_success(requests_mock):
@@ -53,9 +58,12 @@ def test_get_recently_played_games_success(requests_mock):
             {"name": "TestGame", "playtime_2weeks": 120}]}}
     )
     result = get_recently_played_games()
-    assert result is not None
-    assert "response" in result
-    assert "games" in result["response"]
+    if result is None:
+        raise AssertionError("Expected result to be not None")
+    if result is None or "response" not in result:
+        raise AssertionError("Expected 'response' to be in result")
+    if "games" not in result["response"]:
+        raise AssertionError("Expected 'games' to be in result['response']")
 
 
 def test_get_recently_played_games_no_games(requests_mock):
@@ -65,7 +73,8 @@ def test_get_recently_played_games_no_games(requests_mock):
         json={"response": {"total_count": 0}}
     )
     result = get_recently_played_games()
-    assert result is None
+    if result is not None:
+        raise AssertionError("Expected result to be None")
 
 
 def test_get_recently_played_games_http_error(requests_mock):
@@ -75,7 +84,8 @@ def test_get_recently_played_games_http_error(requests_mock):
         status_code=404
     )
     result = get_recently_played_games()
-    assert result is None
+    if result is not None:
+        raise AssertionError("Expected result to be None")
 
 
 def test_get_recently_played_games_request_exception(requests_mock):
@@ -85,4 +95,5 @@ def test_get_recently_played_games_request_exception(requests_mock):
         exc=requests.exceptions.RequestException
     )
     result = get_recently_played_games()
-    assert result is None
+    if result is not None:
+        raise AssertionError("Expected result to be None")

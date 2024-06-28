@@ -4,7 +4,7 @@ on:
     push:
         branches: [ "master" ]
         paths:
-            - ".github/workflows/codeql-pylint.yml"
+            - ".github/workflows/codeql.yml"
             - "api/*.py"
     pull_request:
         branches: [ "master" ]

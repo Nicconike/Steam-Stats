@@ -6,14 +6,12 @@ on:
         - cron: "30 18 * * 0"
     workflow_dispatch:
     push:
-        branches:
-            - master
+        branches: [ "master" ]
         paths:
             - '.github/workflows/steam-stats.yml'
             - 'api/*.py'
     pull_request:
-        branches:
-            - master
+        branches: [ "master" ]
 
 jobs:
     update-readme:

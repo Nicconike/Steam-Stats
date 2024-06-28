@@ -24,9 +24,12 @@ def test_get_player_summaries_success(requests_mock):
         }]}}
     )
     result = main.get_player_summaries()
-    assert result is not None
-    assert "response" in result
-    assert "players" in result["response"]
+    if result is None:
+        raise AssertionError("Expected result to be not None")
+    if result is None or "response" not in result:
+        raise AssertionError("Expected 'response' to be in result")
+    if "players" not in result["response"]:
+        raise AssertionError("Expected 'players' to be in result['response']")
 
 
 def test_get_recently_played_games_success(requests_mock):
@@ -39,9 +42,12 @@ def test_get_recently_played_games_success(requests_mock):
         ]}}
     )
     result = main.get_recently_played_games()
-    assert result is not None
-    assert "response" in result
-    assert "games" in result["response"]
+    if result is None:
+        raise AssertionError("Expected result to be not None")
+    if result is None or "response" not in result:
+        raise AssertionError("Expected 'response' to be in result")
+    if "games" not in result["response"]:
+        raise AssertionError("Expected 'games' to be in result['response']")
 
 
 def test_get_recently_played_games_no_games(requests_mock):
@@ -51,7 +57,8 @@ def test_get_recently_played_games_no_games(requests_mock):
         json={"response": {"total_count": 0}}
     )
     result = main.get_recently_played_games()
-    assert result is None
+    if result is not None:
+        raise AssertionError("Expected result to be None")
 
 
 def test_fetch_workshop_item_links_success(requests_mock):
@@ -66,8 +73,10 @@ def test_fetch_workshop_item_links_success(requests_mock):
         json={"servertime": 1234567890}
     )
     result = main.fetch_workshop_item_links("dummy_custom_id", "dummy_api_key")
-    assert result == [
+    expected_result = [
         "https://steamcommunity.com/sharedfiles/filedetails/?id=2984474065"]
+    if result != expected_result:
+        raise AssertionError(f"Result should be {expected_result}")
 
 
 def test_generate_steam_stats(requests_mock):
@@ -88,35 +97,36 @@ def test_generate_steam_stats(requests_mock):
         ]}}
     )
     result = main.generate_steam_stats()
-    assert "![Steam Summary]" in result
-    assert "![Recently Played Games]" in result
+    if "![Steam Summary]" not in result:
+        raise AssertionError("Expected '![Steam Summary]' to be in result")
+    if "![Recently Played Games]" not in result:
+        raise AssertionError(
+            "Expected '![Recently Played Games]' to be in result")
 
 
 def test_generate_workshop_stats(requests_mock):
     """Test generating Workshop stats"""
-    # Mock the initial request to fetch workshop item links
     requests_mock.get(
         'https://steamcommunity.com/id/nicconike/myworkshopfiles/?p=1',
         text='<div class="workshopItem"><a class="ugc"'
         'href="https://steamcommunity.com/sharedfiles/filedetails/?id=2984474065"></a></div>'
     )
-    # Mock the server info request
     requests_mock.get(
         'https://api.steampowered.com/ISteamWebAPIUtil/GetServerInfo/v1/',
         json={"servertime": 1234567890}
     )
-    # Mock the request to fetch individual workshop stats
     requests_mock.get(
         'https://steamcommunity.com/sharedfiles/filedetails/?id=2984474065',
         text='<table class="stats_table"><tr><td>1,000</td><td>Unique Visitors</td></tr></table>'
     )
-    # Mock the next page request if applicable
     requests_mock.get(
         'https://steamcommunity.com/id/dummy_custom_id/myworkshopfiles/?p=2',
         text=''
     )
     result = main.generate_workshop_stats()
-    assert "![Steam Workshop Stats]" in result
+    if "![Steam Workshop Stats]" not in result:
+        raise AssertionError(
+            "Expected '![Steam Workshop Stats]' to be in result")
 
 
 def test_main(requests_mock):

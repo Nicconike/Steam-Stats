@@ -41,7 +41,8 @@ async def test_get_element_bounding_box():
             return_value=mock_browser)
 
         result = await get_element_bounding_box(html_file, selector)
-        assert result == bounding_box
+        if result != bounding_box:
+            raise AssertionError(f"Expected result to be {bounding_box}")
 
 
 @pytest.mark.asyncio
@@ -88,7 +89,8 @@ def test_format_unix_time():
     unix_time = 1609459200  # 01/01/2021 @ 12:00am (UTC)
     expected = "01/01/2021"
     result = format_unix_time(unix_time)
-    assert result == expected
+    if result != expected:
+        raise AssertionError(f"Expected result to be {expected}")
 
 
 def test_generate_card_for_player_summary():
@@ -107,8 +109,10 @@ def test_generate_card_for_player_summary():
         }
     }
     result = generate_card_for_player_summary(player_data)
-    assert result is not None
-    assert "![Steam Summary]" in result
+    if result is None:
+        raise AssertionError("Result should not be None")
+    if "![Steam Summary]" not in result:
+        raise AssertionError("Result should contain '![Steam Summary]'")
 
 
 def test_generate_card_for_played_games():
@@ -124,8 +128,11 @@ def test_generate_card_for_played_games():
         }
     }
     result = generate_card_for_played_games(games_data)
-    assert result is not None
-    assert "![Recently Played Games]" in result
+    if result is None:
+        raise AssertionError("Result should not be None")
+    if "![Recently Played Games]" not in result:
+        raise AssertionError(
+            "Result should contain '![Recently Played Games]'")
 
 
 def test_generate_card_for_steam_workshop():
@@ -136,5 +143,7 @@ def test_generate_card_for_steam_workshop():
         "total_current_favorites": 200
     }
     result = generate_card_for_steam_workshop(workshop_stats)
-    assert result is not None
-    assert "![Steam Workshop Stats]" in result
+    if result is None:
+        raise AssertionError("Result should not be None")
+    if "![Steam Workshop Stats]" not in result:
+        raise AssertionError("Result should contain '![Steam Workshop Stats]'")

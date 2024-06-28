@@ -3,7 +3,7 @@ name: "Code Coverage"
 on:
     workflow_dispatch:
     push:
-        branches: [ "master" , "tests"]
+        branches: [ "master" ]
         paths:
             - ".github/workflows/coverage.yml"
             - "tests/*.py"

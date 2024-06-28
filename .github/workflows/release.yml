@@ -2,16 +2,14 @@ name: Release
 
 on:
     push:
-        branches:
-            - master
+        branches: [ "master" ]
         paths:
             - '.github/workflows/release.yml'
             - 'api/*.py'
             - 'pyproject.toml'
             - 'Dockerfile'
     pull_request:
-        branches:
-            - master
+        branches: [ "master" ]
 
 jobs:
     release:

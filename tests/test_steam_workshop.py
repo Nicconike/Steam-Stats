@@ -30,8 +30,10 @@ def test_get_server_info_success(requests_mock):
         json={"servertime": 1234567890}
     )
     result = get_server_info("dummy_api_key")
-    assert result is not None
-    assert "servertime" in result
+    if result is not None:
+        raise AssertionError("Result should be None")
+    if result is None or "servertime" not in result:
+        raise AssertionError("Expected 'servertime' to be in result")
 
 
 def test_get_server_info_http_error(requests_mock):
@@ -41,7 +43,8 @@ def test_get_server_info_http_error(requests_mock):
         status_code=404
     )
     result = get_server_info("dummy_api_key")
-    assert result is None
+    if result is not None:
+        raise AssertionError("Expected result to be None")
 
 
 def test_get_server_info_request_exception(requests_mock):
@@ -51,7 +54,8 @@ def test_get_server_info_request_exception(requests_mock):
         exc=requests.exceptions.RequestException
     )
     result = get_server_info("dummy_api_key")
-    assert result is None
+    if result is not None:
+        raise AssertionError("Expected result to be None")
 
 
 def test_is_server_online_success(requests_mock):
@@ -61,7 +65,8 @@ def test_is_server_online_success(requests_mock):
         json={"servertime": 1234567890}
     )
     result = is_server_online("dummy_api_key")
-    assert result is True
+    if not result:
+        raise AssertionError("Expected result to be True")
 
 
 def test_is_server_online_http_error(requests_mock):
@@ -71,7 +76,8 @@ def test_is_server_online_http_error(requests_mock):
         status_code=404
     )
     result = is_server_online("dummy_api_key")
-    assert result is False
+    if result:
+        raise AssertionError("Expected result to be False")
 
 
 def test_is_server_online_request_exception(requests_mock):
@@ -81,7 +87,8 @@ def test_is_server_online_request_exception(requests_mock):
         exc=requests.exceptions.RequestException
     )
     result = is_server_online("dummy_api_key")
-    assert result is False
+    if result:
+        raise AssertionError("Expected result to be False")
 
 
 def test_extract_links():
@@ -94,8 +101,10 @@ def test_extract_links():
     mock_link_tag.__getitem__.return_value = (
         "https://steamcommunity.com/id/nicconike/myworkshopfiles/")
     result = extract_links([mock_item])
-    assert result == [
+    expected_result = [
         "https://steamcommunity.com/id/nicconike/myworkshopfiles/"]
+    if result != expected_result:
+        raise AssertionError(f"Result should be {expected_result}")
 
 
 def test_has_next_page():
@@ -103,7 +112,8 @@ def test_has_next_page():
     mock_soup = MagicMock()
     mock_soup.find.return_value = MagicMock(find=MagicMock(return_value=True))
     result = has_next_page(mock_soup)
-    assert result is True
+    if not result:
+        raise AssertionError("Expected result to be True")
 
 
 def test_handle_request_exception():
@@ -126,8 +136,10 @@ def test_fetch_workshop_item_links_success(requests_mock):
         json={"servertime": 1234567890}
     )
     result = fetch_workshop_item_links("dummy_custom_id", "dummy_api_key")
-    assert result == [
+    expected_result = [
         "https://steamcommunity.com/sharedfiles/filedetails/?id=2984474065"]
+    if result != expected_result:
+        raise AssertionError(f"Result should be {expected_result}")
 
 
 def test_fetch_individual_workshop_stats_success(requests_mock):
@@ -137,8 +149,10 @@ def test_fetch_individual_workshop_stats_success(requests_mock):
         text='<table class="stats_table"><tr><td>1,000</td><td>Unique Visitors</td></tr></table>'
     )
     result = fetch_individual_workshop_stats("http://example.com")
-    assert result == {"unique_visitors": 1000,
-                      "current_subscribers": 0, "current_favorites": 0}
+    expected_result = {"unique_visitors": 1000,
+                       "current_subscribers": 0, "current_favorites": 0}
+    if result != expected_result:
+        raise AssertionError(f"Result should be {expected_result}")
 
 
 def test_fetch_all_workshop_stats_success(requests_mock):
@@ -148,7 +162,11 @@ def test_fetch_all_workshop_stats_success(requests_mock):
         text='<table class="stats_table"><tr><td>1,000</td><td>Unique Visitors</td></tr></table>'
     )
     result = fetch_all_workshop_stats(["http://example.com"])
-    assert result["total_unique_visitors"] == 1000
-    assert result["total_current_subscribers"] == 0
-    assert result["total_current_favorites"] == 0
-    assert len(result["individual_stats"]) == 1
+    if result["total_unique_visitors"] != 1000:
+        raise AssertionError("Total unique visitors should be 1000")
+    if result["total_current_subscribers"] != 0:
+        raise AssertionError("Total current subscribers should be 0")
+    if result["total_current_favorites"] != 0:
+        raise AssertionError("Total current favorites should be 0")
+    if len(result["individual_stats"]) != 1:
+        raise AssertionError("Length of individual stats should be 1")
