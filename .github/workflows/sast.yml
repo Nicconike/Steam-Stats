@@ -7,7 +7,7 @@ on:
         branches: [ "master" ]
         paths:
             - ".github/workflows/sast.yml"
-            - "api/*.py"
+            - "**/*.py"
     pull_request:
         branches: [ "master" ]
 
