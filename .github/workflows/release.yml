@@ -100,7 +100,7 @@ jobs:
                 load: ${{ github.event_name == 'pull_request' }}
                 tags: |
                     ${{ vars.DOCKER_USERNAME }}/steam-stats:latest
-                    ${{ needs.release.outputs.released == 'true' && vars.DOCKER_USERNAME }}/steam-stats:${{ needs.release.outputs.version }}
+                    if ${{ needs.release.outputs.released == 'true'}} then ${{ vars.DOCKER_USERNAME }}/steam-stats:${{ needs.release.outputs.version }}
                 labels: ${{ steps.meta.outputs.labels }}
                 cache-from: type=gha
                 cache-to: type=gha,mode=max

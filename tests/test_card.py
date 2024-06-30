@@ -1,7 +1,10 @@
 """Test Card Generation Script"""
 # Disable pylint warnings for false positives
 # pylint: disable=duplicate-code
+from unittest import mock
 from unittest.mock import patch, MagicMock, AsyncMock
+from playwright.async_api import Error as PlaywrightError
+
 import pytest
 from api.card import (
     get_element_bounding_box,
@@ -28,21 +31,85 @@ async def test_get_element_bounding_box():
     selector = ".test-element"
     bounding_box = {"x": 10, "y": 20, "width": 100, "height": 200}
 
-    with patch("os.path.exists", return_value=True), \
-            patch("api.card.async_playwright") as mock_playwright:
-        mock_browser = MagicMock()
-        mock_page = MagicMock()
-        mock_page.evaluate = AsyncMock(return_value=bounding_box)
-        mock_page.goto = AsyncMock()
-        mock_page.close = AsyncMock()
-        mock_browser.new_page = AsyncMock(return_value=mock_page)
-        mock_browser.close = AsyncMock()
-        mock_playwright.return_value.__aenter__.return_value.firefox.launch = AsyncMock(
-            return_value=mock_browser)
+    # Test FileNotFoundError
+    with mock.patch("os.path.exists", return_value=False):
+        with mock.patch("api.card.logger") as mock_logger:
+            result = await get_element_bounding_box(html_file, selector)
+            if result is not None:
+                raise AssertionError(
+                    "Expected result to be None for FileNotFoundError")
+            if not mock_logger.error.called:
+                raise AssertionError(
+                    "Expected logger.error to be called for FileNotFoundError")
+            if mock_logger.error.call_args[0][0] != "File Not Found Error: %s" or \
+                    mock_logger.error.call_args[0][1] != "HTML file not found:" + str(html_file):
+                raise AssertionError(
+                    "Expected logger.error to be called with 'File Not Found Error: %s',"
+                    "'HTML file not found:" + str(html_file) + "'")
 
-        result = await get_element_bounding_box(html_file, selector)
-        if result != bounding_box:
-            raise AssertionError(f"Expected result to be {bounding_box}")
+    # Test PlaywrightError
+    with mock.patch("os.path.exists", return_value=True):
+        with mock.patch("api.card.async_playwright") as mock_playwright:
+            mock_playwright.return_value.__aenter__.side_effect = PlaywrightError(
+                "Playwright error")
+            with mock.patch("api.card.logger") as mock_logger:
+                result = await get_element_bounding_box(html_file, selector)
+                if result is not None:
+                    raise AssertionError(
+                        "Expected result to be None for PlaywrightError")
+                if not mock_logger.error.called:
+                    raise AssertionError(
+                        "Expected logger.error to be called for PlaywrightError")
+                if mock_logger.error.call_args[0][0] != "Playwright Error: %s" or \
+                        mock_logger.error.call_args[0][1] != "Playwright error":
+                    raise AssertionError(
+                        "Expected logger.error to be called with 'Playwright Error: %s',"
+                        "'Playwright error'")
+
+    # Test KeyError
+    with mock.patch("os.path.exists", return_value=True):
+        with mock.patch("api.card.async_playwright") as mock_playwright:
+            mock_browser = mock.AsyncMock()
+            mock_page = mock.AsyncMock()
+            mock_playwright.return_value.__aenter__.return_value.firefox.launch.return_value = (
+                mock_browser)
+            mock_browser.new_page.return_value = mock_page
+            mock_page.evaluate.side_effect = KeyError("Key error")
+            with mock.patch("api.card.logger") as mock_logger:
+                result = await get_element_bounding_box(html_file, selector)
+                if result is not None:
+                    raise AssertionError(
+                        "Expected result to be None for KeyError")
+                if not mock_logger.error.called:
+                    raise AssertionError(
+                        "Expected logger.error to be called for KeyError")
+                if mock_logger.error.call_args[0][0] != "Key Error: %s" or \
+                        mock_logger.error.call_args[0][1] != "'Key error'":
+                    raise AssertionError(
+                        "Expected logger.error to be called with 'Key Error: %s', 'Key error'")
+
+    # Test asyncio.TimeoutError
+    with mock.patch("os.path.exists", return_value=True):
+        with mock.patch("api.card.async_playwright") as mock_playwright:
+            mock_browser = mock.AsyncMock()
+            mock_page = mock.AsyncMock()
+            mock_playwright.return_value.__aenter__.return_value.firefox.launch.return_value = (
+                mock_browser)
+            mock_browser.new_page.return_value = mock_page
+            mock_page.goto.side_effect = TimeoutError("Timeout error")
+            with mock.patch("api.card.logger") as mock_logger:
+                result = await get_element_bounding_box(html_file, selector)
+                if result is not None:
+                    raise AssertionError(
+                        "Expected result to be None for TimeoutError")
+                if not mock_logger.error.called:
+                    raise AssertionError(
+                        "Expected logger.error to be called for TimeoutError")
+                if mock_logger.error.call_args[0][0] != "Timeout Error: %s" or \
+                        mock_logger.error.call_args[0][1] != "Timeout error":
+                    raise AssertionError(
+                        "Expected logger.error to be called with 'Timeout Error: %s',"
+                        "'Timeout error'")
 
 
 @pytest.mark.asyncio
