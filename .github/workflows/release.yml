@@ -99,7 +99,7 @@ jobs:
                 load: ${{ github.event_name == 'pull_request' }}
                 tags: |
                     ${{ vars.DOCKER_USERNAME }}/steam-stats:latest
-                    ${{ vars.DOCKER_USERNAME }}/steam-stats:${{ steps.meta.outputs.tags }}
+                    ${{ steps.meta.outputs.tags }}
                 labels: ${{ steps.meta.outputs.labels }}
                 cache-from: type=gha
                 cache-to: type=gha,mode=max
