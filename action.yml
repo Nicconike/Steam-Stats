@@ -1,5 +1,5 @@
 name: "Steam Stats"
-description: "Update your GitHub Profile with your latest Steam Stats"
+description: "Showcase your Steam Gaming Stats in your GitHub Profile"
 author: "Nicconike"
 inputs:
     GH_TOKEN:

@@ -147,7 +147,7 @@ And thank you for considering to contribute.
 	- [Progress Bar Design](https://github.com/Nicconike/Steam-Stats/blob/master/assets/style.css)[^2] - [Ana Tudor](https://codepen.io/thebabydino)
 
 ***
-Created with Game Sense & ❤️ by [Nicco](https://github.com/Nicconike)
+Created with 🐍 & ❤️ by [Nicco](https://github.com/Nicconike)
 
 [^1]: Unfortunately, Steam Web API doesn't support Web Sockets so the profile status cannot be updated in real time as it gets updated in steam profile 🥲
 
