@@ -23,6 +23,7 @@ jobs:
             pull-requests: write
         outputs:
             released: ${{ steps.github-release.outputs.released }}
+            version: ${{ steps.github-release.outputs.new_version }}
         steps:
           - name: GitHub App Token
             uses: actions/create-github-app-token@v1
@@ -99,7 +100,7 @@ jobs:
                 load: ${{ github.event_name == 'pull_request' }}
                 tags: |
                     ${{ vars.DOCKER_USERNAME }}/steam-stats:latest
-                    ${{ steps.meta.outputs.tags }}
+                    ${{ needs.release.outputs.released == 'true' && vars.DOCKER_USERNAME }}/steam-stats:${{ needs.release.outputs.version }}
                 labels: ${{ steps.meta.outputs.labels }}
                 cache-from: type=gha
                 cache-to: type=gha,mode=max
@@ -109,7 +110,7 @@ jobs:
             uses: docker/scout-action@v1.10.0
             with:
                 command: quickview, cves
-                image: ${{ steps.meta.outputs.tags }}
+                image: ${{ vars.DOCKER_USERNAME }}/steam-stats:latest
                 to: ${{ vars.DOCKER_USERNAME }}/steam-stats:latest
                 only-severities: critical, high
                 only-fixed: true
