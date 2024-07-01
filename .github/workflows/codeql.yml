@@ -93,7 +93,7 @@ jobs:
           - name: Generate Pylint Badge
             id: generate-badge
             run: |
-                score=$(tail -n 1 pylint-report.txt | grep -oP '\d+\.\d+')
+                score=$(grep -oP 'Your code has been rated at \K[0-9]+\.[0-9]+' pylint-report.txt)
                 if [ -z "$score" ]; then
                     score="0.0"
                 fi
