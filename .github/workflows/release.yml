@@ -13,7 +13,7 @@ on:
 
 jobs:
     release:
-        if: github.actor != 'dependabot[bot]' || github.actor != 'protected-auto-commits[bot]' && github.repository == 'nicconike/steam-stats'
+        if: github.actor != 'dependabot[bot]' || github.actor != 'github-actions[bot]' || github.actor != 'protected-auto-commits[bot]' && github.repository == 'nicconike/steam-stats'
         runs-on: ubuntu-latest
         concurrency: release
         permissions:
@@ -66,6 +66,7 @@ jobs:
     docker:
         runs-on: ubuntu-latest
         concurrency: docker
+        needs: release
         steps:
           - name: Checkout Code
             uses: actions/checkout@v4
