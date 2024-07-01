@@ -91,7 +91,9 @@ jobs:
                 private-key: ${{ secrets.APP_PRIVATE_KEY }}
 
           - name: Generate Pylint Badge
-            id: generate-badge
+            if: github.ref == 'refs/heads/master'
+            env:
+                GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
             run: |
                 score=$(grep -oP 'Your code has been rated at \K[0-9]+\.[0-9]+' pylint-report.txt)
                 if [ -z "$score" ]; then
@@ -107,14 +109,9 @@ jobs:
                 fi
                 badge="![pylint](https://img.shields.io/badge/linting-pylint-$score-$color)"
                 sed -i 's|!\[pylint\](.*)|'"$badge"'|' README.md
-
-          - name: Commit & Push Changes
-            if: github.ref == 'refs/heads/master'
-            env:
-                GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
-            run: |
-                git config --global user.email "38905025+Nicconike@users.noreply.github.com"
-                git config --global user.name "Nicco"
+                git config --global user.email "action@github.com"
+                git config --global user.name "GitHub Action"
+                git remote set-url origin https://x-access-token:${{ steps.app-token.outputs.token }}@github.com/${{ github.repository }}.git
                 git add README.md
                 git commit -m "Update Pylint Badge"
-                git push
+                git push origin HEAD:master
