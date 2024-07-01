@@ -19,7 +19,7 @@ RUN apt-get update && \
 	apt-get install -y --no-install-recommends git && \
 	pip install --no-cache-dir -r /steam-stats/requirements.txt && \
 	apt-get purge -y --auto-remove && \
-	playwright uninstall chromium webkit && \
+	playwright uninstall chromium && \
 	apt-get clean && \
 	rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 

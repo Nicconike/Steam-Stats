@@ -12,6 +12,7 @@ on:
 
 jobs:
     code-coverage:
+        if: github.actor != 'dependabot[bot]' || github.actor != 'github-actions[bot]' || github.actor != 'protected-auto-commits[bot]'
         runs-on: ubuntu-latest
         steps:
           - name: Checkout
