@@ -3,7 +3,7 @@
 [![Release](https://github.com/Nicconike/Steam-Stats/actions/workflows/release.yml/badge.svg)](https://github.com/Nicconike/Steam-Stats/actions/workflows/release.yml)
 [![CodeQL & Pylint](https://github.com/Nicconike/Steam-Stats/actions/workflows/codeql.yml/badge.svg)](https://github.com/Nicconike/Steam-Stats/actions/workflows/codeql.yml)
 [![Bandit](https://github.com/Nicconike/Steam-Stats/actions/workflows/sast.yml/badge.svg)](https://github.com/Nicconike/Steam-Stats/actions/workflows/sast.yml)
-![pylint](https://img.shields.io/badge/linting-pylint-9.28-brightgreen)
+![Pylint](https://img.shields.io/badge/Pylint-9.28-brightgreen?logo=python)
 [![codecov](https://codecov.io/gh/Nicconike/Steam-Stats/graph/badge.svg?token=SC5P7CS1BW)](https://codecov.io/gh/Nicconike/Steam-Stats)
 ![Docker Image Size](https://img.shields.io/docker/image-size/nicconike/steam-stats?logo=docker&label=Docker%20Image&link=https%3A%2F%2Fhub.docker.com%2Fr%2Fnicconike%2Fsteam-stats)
 ![Docker Pulls](https://img.shields.io/docker/pulls/nicconike/steam-stats?logo=docker&label=Docker%20Pulls&link=https%3A%2F%2Fhub.docker.com%2Fr%2Fnicconike%2Fsteam-stats)
@@ -139,8 +139,6 @@ And thank you for considering to contribute.
 		- [Scout-Action](https://github.com/docker/scout-action)
 	- **CodeQL**
 		- [CodeQL-Action](https://github.com/github/codeql-action)
-	- **Pylint**
-		- [Pylint-Github-Action](https://github.com/Silleellie/pylint-github-action)
 	- **Codecov**
 		- [Codecov-Action](https://github.com/codecov/codecov-action)
 - **Styles**

@@ -12,18 +12,12 @@ on:
 jobs:
     codeql:
         if: github.actor != 'dependabot[bot]' || github.actor != 'protected-auto-commits[bot]'
-        name: Analyze (${{ matrix.language }})
+        name: Analyze Python
         runs-on: ubuntu-latest
         permissions:
             actions: read
             contents: read
             security-events: write
-
-        strategy:
-            fail-fast: false
-            matrix:
-                include:
-                  - language: python
 
         steps:
           - name: Checkout repository
@@ -32,7 +26,7 @@ jobs:
           - name: Initialize CodeQL
             uses: github/codeql-action/init@v3
             with:
-                languages: ${{ matrix.language }}
+                languages: python
                 queries: +security-extended
 
           - name: Autobuild
@@ -41,7 +35,7 @@ jobs:
           - name: Perform CodeQL Analysis
             uses: github/codeql-action/analyze@v3
             with:
-                category: "/language:${{matrix.language}}"
+                category: "/language:python"
                 output: codeql-report.sarif
 
           - name: Upload CodeQL Results
@@ -109,7 +103,7 @@ jobs:
                 elif (( $(echo "$score >= 5" | bc -l) )); then
                     color="orange"
                 fi
-                badge="![pylint](https://img.shields.io/badge/linting-pylint-$score-$color)"
+                badge="![Pylint](https://img.shields.io/badge/Pylint-$score-$color?logo=python)"
                 sed -i 's|!\[pylint\](.*)|'"$badge"'|' README.md
                 git config --global user.email "action@github.com"
                 git config --global user.name "GitHub Action"
