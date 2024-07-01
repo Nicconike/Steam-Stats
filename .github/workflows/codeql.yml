@@ -73,6 +73,13 @@ jobs:
                 restore-keys: |
                     ${{ runner.os }}-pip-
 
+          - name: GitHub App Token
+            uses: actions/create-github-app-token@v1
+            id: app-token
+            with:
+                app-id: ${{ secrets.APP_CLIENT_ID }}
+                private-key: ${{ secrets.APP_PRIVATE_KEY }}
+
           - name: Pylint Scan & Badge
             uses: Silleellie/pylint-github-action@v2
             with:
@@ -87,3 +94,5 @@ jobs:
                 color-ok-score: orange
                 color-good-score: yellow
                 color-perfect-score: brightgreen
+            env:
+                github_token: ${{ steps.app-token.outputs.token }}
