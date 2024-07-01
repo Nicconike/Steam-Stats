@@ -79,10 +79,10 @@ jobs:
                 lint-path: |
                     api
                     tests
-                python-version: 3.x
+                python-version: 3.12
                 requirements-path: requirements.txt
                 readme-path: README.md
-                badge-text: PyLint
+                badge-text: Pylint
                 color-bad-score: red
                 color-ok-score: orange
                 color-good-score: yellow

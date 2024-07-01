@@ -21,9 +21,6 @@ jobs:
             contents: write
             issues: write
             pull-requests: write
-        outputs:
-            released: ${{ steps.github-release.outputs.released }}
-            version: ${{ steps.github-release.outputs.new_version }}
         steps:
           - name: GitHub App Token
             uses: actions/create-github-app-token@v1
@@ -101,7 +98,6 @@ jobs:
                 load: ${{ github.event_name == 'pull_request' }}
                 tags: |
                     ${{ vars.DOCKER_USERNAME }}/steam-stats:latest
-                    if ${{ needs.release.outputs.released == 'true'}} then ${{ vars.DOCKER_USERNAME }}/steam-stats:${{ needs.release.outputs.version }}
                 labels: ${{ steps.meta.outputs.labels }}
                 cache-from: type=gha
                 cache-to: type=gha,mode=max
