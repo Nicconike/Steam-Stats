@@ -12,7 +12,7 @@ on:
 jobs:
     codeql:
         if: github.actor != 'dependabot[bot]' || github.actor != 'protected-auto-commits[bot]'
-        name: Analyze Python
+        name: CodeQL
         runs-on: ubuntu-latest
         permissions:
             actions: read
@@ -96,18 +96,19 @@ jobs:
                     score="0.0"
                 fi
                 color="red"
-                if (( $(echo "$score >= 9" | bc -l) )); then
+                if (( $(echo "$score == 10" | bc -l) )); then
                     color="brightgreen"
-                elif (( $(echo "$score >= 7" | bc -l) )); then
+                elif (( $(echo "$score >= 9" | bc -l) )); then
                     color="yellow"
-                elif (( $(echo "$score >= 5" | bc -l) )); then
+                elif (( $(echo "$score >= 8" | bc -l) )); then
                     color="orange"
+                elif (( $(echo "$score >= 6" | bc -l) )); then
+                    color="red"
                 fi
                 badge="![Pylint](https://img.shields.io/badge/Pylint-$score-$color?logo=python)"
-                sed -i 's|!\[pylint\](.*)|'"$badge"'|' README.md
+                sed -i 's|!\[Pylint\](.*)|'"$badge"'|' README.md
                 git config --global user.email "action@github.com"
                 git config --global user.name "GitHub Action"
-                git remote set-url origin https://x-access-token:${{ steps.app-token.outputs.token }}@github.com/${{ github.repository }}.git
                 git add README.md
-                git commit -m "Update Pylint Badge"
+                git commit -m "chore: Update Pylint Badge"
                 git push origin HEAD:master
