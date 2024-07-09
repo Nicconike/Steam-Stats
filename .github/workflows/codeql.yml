@@ -2,12 +2,12 @@ name: "CodeQL & Pylint"
 
 on:
     push:
-        branches: [ "master" ]
+        branches: master
         paths:
             - ".github/workflows/codeql.yml"
             - "api/*.py"
     pull_request:
-        branches: [ "master" ]
+        branches: master
 
 jobs:
     codeql:
@@ -20,7 +20,7 @@ jobs:
             security-events: write
 
         steps:
-          - name: Checkout repository
+          - name: Checkout Repo
             uses: actions/checkout@v4
 
           - name: Initialize CodeQL
@@ -107,8 +107,8 @@ jobs:
                 fi
                 badge="![Pylint](https://img.shields.io/badge/Pylint-$score-$color?logo=python)"
                 sed -i 's|!\[Pylint\](.*)|'"$badge"'|' README.md
-                git config --global user.email "action@github.com"
-                git config --global user.name "GitHub Action"
+                git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+                git config --global user.name "github-actions[bot]"
                 git add README.md
                 git commit -m "chore: Update Pylint Badge"
                 git push origin HEAD:master

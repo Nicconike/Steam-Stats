@@ -1,6 +1,7 @@
 """Main Runner Script"""
 # Disable pylint warnings for false positives
 # pylint: disable=duplicate-code
+import base64
 import logging
 import os
 import time
@@ -11,10 +12,11 @@ from api.card import (
     generate_card_for_played_games,
     generate_card_for_steam_workshop
 )
+from github import Github, InputGitTreeElement
 
 # Configure logging
 logging.basicConfig(level=logging.INFO,
-                    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+                    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 
 # Required Secrets Configuration
@@ -30,32 +32,29 @@ WORKSHOP_STATS = os.getenv("INPUT_WORKSHOP_STATS",
 __version__ = "0.1.5"
 
 
-def update_readme(markdown_data, start_marker, end_marker, readme_path="README.md"):
+def update_readme(repo, markdown_data, start_marker, end_marker):
     """Updates the README.md file with the provided Markdown content within specified markers"""
-    # Read the current README content
-    with open(readme_path, "r", encoding="utf-8") as file:
-        readme_content = file.read()
+    try:
+        readme_file = repo.get_contents("README.md")
+        readme_content = readme_file.decoded_content.decode("utf-8")
 
-    # Find the start and end index for the section to update
-    start_index = readme_content.find(start_marker)
-    if start_index == -1:
-        logger.error("Start marker not found in README.md")
-        return
+        start_index = readme_content.find(start_marker)
+        end_index = readme_content.find(end_marker, start_index)
 
-    end_index = readme_content.find(end_marker, start_index)
-    if end_index == -1:
-        logger.error("End marker not found in README.md")
-        return
+        if start_index == -1 or end_index == -1:
+            logger.error("Markers not found: %s", start_marker)
+            return None
 
-    # Construct the new README content with the updated section
-    new_readme_content = (
-        readme_content[:start_index + len(start_marker)] + "\n" +
-        markdown_data + "\n" + readme_content[end_index:]
-    )
+        new_section_content = start_marker + "\n" + markdown_data + "\n" + end_marker
 
-    # Write the updated content back to the README file
-    with open(readme_path, "w", encoding="utf-8") as file:
-        file.write(new_readme_content)
+        if new_section_content != readme_content[start_index:end_index + len(end_marker)]:
+            return new_section_content
+
+        return None
+
+    except (FileNotFoundError, PermissionError, IOError) as e:
+        logger.error("Error occurred while updating README: %s", str(e))
+        return None
 
 
 def generate_steam_stats():
@@ -106,39 +105,172 @@ def generate_workshop_stats():
     return workshop_markdown_content
 
 
-def main():
-    """Main function to run the script"""
-    # Start the timer
-    start_time = time.time()
+def get_github_token():
+    """Get GitHub token from environment variables"""
+    token = os.environ.get("GITHUB_TOKEN") or os.environ.get(
+        "GH_TOKEN")
+    if not token:
+        raise ValueError(
+            "No GitHub token found in environment variables (GITHUB_TOKEN or GH_TOKEN")
+    return token
 
-    user_markdown_content = generate_steam_stats()
-    if user_markdown_content:
-        update_readme(user_markdown_content,
-                      "<!-- Steam-Stats start -->", "<!-- Steam-Stats end -->")
-        logger.info("README.md successfully updated with Steam Stats")
+
+def get_repo(g):
+    """Get Repo object"""
+    repo_name = os.environ.get("GITHUB_REPOSITORY")
+    if not repo_name:
+        raise ValueError("GITHUB_REPOSITORY environment variable not set")
+    return g.get_repo(repo_name)
+
+
+def create_tree_elements(repo, files_to_update):
+    """Create tree elements for GitHub commit"""
+    tree_elements = []
+    for file_path, file_content in files_to_update.items():
+        if isinstance(file_content, bytes):
+            content = base64.b64encode(file_content).decode("utf-8")
+            encoding = "base64"
+        else:
+            content = file_content
+            encoding = "utf-8"
+
+        blob = repo.create_git_blob(content, encoding)
+        element = InputGitTreeElement(
+            path=file_path, mode="100644", type="blob", sha=blob.sha)
+        tree_elements.append(element)
+    return tree_elements
+
+
+def commit_to_github(repo, files_to_update):
+    """Commit files to GitHub Repo"""
+    if not files_to_update:
+        logger.info("No changes to commit")
+        return True
+
+    try:
+        branch = repo.get_branch(repo.default_branch)
+        last_commit_sha = branch.commit.sha
+
+        tree_elements = create_tree_elements(repo, files_to_update)
+        new_tree = repo.create_git_tree(
+            tree_elements, repo.get_git_tree(last_commit_sha))
+
+        new_commit = repo.create_git_commit(
+            message="chore: Update Steam Stats",
+            tree=new_tree,
+            parents=[repo.get_git_commit(last_commit_sha)]
+        )
+
+        ref = repo.get_git_ref("heads/" + branch.name)
+        ref.edit(sha=new_commit.sha)
+        return True
+
+    except (ValueError, IOError) as e:
+        logger.error("Error occurred while committing to GitHub: %s", str(e))
+        return False
+
+
+def initialize_github():
+    """Initialize GitHub client and get repo"""
+    token = get_github_token()
+    g = Github(token)
+    return get_repo(g)
+
+
+def get_readme_content(repo):
+    """Get current README content"""
+    readme_file = repo.get_contents("README.md")
+    if isinstance(readme_file, list):
+        readme_file = readme_file[0]
+    return readme_file.decoded_content.decode("utf-8")
+
+
+def update_readme_sections(repo, current_content):
+    """Update README sections with Steam and Workshop stats"""
+    updated_content = current_content
+
+    steam_stats_content = generate_steam_stats()
+    if steam_stats_content:
+        updated_content = update_section(repo, updated_content, steam_stats_content,
+                                         "<!-- Steam-Stats start -->", "<!-- Steam-Stats end -->")
+        logger.info("Steam stats updated")
     else:
-        logger.error("Failed to update README with latest Steam Stats")
+        logger.info("No Steam stats content generated")
 
     if WORKSHOP_STATS:
-        workshop_markdown_content = generate_workshop_stats()
-        if workshop_markdown_content:
-            update_readme(workshop_markdown_content,
-                          "<!-- Steam-Workshop start -->", "<!-- Steam-Workshop end -->")
-            logger.info(
-                "README.md successfully updated with Workshop Stats")
+        workshop_content = generate_workshop_stats()
+        if workshop_content:
+            updated_content = update_section(repo, updated_content, workshop_content,
+                                             "<!-- Steam-Workshop start -->",
+                                             "<!-- Steam-Workshop end -->")
+            logger.info("Workshop stats updated")
         else:
-            logger.error(
-                "Failed to update README with latest Workshop Stats")
+            logger.info("No Workshop stats content generated")
 
-    end_time = time.time()  # End the timer
-    total_time = round(end_time - start_time, 3)  # Total time
+    return updated_content
+
+
+def update_section(repo, current_content, new_content, start_marker, end_marker):
+    """Update a section of the README using markers"""
+    updated_section = update_readme(
+        repo, new_content, start_marker, end_marker)
+    if updated_section:
+        start_index = current_content.find(start_marker)
+        end_index = current_content.find(
+            end_marker, start_index) + len(end_marker)
+        return current_content[:start_index] + updated_section + current_content[end_index:]
+    return current_content
+
+
+def collect_files_to_update(current_readme, original_readme):
+    """Collect files that needs to be updated"""
+    files_to_update = {}
+    if current_readme != original_readme:
+        files_to_update["README.md"] = current_readme.encode("utf-8")
+
+    for png_file in ["steam_summary.png", "recently_played_games.png", "steam_workshop_stats.png"]:
+        png_path = "assets/" + png_file
+        if os.path.exists(png_path):
+            with open(png_path, "rb") as file:
+                files_to_update["assets/" + png_file] = file.read()
+
+    return files_to_update
+
+
+def log_execution_time(start_time):
+    """Log the total execution time"""
+    total_time = round(time.time() - start_time, 3)
     if total_time > 60:
-        minutes = total_time // 60
-        seconds = total_time % 60
+        minutes, seconds = divmod(total_time, 60)
         logger.info(
-            "Total Execution Time: %d minutes and %.3f seconds", int(minutes), seconds)
+            "Total Execution Time: %d minutes and %.3f seconds", minutes, seconds)
     else:
         logger.info("Total Execution Time: %.3f seconds", total_time)
+
+
+def main():
+    """Main function to run the script"""
+    start_time = time.time()
+
+    try:
+        repo = initialize_github()
+        original_readme = get_readme_content(repo)
+        current_readme = update_readme_sections(repo, original_readme)
+        files_to_update = collect_files_to_update(
+            current_readme, original_readme)
+
+        if files_to_update:
+            if commit_to_github(repo, files_to_update):
+                logger.info("Successfully committed to GitHub")
+            else:
+                logger.error("Failed to commit changes to GitHub")
+        else:
+            logger.info("No changes to commit")
+
+    except (ValueError, IOError) as e:
+        logger.error("%s error occurred: %s", type(e).__name__, str(e))
+
+    log_execution_time(start_time)
 
 
 if __name__ == "__main__":

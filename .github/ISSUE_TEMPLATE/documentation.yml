@@ -1,6 +1,6 @@
 name: Documentation
 description: Suggest improvements or report issues with the documentation
-title: "[DOC] "
+title: " "
 labels: ["documentation"]
 assignees: "nicconike"
 body:

@@ -1,4 +1,4 @@
-# 🛠️Work in Progress 🚧|🚧 Please come back later⚒️
+# Steam Stats📶
 [![Steam Stats](https://github.com/Nicconike/Steam-Stats/actions/workflows/steam-stats.yml/badge.svg)](https://github.com/Nicconike/Steam-Stats/actions/workflows/steam-stats.yml)
 [![Release](https://github.com/Nicconike/Steam-Stats/actions/workflows/release.yml/badge.svg)](https://github.com/Nicconike/Steam-Stats/actions/workflows/release.yml)
 [![CodeQL & Pylint](https://github.com/Nicconike/Steam-Stats/actions/workflows/codeql.yml/badge.svg)](https://github.com/Nicconike/Steam-Stats/actions/workflows/codeql.yml)
@@ -17,14 +17,9 @@
 ***
 ## Prerequisites
 1. **Steam Web API Key:** API key is important to fetch your account details and for that you will require a key which you can create for your account [here](https://steamcommunity.com/dev)
-2. **Github API Token:**
-	1. Goto your Github profile -> Settings -> Developer Settings -> Personal Access Tokens -> Tokens(Classic) or just click [here](https://github.com/settings/tokens)
-	2. Generate new token -> Generate new token(classic)
-	3. Select scopes -> repo and workflow only
-	4. Set a reasonable expiration date
-3. **Markdown Comments:** Update the markdown file by adding the comments where the Steam Stats will be embedded to. Refer [here](#Update-Readme) to learn more.
-4. **Steam ID:** You can get your 64-bit Steam id (SteamID64 - 17 digit number) by clicking on your profile name in the top right corner in steam desktop client, select "Account Details" and your Steam ID will be displayed directly under your account name
-5. **Steam Custom ID:** Open the Steam desktop application, click on your profile name in the top right corner. Select _View Profile_ and your custom URL will be displayed in the URL bar. From this url you will know your Steam Custom ID
+2. **Markdown Comments:** Update the markdown file by adding the comments where the Steam Stats will be embedded to. Refer [here](#Update-Readme) to learn more.
+3. **Steam ID:** You can get your 64-bit Steam id (SteamID64 - 17 digit number) by clicking on your profile name in the top right corner in steam desktop client, select "Account Details" and your Steam ID will be displayed directly under your account name
+4. **Steam Custom ID:** Open the Steam desktop application, click on your profile name in the top right corner. Select _View Profile_ and your custom URL will be displayed in the URL bar. From this url you will know your Steam Custom ID
 
 The Github Actions is set to run on every Monday 12 AM IST (UTC+5:30) which you can modify to your own time as per your liking by updating it in the workflow file
 
@@ -83,11 +78,11 @@ schedule:
 	2. This module displays the total number of Unique Visitors, Subscribers and Favorites for your Steam Workshop Items
 ***
 ## Setup with Example
-After completing the steps mentioned in the [Prerequisites](#Prerequisites), you have to save all the mentioned keys(except markdown comments) like Github Token,API Key, Steam-ID, Custom-ID as Secrets in your Github repo's settings.
+After completing the steps mentioned in the [Prerequisites](#Prerequisites), you have to save all the mentioned keys(except markdown comments) like Steam API Key, Steam-ID, Custom-ID as Secrets in your Github repo's settings.
 
 > Repo Settings -> Security -> Secrets and Variables -> Actions -> Add in Repository Secrets
 
-If you are new to **Github Secrets** then you can checkout this doc [here](https://docs.github.com/en/actions/security-guides/using-secrets-in-github-actions). And from [here](https://docs.github.com/en/actions/security-guides/automatic-token-authentication) you can learn about **Github Tokens**.
+If you are new to **Github Secrets** then you can checkout this doc [here](https://docs.github.com/en/actions/security-guides/using-secrets-in-github-actions).
 
 **Sample Workflow File**
 
@@ -110,11 +105,13 @@ jobs:
                 STEAM_API_KEY: ${{ secrets.STEAM_API_KEY }}
                 STEAM_ID: ${{ vars.STEAM_ID }}
                 STEAM_CUSTOM_ID: ${{ vars.STEAM_CUSTOM_ID }}
+				WORKSHOP_STATS: True # Optional
+                LOG_SCALE: True # Optional
 ```
 ***
 ## Contributions
 
-
+Star⭐ and Fork🍴 the Repo to start with your feature request(or bug) and experiment with the project to implement whatever Idea you might have and sent the Pull Request through 🤙
 
 Please refer [Contributing.md](https://github.com/Nicconike/Steam-Stats/blob/master/.github/CONTRIBUTING.md) to get to know how to contribute to this project.
 And thank you for considering to contribute.
@@ -123,26 +120,23 @@ And thank you for considering to contribute.
 ## Credits
 
 - **Actions**
-	- **GitHub Actions**
-		- [Checkout](https://github.com/actions/checkout)
-		- [Setup-Python](https://github.com/actions/setup-python)
-		- [Cache](https://github.com/actions/cache)
-		- [Upload-Artifact](https://github.com/actions/upload-artifact)
-		- [Create-Github-App-Token](https://github.com/actions/create-github-app-token)
-	- **Semantic Release**
-		- [Python-Semantic-Release](https://github.com/python-semantic-release/python-semantic-release)
-	- **Docker**
-		- [Setup-Buildx-Action](https://github.com/docker/setup-buildx-action)
-		- [Login-Action](https://github.com/docker/login-action)
-		- [Metadata-Action](https://github.com/docker/metadata-action)
-		- [Build-Push-Action](https://github.com/docker/build-push-action)
-		- [Scout-Action](https://github.com/docker/scout-action)
-	- **CodeQL**
-		- [CodeQL-Action](https://github.com/github/codeql-action)
-	- **Codecov**
-		- [Codecov-Action](https://github.com/codecov/codecov-action)
+	- **[GitHub Actions](https://github.com/actions)**
+	- **[Python Semantic Release](https://github.com/python-semantic-release/python-semantic-release)**
+	- **[Docker](https://github.com/docker)**
+	- **[CodeQL](https://github.com/github/codeql-action)**
+	- **[Codecov](https://github.com/codecov/codecov-action)**
 - **Styles**
 	- [Progress Bar Design](https://github.com/Nicconike/Steam-Stats/blob/master/assets/style.css)[^2] - [Ana Tudor](https://codepen.io/thebabydino)
+
+***
+## Support💙
+If you are using this project and are really happy with it, then there are few ways to support me so that I can keep doing what I like doing:
+	- Credit in your readme where you use this action
+	- Drop a follow!😁
+	- Starring and Sharing the project
+	- Donations through [GitHub Sponsers](https://github.com/sponsors/Nicconike) or whichever platform you like. So, that I can create more projects like these and play more games🎮🎧
+
+**Thanks!🫡**
 
 ***
 Created with 🐍 & ❤️ by [Nicco](https://github.com/Nicconike)

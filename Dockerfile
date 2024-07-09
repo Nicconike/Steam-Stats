@@ -4,6 +4,11 @@ FROM mcr.microsoft.com/playwright/python:v1.44.0-jammy
 # Set environment variables
 ENV PYTHONUNBUFFERED=1
 ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONPATH=/steam-stats
+ENV HOME=/steam-stats
+
+# Create a non-root user
+RUN useradd -ms /bin/bash steam-stats
 
 # Set the working directory in the container
 WORKDIR /steam-stats
@@ -24,7 +29,13 @@ RUN apt-get update && \
 
 # Copy application code and other necessary files into the container
 COPY api/ /steam-stats/api/
-COPY README.md /steam-stats/
+COPY assets/style.css /steam-stats/assets/
+
+# Change ownership of the steam-stats directory to the non-root user
+RUN chown -R steam-stats:steam-stats /steam-stats
+
+# Switch to the non-root user
+USER steam-stats
 
 # Command to run the application
-CMD ["python", "api/main.py"]
+ENTRYPOINT ["sh", "-c", "cd /steam-stats && python api/main.py"]
