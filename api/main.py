@@ -108,10 +108,10 @@ def generate_workshop_stats():
 def get_github_token():
     """Get GitHub token from environment variables"""
     token = os.environ.get("GITHUB_TOKEN") or os.environ.get(
-        "GH_TOKEN")
+        "GH_TOKEN") or os.environ.get("INPUT_GH_TOKEN")
     if not token:
         raise ValueError(
-            "No GitHub token found in environment variables (GITHUB_TOKEN or GH_TOKEN")
+            "No GitHub token found in env vars (GITHUB_TOKEN, GH_TOKEN or INPUT_GH_TOKEN")
     return token
 
 

@@ -56,17 +56,20 @@ schedule:
 	<!-- Steam-Workshop end -->
 	```
 3. Don't forget to add these comments in your readme file or wherever you want to display your steam stats, because without the comments the readme will not get updated
+
+> [!CAUTION]
+> The `Steam-Stats` marker should be placed before the `Steam-Workshop` markers if you are using both.
 ***
 ## Features
 1. Steam Player Summary[^1]
 2. Recently Played Games from Steam in the Last 2 Weeks
-3. Steam Workshop Stats (If Available)
+3. Steam Workshop Stats (If Applicable)
 
 ### Feature Flags
 1. Steam User Stats (Required | Default)
 	1. Steam Player Summary
 	2. Steam's Recently Played Games in the last 2 weeks
-		1. The Graph plot for recently played games is by default implemented in a fixed scale but if you want you can update it to be in a logarithmic scale by using this flag: `LOG_SCALE: True`
+		1. The Graph plot for recently played games is by default implemented in a fixed linear scale but if you want you can update it to be in a logarithmic scale by using this flag in your workflow: `LOG_SCALE: True`
 		2. When `LOG_SCALE` is `False`
 
 			![Recently Played Games](https://github.com/Nicconike/Steam-Stats/blob/master/assets/recently_played_games(linear).png)
@@ -74,7 +77,7 @@ schedule:
 
 			![Recently Played Games](https://github.com/Nicconike/Steam-Stats/blob/master/assets/recently_played_games(logarithmic).png)
 2. Steam Workshop Stats (Optional)
-	1. Workshop Stats Module can be activated/used by adding this flag in the workflow file in the environment variables: `WORKSHOP_STATS: True`
+	1. Workshop Stats Module can be used by adding this flag in your workflow file in the environment variables: `WORKSHOP_STATS: True`
 	2. This module displays the total number of Unique Visitors, Subscribers and Favorites for your Steam Workshop Items
 ***
 ## Setup with Example
@@ -82,7 +85,7 @@ After completing the steps mentioned in the [Prerequisites](#Prerequisites), you
 
 > Repo Settings -> Security -> Secrets and Variables -> Actions -> Add in Repository Secrets
 
-If you are new to **Github Secrets** then you can checkout this doc [here](https://docs.github.com/en/actions/security-guides/using-secrets-in-github-actions).
+If you are new to **Github Secrets** then you can checkout this official doc [here](https://docs.github.com/en/actions/security-guides/using-secrets-in-github-actions).
 
 **Sample Workflow File**
 
@@ -108,6 +111,9 @@ jobs:
 				WORKSHOP_STATS: True # Optional
                 LOG_SCALE: True # Optional
 ```
+
+Checkout this real time usage example in a github repo from [here](https://github.com/Nicconike/Nicconike?tab=readme-ov-file#gaming-) and also the github actions [workflow file](https://github.com/Nicconike/Nicconike/blob/master/.github/workflows/steam-stats.yml).
+
 ***
 ## Contributions
 
@@ -131,10 +137,10 @@ And thank you for considering to contribute.
 ***
 ## Support💙
 If you are using this project and are really happy with it, then there are few ways to support me so that I can keep doing what I like doing:
-	- Credit in your readme where you use this action
-	- Drop a follow!😁
-	- Starring and Sharing the project
-	- Donations through [GitHub Sponsers](https://github.com/sponsors/Nicconike) or whichever platform you like. So, that I can create more projects like these and play more games🎮🎧
+- Credit in your readme where you use this action
+- Drop a follow!😁
+- Starring and Sharing the project
+- Donations through [GitHub Sponsers](https://github.com/sponsors/Nicconike) or whichever platform you like. So, that I can create more projects like these and play more games🎮🎧
 
 **Thanks!🫡**
 
@@ -143,4 +149,4 @@ Created with 🐍 & ❤️ by [Nicco](https://github.com/Nicconike)
 
 [^1]: Unfortunately, Steam Web API doesn't support Web Sockets so the profile status cannot be updated in real time as it gets updated in steam profile 🥲
 
-[^2]: Modified `style.css` code according to my requirements
+[^2]: Modified `style.css` code according to project requirements

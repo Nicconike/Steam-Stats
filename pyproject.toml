@@ -39,8 +39,6 @@ version_variables = ["api/main.py:__version__"]
 branch = "master"
 commit_message = "chore: Version Release v{version}"
 tag_format = "v{version}"
-changelog_file = "CHANGELOG.md"
-template_dir = "templates"
 
 [tool.semantic_release.branches]
 main = { match = "master", prerelease_token = "rc", prerelease = false }
@@ -58,14 +56,13 @@ token = { env = "GH_TOKEN" }
 [tool.semantic_release.publish]
 upload_to_vcs_release = true
 dist_glob_patterns = [
-    "dist/*",
-    "!tests/*",
-    "!templates/*",
-    "!*.dockerignore",
-    "!*.env.example",
-    "!*.gitignore",
-    "!**/.github/workflows/*"
+    "dist/*"
 ]
+
+[tool.semantic_release.changelog]
+template_dir = "templates"
+changelog_file = "CHANGELOG.md"
+exclude_commit_patterns = []
 
 [tool.semantic_release.changelog.environment]
 trim_blocks = true
