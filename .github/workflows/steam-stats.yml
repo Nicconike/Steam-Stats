@@ -18,44 +18,13 @@ jobs:
         if: github.actor != 'dependabot[bot]' || github.actor != 'github-actions[bot]' || github.actor != 'protected-auto-commits[bot]' && github.base_ref == 'master'
         name: Steam Stats
         runs-on: ubuntu-latest
-        permissions:
-            contents: write
-        container:
-            image: nicconike/steam-stats:latest
         steps:
-          - name: Checkout Repo
-            uses: actions/checkout@v4
-            with:
-                token: ${{ secrets.GH_TOKEN }}
-
-          - name: Update Steam Stats
-            run: |
-                export PYTHONPATH=$(pwd)
-                python api/main.py
+          - name: Run Steam Stats
+            uses: docker://nicconike/steam-stats:latest
             env:
                 GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-                INPUT_STEAM_API_KEY: ${{ secrets.STEAM_API_KEY }}
-                INPUT_STEAM_ID: ${{ vars.STEAM_ID }}
-                INPUT_STEAM_CUSTOM_ID: ${{ vars.STEAM_CUSTOM_ID }}
-                INPUT_WORKSHOP_STATS: True
-                INPUT_LOG_SCALE: True
-                HOME: /root
+                STEAM_API_KEY: ${{ secrets.STEAM_API_KEY }}
+                STEAM_ID: ${{ vars.STEAM_ID }}
+                STEAM_CUSTOM_ID: ${{ vars.STEAM_CUSTOM_ID }}
+                WORKSHOP_STATS: True
                 GITHUB_REPOSITORY: ${{ github.repository }}
-
-          - name: Configure Git & Commit Changes
-            run: |
-                git config --global --add safe.directory /__w/Steam-Stats/Steam-Stats
-                git config --global user.email "action@github.com"
-                git config --global user.name "GitHub Action"
-                git add .
-                if ! git diff-index --quiet HEAD; then
-                    git commit -m "chore: Update Steam Stats"
-                    if [ "${{ github.ref }}" = "refs/heads/master" ]; then
-                        git pull --rebase origin master
-                        git push origin HEAD:master
-                    else
-                        echo "Not on master branch, skipping push"
-                    fi
-                else
-                    echo "No changes to commit"
-                fi

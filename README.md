@@ -29,6 +29,7 @@ schedule:
 ```
 > [!IMPORTANT]
 > Please don't forget any of the steps mentioned in the prerequisites else the Github Action will not work.
+> Also, make sure that you have set the country correctly in your Steam Account.
 >
 > You can refer the [Steam Stats Wiki](https://github.com/Nicconike/Steam-Stats/wiki) if you have any questions related to any of the steps mentioned in [Prerequisites](#Prerequisites).
 ***
@@ -89,27 +90,31 @@ If you are new to **Github Secrets** then you can checkout this official doc [he
 
 **Sample Workflow File**
 
+`steam-stats.yml`
+
 ```yml
 name: Steam Stats
 
 on:
+	push:
+		branches: master
     schedule:
         # Runs every Monday at 12AM IST (UTC+5:30)
         - cron: "30 18 * * 0"
     workflow_dispatch:
 
 jobs:
-    update-readme:
+    steam-stats:
         name: Steam Stats
         runs-on: ubuntu-latest
         steps:
           - uses: nicconike/steam-stats@master
             with:
-                STEAM_API_KEY: ${{ secrets.STEAM_API_KEY }}
-                STEAM_ID: ${{ vars.STEAM_ID }}
-                STEAM_CUSTOM_ID: ${{ vars.STEAM_CUSTOM_ID }}
-				WORKSHOP_STATS: True # Optional
+                STEAM_API_KEY: ${{ secrets.STEAM_API_KEY }} # Replace with your created key saved in actions secrets
+                STEAM_ID: ${{ vars.STEAM_ID }} # Replace with your Steam ID env var
+                STEAM_CUSTOM_ID: ${{ vars.STEAM_CUSTOM_ID }} # Replace with your custom ID env var
                 LOG_SCALE: True # Optional
+				WORKSHOP_STATS: True # Optional
 ```
 
 Checkout this real time usage example in a github repo from [here](https://github.com/Nicconike/Nicconike?tab=readme-ov-file#gaming-) and also the github actions [workflow file](https://github.com/Nicconike/Nicconike/blob/master/.github/workflows/steam-stats.yml).
@@ -142,11 +147,12 @@ If you are using this project and are really happy with it, then there are few w
 - Starring and Sharing the project
 - Donations through [GitHub Sponsers](https://github.com/sponsors/Nicconike) or whichever platform you like. So, that I can create more projects like these and play more games🎮🎧
 
-**Thanks!🫡**
+#### **Thanks!🫡**
+Other Major Platforms Coming Soon:tm:😉
 
 ***
 Created with 🐍 & ❤️ by [Nicco](https://github.com/Nicconike)
 
 [^1]: Unfortunately, Steam Web API doesn't support Web Sockets so the profile status cannot be updated in real time as it gets updated in steam profile 🥲
 
-[^2]: Modified `style.css` code according to project requirements
+[^2]: Modified design code according to project requirements

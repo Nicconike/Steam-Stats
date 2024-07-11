@@ -19,6 +19,12 @@ MARGIN = 10
 repo_owner, repo_name = os.environ["GITHUB_REPOSITORY"].split('/')
 branch_name = os.environ["GITHUB_REF_NAME"]
 
+# Personastate mapping for Steam Profile Status
+personastate_map = {
+    0: "Offline", 1: "Online", 2: "Busy", 3: "Away",
+    4: "Snooze", 5: "Looking to trade", 6: "Looking to play"
+}
+
 
 async def get_element_bounding_box(html_file, selector):
     """Get the bounding box of the specified element using Playwright"""
@@ -114,7 +120,8 @@ def generate_card_for_player_summary(player_data):
     personaname = summary_data["personaname"]
     personastate = summary_data["personastate"]
     avatarfull = summary_data["avatarfull"]
-    loccountrycode = summary_data["loccountrycode"]
+    loccountrycode = summary_data.get(
+        "loccountrycode", "")
     lastlogoff = summary_data["lastlogoff"]
     timecreated = summary_data["timecreated"]
     gameextrainfo = summary_data.get("gameextrainfo", None)
@@ -123,16 +130,17 @@ def generate_card_for_player_summary(player_data):
     lastlogoff_str = format_unix_time(lastlogoff)
     timecreated_str = format_unix_time(timecreated)
 
-    personastate_map = {
-        0: "Offline",
-        1: "Online",
-        2: "Busy",
-        3: "Away",
-        4: "Snooze",
-        5: "Looking to trade",
-        6: "Looking to play"
-    }
     personastate_value = personastate_map.get(personastate, "Unknown")
+
+    # Create country section only if loccountrycode exists
+    country_section = ""
+    if loccountrycode:
+        country_section = f'''
+            <p id="country">Country: <span id="country-code">{loccountrycode}</span>
+                <img id="flag" class="flag"
+                src="https://flagcdn.com/w320/{loccountrycode.lower()}.png" alt="Flag">
+            </p>
+        '''
 
     html_content = f"""
 <!DOCTYPE html>
@@ -185,10 +193,7 @@ def generate_card_for_player_summary(player_data):
             <div class="info-container">
                 <div class="info-left">
                     <p id="status">Status: {personastate_value}</p>
-                    <p id="country">Country: <span id="country-code">{loccountrycode}</span>
-                        <img id="flag" class="flag"
-                        src="https://flagcdn.com/w320/{loccountrycode.lower()}.png" alt="Flag">
-                    </p>
+                    {country_section}
                 </div>
                 <div class="info-right">
                     <p id="lastlogoff">Last Logoff: {lastlogoff_str}</p>

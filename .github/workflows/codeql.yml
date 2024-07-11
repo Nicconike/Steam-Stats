@@ -76,23 +76,15 @@ jobs:
                 restore-keys: |
                     ${{ runner.os }}-pip-
 
-          - name: Run Pylint
+          - name: Run Pylint and Generate Badge
             id: run-pylint
             run: |
-                git add .
                 python -m pip install --upgrade pip
                 pip install pylint
-                pylint api tests > pylint-report.txt || true
+                pylint_output=$(pylint api tests || true)
+                echo "$pylint_output"
 
-          - name: Generate Pylint Badge
-            if: github.ref == 'refs/heads/master'
-            env:
-                GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
-            run: |
-                score=$(grep -oP 'Your code has been rated at \K[0-9]+\.[0-9]+' pylint-report.txt)
-                if [ -z "$score" ]; then
-                    score="0.0"
-                fi
+                score=$(echo "$pylint_output" | grep -oP 'Your code has been rated at \K[0-9]+\.[0-9]+' || echo "0.0")
                 color="red"
                 if (( $(echo "$score == 10" | bc -l) )); then
                     color="brightgreen"
@@ -103,10 +95,17 @@ jobs:
                 elif (( $(echo "$score >= 6" | bc -l) )); then
                     color="red"
                 fi
+
                 badge="![Pylint](https://img.shields.io/badge/Pylint-$score-$color?logo=python)"
-                sed -i 's|!\[Pylint\](.*)|'"$badge"'|' README.md
+                echo "PYLINT_BADGE=$badge" >> $GITHUB_OUTPUT
+
+          - name: Update README with Pylint Badge
+            if: github.ref == 'refs/heads/master'
+            env:
+                GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
+            run: |
+                sed -i 's|!\[Pylint\](.*)|${{ steps.run-pylint.outputs.PYLINT_BADGE }}|' README.md
                 git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
                 git config --global user.name "github-actions[bot]"
                 git add README.md
-                git commit -m "chore: Update Pylint Badge"
-                git push origin HEAD:master
+                git diff --quiet && git diff --staged --quiet || (git commit -m "chore: Update Pylint Badge" && git push origin HEAD:master)

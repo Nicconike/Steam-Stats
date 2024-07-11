@@ -1,407 +1,163 @@
 """Test Main Runner Script"""
 # Disable pylint warnings for false positives
-# pylint: disable=redefined-outer-name
-from unittest import mock
-from unittest.mock import patch, ANY
+# pylint: disable=redefined-outer-name, unused-argument
+from unittest.mock import Mock, patch
 import pytest
-from api.main import (main, update_readme, get_player_summaries, get_recently_played_games,
-                      fetch_workshop_item_links, generate_steam_stats, generate_workshop_stats)
-
-
-@pytest.fixture(autouse=True)
-def mock_env_vars(monkeypatch):
-    """Mock environment variables"""
-    monkeypatch.setenv("INPUT_STEAM_API_KEY", "dummy_api_key")
-    monkeypatch.setenv("INPUT_STEAM_CUSTOM_ID", "dummy_custom_id")
+from api.main import (
+    update_readme, generate_steam_stats, generate_workshop_stats,
+    get_github_token, get_repo, create_tree_elements, commit_to_github,
+    initialize_github, get_readme_content, update_readme_sections,
+    update_section, collect_files_to_update
+)
 
 
 @pytest.fixture
-def readme_content():
-    """Fixture to provide initial README content"""
-    return "Some initial content\n<!-- START -->\nOld content\n<!-- END -->\nSome final content"
+def mock_dependencies(mocker):
+    """Mock all the function dependencies"""
+    mocks = {
+        'get_player_summaries': mocker.patch('main.get_player_summaries',
+                                             return_value={'response': {'players': [{'personaname':
+                                                                                     'TestUser'
+                                                                                     }]}}),
+        'get_recently_played_games': mocker.patch('main.get_recently_played_games',
+                                                  return_value={'response': {'games': []}}),
+        'generate_card_for_player_summary': mocker.patch('main.generate_card_for_player_summary',
+                                                         return_value='Player Summary Card'),
+        'generate_card_for_played_games': mocker.patch('main.generate_card_for_played_games',
+                                                       return_value='Recently Played Games Card'),
+        'fetch_workshop_item_links': mocker.patch('main.fetch_workshop_item_links',
+                                                  return_value=['link1', 'link2']),
+        'fetch_all_workshop_stats': mocker.patch('main.fetch_all_workshop_stats',
+                                                 return_value={'stats': 'data'}),
+        'generate_card_for_steam_workshop': mocker.patch('main.generate_card_for_steam_workshop',
+                                                         return_value='Workshop Stats Card'),
+        'Github': mocker.patch('main.Github'),
+        'get_repo': mocker.patch('main.get_repo'),
+    }
+
+    mocker.patch.dict('os.environ', {
+        'INPUT_STEAM_ID': 'test_steam_id',
+        'INPUT_STEAM_API_KEY': 'test_api_key',
+        'INPUT_STEAM_CUSTOM_ID': 'test_custom_id',
+        'INPUT_WORKSHOP_STATS': 'true',
+        'GITHUB_REPOSITORY': 'test/repo'
+    })
+
+    return mocks
 
 
-@pytest.fixture
-def updated_readme_content():
-    """Fixture to provide expected updated README content"""
-    return "Some initial content\n<!-- START -->\nNew content\n<!-- END -->\nSome final content"
-
-
-def test_update_readme_success(readme_content, updated_readme_content, tmp_path):
-    """Test successful update of README.md"""
-    readme_path = tmp_path / "README.md"
-    readme_path.write_text(readme_content, encoding="utf-8")
-
-    with mock.patch("api.main.logger") as mock_logger:
-        update_readme("New content", "<!-- START -->",
-                      "<!-- END -->", readme_path=str(readme_path))
-
-        result = readme_path.read_text(encoding="utf-8")
-        if result != updated_readme_content:
-            raise AssertionError("Expected README content to be updated")
-
-        if mock_logger.error.called:
-            raise AssertionError("Expected no errors to be logged")
-
-
-def test_update_readme_start_marker_not_found(readme_content, tmp_path):
-    """Test when start marker is not found in README.md"""
-    readme_path = tmp_path / "README.md"
-    readme_path.write_text(readme_content, encoding="utf-8")
-
-    with mock.patch("api.main.logger") as mock_logger:
-        update_readme("New content", "<!-- NON_EXISTENT_START -->",
-                      "<!-- END -->", readme_path=str(readme_path))
-
-        result = readme_path.read_text(encoding="utf-8")
-        if result != readme_content:
-            raise AssertionError("Expected README content to remain unchanged")
-
-        if not mock_logger.error.called:
-            raise AssertionError(
-                "Expected an error to be logged for missing start marker")
-
-
-def test_update_readme_end_marker_not_found(readme_content, tmp_path):
-    """Test when end marker is not found in README.md"""
-    readme_path = tmp_path / "README.md"
-    readme_path.write_text(readme_content, encoding="utf-8")
-
-    with mock.patch("api.main.logger") as mock_logger:
-        update_readme("New content", "<!-- START -->",
-                      "<!-- NON_EXISTENT_END -->", readme_path=str(readme_path))
-
-        result = readme_path.read_text(encoding="utf-8")
-        if result != readme_content:
-            raise AssertionError("Expected README content to remain unchanged")
-
-        if not mock_logger.error.called:
-            raise AssertionError(
-                "Expected an error to be logged for missing end marker")
-
-
-def test_update_readme_no_markers(tmp_path):
-    """Test when neither start nor end markers are found in README.md"""
-    readme_content = "Some initial content\nSome final content"
-    readme_path = tmp_path / "README.md"
-    readme_path.write_text(readme_content, encoding="utf-8")
-
-    with mock.patch("api.main.logger") as mock_logger:
-        update_readme("New content", "<!-- START -->",
-                      "<!-- END -->", readme_path=str(readme_path))
-
-        result = readme_path.read_text(encoding="utf-8")
-        if result != readme_content:
-            raise AssertionError("Expected README content to remain unchanged")
-
-        if not mock_logger.error.called:
-            raise AssertionError(
-                "Expected errors to be logged for missing markers")
-
-
-def test_get_player_summaries_success(requests_mock):
-    """Test successful retrieval of player summaries"""
-    requests_mock.get(
-        'http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/',
-        json={"response": {"players": [{
-            "personaname": "TestUser", "personastate": 1, "avatarfull":
-            "http://example.com/avatar.jpg", "loccountrycode": "US",
-            "lastlogoff": 1609459200, "timecreated": 1609459200
-        }]}}
+def test_update_readme(mock_dependencies):
+    """Test Update Readme"""
+    mock_repo = Mock()
+    mock_repo.get_contents.return_value.decoded_content = (
+        b'<!-- Start -->\n'
+        b'Old content\n'
+        b'<!-- End -->'
     )
-    result = get_player_summaries()
-    if result is None:
-        raise AssertionError("Expected result to be not None")
-    if result is None or "response" not in result:
-        raise AssertionError("Expected 'response' to be in result")
-    if "players" not in result["response"]:
-        raise AssertionError("Expected 'players' to be in result['response']")
+    result = update_readme(mock_repo, 'New content',
+                           '<!-- Start -->', '<!-- End -->')
+    expected = '<!-- Start -->\nNew content\n<!-- End -->'
+    if result != expected:
+        pytest.fail(f"Expected '{expected}', but got '{result}'")
 
 
-def test_get_recently_played_games_success(requests_mock):
-    """Test successful retrieval of recently played games"""
-    requests_mock.get(
-        'http://api.steampowered.com/IPlayerService/GetRecentlyPlayedGames/v0001/',
-        json={"response": {"total_count": 1, "games": [
-            {"name": "TestGame", "playtime_2weeks": 120,
-                "appid": 12345, "img_icon_url": "icon.jpg"}
-        ]}}
+def test_generate_steam_stats(mock_dependencies):
+    """Test Generating Steam Stats"""
+    result = generate_steam_stats()
+    expected = 'Player Summary CardRecently Played Games Card'
+    if result != expected:
+        pytest.fail(f"Expected '{expected}', but got '{result}'")
+
+
+def test_generate_workshop_stats(mock_dependencies):
+    """Test Generating Steam Workshop Stats"""
+    result = generate_workshop_stats()
+    expected = 'Workshop Stats Card'
+    if result != expected:
+        pytest.fail(f"Expected '{expected}', but got '{result}'")
+
+
+def test_get_github_token():
+    """Test fetching Github Token"""
+    with patch.dict('os.environ', {'GITHUB_TOKEN': 'test_token'}):
+        token = get_github_token()
+        if token != 'test_token':
+            pytest.fail(f"Expected 'test_token', but got '{token}'")
+
+
+def test_get_repo():
+    """Test fetching Github Repo"""
+    mock_github = Mock()
+    with patch.dict('os.environ', {'GITHUB_REPOSITORY': 'test/repo'}):
+        get_repo(mock_github)
+        mock_github.get_repo.assert_called_once_with('test/repo')
+
+
+def test_create_tree_elements():
+    """Test Creating Tree Elements for Git"""
+    mock_repo = Mock()
+    files_to_update = {'test.txt': 'content'}
+    create_tree_elements(mock_repo, files_to_update)
+    mock_repo.create_git_blob.assert_called_once()
+
+
+def test_commit_to_github():
+    """Test committing to Github"""
+    mock_repo = Mock()
+    files_to_update = {'test.txt': 'content'}
+    result = commit_to_github(mock_repo, files_to_update)
+    if not result:
+        pytest.fail("Expected True, but got False")
+
+
+def test_initialize_github(mock_dependencies):
+    """Test Initializing Github"""
+    with patch('main.get_github_token', return_value='test_token'):
+        initialize_github()
+        mock_dependencies['Github'].assert_called_once_with('test_token')
+
+
+def test_get_readme_content():
+    """Test fetching readme content"""
+    mock_repo = Mock()
+    mock_repo.get_contents.return_value.decoded_content = b'README content'
+    result = get_readme_content(mock_repo)
+    if result != 'README content':
+        pytest.fail(f"Expected 'README content', but got '{result}'")
+
+
+def test_update_readme_sections(mock_dependencies):
+    """Test updating readme sections with markers"""
+    mock_repo = Mock()
+    current_content = '<!-- Steam-Stats start -->Old<!-- Steam-Stats end -->'
+    result = update_readme_sections(mock_repo, current_content)
+    expected = (
+        '<!-- Steam-Stats start -->\n'
+        'Player Summary CardRecently Played Games Card\n'
+        '<!-- Steam-Stats end -->'
     )
-    result = get_recently_played_games()
-    if result is None:
-        raise AssertionError("Expected result to be not None")
-    if result is None or "response" not in result:
-        raise AssertionError("Expected 'response' to be in result")
-    if "games" not in result["response"]:
-        raise AssertionError("Expected 'games' to be in result['response']")
+    if result != expected:
+        pytest.fail(f"Expected '{expected}', but got '{result}'")
 
 
-def test_get_recently_played_games_no_games(requests_mock):
-    """Test retrieval of recently played games with no games played"""
-    requests_mock.get(
-        'http://api.steampowered.com/IPlayerService/GetRecentlyPlayedGames/v0001/',
-        json={"response": {"total_count": 0}}
-    )
-    result = get_recently_played_games()
-    if result is not None:
-        raise AssertionError("Expected result to be None")
+def test_update_section():
+    """Test updating section in Readme"""
+    mock_repo = Mock()
+    current_content = '<!-- Start -->Old<!-- End -->'
+    new_content = 'New'
+    result = update_section(mock_repo, current_content,
+                            new_content, '<!-- Start -->', '<!-- End -->')
+    expected = '<!-- Start -->\nNew\n<!-- End -->'
+    if result != expected:
+        pytest.fail(f"Expected '{expected}', but got '{result}'")
 
 
-def test_fetch_workshop_item_links_success(requests_mock):
-    """Test successful fetching of workshop item links"""
-    requests_mock.get(
-        'https://steamcommunity.com/id/dummy_custom_id/myworkshopfiles/?p=1',
-        text='<div class="workshopItem"><a class="ugc"'
-        'href="https://steamcommunity.com/sharedfiles/filedetails/?id=2984474065"></a></div>'
-    )
-    requests_mock.get(
-        'https://api.steampowered.com/ISteamWebAPIUtil/GetServerInfo/v1/',
-        json={"servertime": 1234567890}
-    )
-    result = fetch_workshop_item_links("dummy_custom_id", "dummy_api_key")
-    expected_result = [
-        "https://steamcommunity.com/sharedfiles/filedetails/?id=2984474065"]
-    if result != expected_result:
-        raise AssertionError(f"Result should be {expected_result}")
-
-
-def test_generate_steam_stats(requests_mock):
-    """Test generating Steam Stats"""
-    requests_mock.get(
-        'http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/',
-        json={"response": {"players": [{
-            "personaname": "TestUser", "personastate": 1, "avatarfull":
-            "http://example.com/avatar.jpg", "loccountrycode": "US",
-            "lastlogoff": 1609459200, "timecreated": 1609459200}
-        ]}}
-    )
-    requests_mock.get(
-        'http://api.steampowered.com/IPlayerService/GetRecentlyPlayedGames/v0001/',
-        json={"response": {"total_count": 1, "games": [
-            {"name": "TestGame", "playtime_2weeks": 120,
-                "appid": 12345, "img_icon_url": "icon.jpg"}
-        ]}}
-    )
-    with mock.patch('api.main.generate_card_for_player_summary', return_value="![Steam Summary]"):
-        with mock.patch('api.main.generate_card_for_played_games',
-                        return_value="![Recently Played Games]"):
-            result = generate_steam_stats()
-            if "![Steam Summary]" not in result:
-                raise AssertionError(
-                    "Expected '![Steam Summary]' to be in result")
-            if "![Recently Played Games]" not in result:
-                raise AssertionError(
-                    "Expected '![Recently Played Games]' to be in result")
-
-    requests_mock.get(
-        'http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/',
-        json={"response": {"players": []}}
-    )
-    requests_mock.get(
-        'http://api.steampowered.com/IPlayerService/GetRecentlyPlayedGames/v0001/',
-        json={"response": {"total_count": 1, "games": [
-            {"name": "TestGame", "playtime_2weeks": 120,
-                "appid": 12345, "img_icon_url": "icon.jpg"}
-        ]}}
-    )
-    with mock.patch('api.main.generate_card_for_player_summary', return_value=None):
-        with mock.patch('api.main.generate_card_for_played_games',
-                        return_value="![Recently Played Games]"):
-            result = generate_steam_stats()
-            if "![Steam Summary]" in result:
-                raise AssertionError(
-                    "Expected '![Steam Summary]' not to be in result")
-            if "![Recently Played Games]" not in result:
-                raise AssertionError(
-                    "Expected '![Recently Played Games]' to be in result")
-
-    requests_mock.get(
-        'http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/',
-        json={"response": {"players": [{
-            "personaname": "TestUser", "personastate": 1, "avatarfull":
-            "http://example.com/avatar.jpg", "loccountrycode": "US",
-            "lastlogoff": 1609459200, "timecreated": 1609459200}
-        ]}}
-    )
-    requests_mock.get(
-        'http://api.steampowered.com/IPlayerService/GetRecentlyPlayedGames/v0001/',
-        json={"response": {"total_count": 0}}
-    )
-    with mock.patch('api.main.generate_card_for_player_summary', return_value="![Steam Summary]"):
-        with mock.patch('api.main.generate_card_for_played_games', return_value=None):
-            result = generate_steam_stats()
-            if "![Steam Summary]" not in result:
-                raise AssertionError(
-                    "Expected '![Steam Summary]' to be in result")
-            if "![Recently Played Games]" in result:
-                raise AssertionError(
-                    "Expected '![Recently Played Games]' not to be in result")
-
-    requests_mock.get(
-        'http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/',
-        json={"response": {"players": []}}
-    )
-    requests_mock.get(
-        'http://api.steampowered.com/IPlayerService/GetRecentlyPlayedGames/v0001/',
-        json={"response": {"total_count": 0}}
-    )
-    with mock.patch('api.main.generate_card_for_player_summary', return_value=None):
-        with mock.patch('api.main.generate_card_for_played_games', return_value=None):
-            result = generate_steam_stats()
-            if result:
-                raise AssertionError("Expected result to be empty")
-
-    requests_mock.get(
-        'http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/',
-        json={"response": {"players": [{
-            "personaname": "TestUser", "personastate": 1, "avatarfull":
-            "http://example.com/avatar.jpg", "loccountrycode": "US",
-            "lastlogoff": 1609459200, "timecreated": 1609459200}
-        ]}}
-    )
-    requests_mock.get(
-        'http://api.steampowered.com/IPlayerService/GetRecentlyPlayedGames/v0001/',
-        json={"response": {"total_count": 1, "games": [
-            {"name": "TestGame", "playtime_2weeks": 120,
-                "appid": 12345, "img_icon_url": "icon.jpg"}
-        ]}}
-    )
-    with mock.patch('api.main.generate_card_for_player_summary', return_value=None):
-        with mock.patch('api.main.generate_card_for_played_games', return_value=None):
-            result = generate_steam_stats()
-            if result:
-                raise AssertionError("Expected result to be empty")
-
-    with mock.patch('api.main.get_player_summaries', return_value=None):
-        with mock.patch('api.main.get_recently_played_games',
-                        return_value={"response": {"total_count": 1, "games": [
-                            {"name": "TestGame", "playtime_2weeks": 120,
-                             "appid": 12345, "img_icon_url": "icon.jpg"}
-                        ]}}):
-            with mock.patch('api.main.generate_card_for_played_games',
-                            return_value="![Recently Played Games]"):
-                result = generate_steam_stats()
-                if "![Steam Summary]" in result:
-                    raise AssertionError(
-                        "Expected '![Steam Summary]' not to be in result")
-                if "![Recently Played Games]" not in result:
-                    raise AssertionError(
-                        "Expected '![Recently Played Games]' to be in result")
-
-
-def test_generate_workshop_stats(requests_mock):
-    """Test generating Workshop stats"""
-    requests_mock.get(
-        'https://steamcommunity.com/id/nicconike/myworkshopfiles/?p=1',
-        text='<div class="workshopItem"><a class="ugc"'
-        'href="https://steamcommunity.com/sharedfiles/filedetails/?id=2984474065"></a></div>'
-    )
-    requests_mock.get(
-        'https://api.steampowered.com/ISteamWebAPIUtil/GetServerInfo/v1/',
-        json={"servertime": 1234567890}
-    )
-    requests_mock.get(
-        'https://steamcommunity.com/sharedfiles/filedetails/?id=2984474065',
-        text='<table class="stats_table"><tr><td>1,000</td><td>Unique Visitors</td></tr></table>'
-    )
-    requests_mock.get(
-        'https://steamcommunity.com/id/dummy_custom_id/myworkshopfiles/?p=2',
-        text=''
-    )
-    with mock.patch('api.main.generate_card_for_steam_workshop',
-                    return_value="![Steam Workshop Stats]"):
-        result = generate_workshop_stats()
-        if "![Steam Workshop Stats]" not in result:
-            raise AssertionError(
-                "Expected '![Steam Workshop Stats]' to be in result")
-
-    with mock.patch('api.main.fetch_workshop_item_links', return_value=None):
-        result = generate_workshop_stats()
-        if result:
-            raise AssertionError(
-                "Expected result to be empty when no workshop item links are found")
-
-    with mock.patch('api.main.fetch_workshop_item_links',
-                    return_value=[
-                        'https://steamcommunity.com/sharedfiles/filedetails/?id=2984474065'
-                    ]):
-        with mock.patch('api.main.fetch_all_workshop_stats',
-                        return_value={
-                            "total_unique_visitors": 1000, "total_current_subscribers": 500,
-                            "total_current_favorites": 250, "individual_stats": []
-                        }):
-            with mock.patch('api.main.generate_card_for_steam_workshop', return_value=None):
-                result = generate_workshop_stats()
-                if result:
-                    raise AssertionError(
-                        "Expected result to be empty when card generation fails")
-
-    with mock.patch('api.main.fetch_workshop_item_links', return_value=[]):
-        result = generate_workshop_stats()
-        if result:
-            raise AssertionError(
-                "Expected result to be empty when no workshop item links are found")
-
-    with mock.patch('api.main.fetch_workshop_item_links',
-                    return_value=[
-                        'https://steamcommunity.com/sharedfiles/filedetails/?id=2984474065'
-                    ]):
-        with mock.patch('api.main.fetch_all_workshop_stats', return_value={}):
-            with mock.patch('api.main.generate_card_for_steam_workshop', return_value=None):
-                result = generate_workshop_stats()
-                if result:
-                    raise AssertionError(
-                        "Expected result to be empty when no workshop stats are found")
-
-
-def test_main(requests_mock):
-    """Test the main function execution"""
-    requests_mock.get(
-        'http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/',
-        json={"response": {"players": [{
-            "personaname": "TestUser", "personastate": 1, "avatarfull":
-            "http://example.com/avatar.jpg", "loccountrycode": "US",
-            "lastlogoff": 1609459200, "timecreated": 1609459200}
-        ]}}
-    )
-    requests_mock.get(
-        'http://api.steampowered.com/IPlayerService/GetRecentlyPlayedGames/v0001/',
-        json={"response": {"total_count": 1, "games": [
-            {"name": "TestGame", "playtime_2weeks": 120,
-                "appid": 12345, "img_icon_url": "icon.jpg"}
-        ]}}
-    )
-    requests_mock.get(
-        'https://steamcommunity.com/id/nicconike/myworkshopfiles/?p=1',
-        text='<div class="workshopItem"><a class="ugc"'
-        'href="https://steamcommunity.com/sharedfiles/filedetails/?id=2984474065"></a></div>'
-    )
-    requests_mock.get(
-        'https://api.steampowered.com/ISteamWebAPIUtil/GetServerInfo/v1/',
-        json={"servertime": 1234567890}
-    )
-    requests_mock.get(
-        'https://steamcommunity.com/sharedfiles/filedetails/?id=2984474065',
-        text='<table class="stats_table"><tr><td>1,000</td><td>Unique Visitors</td></tr></table>'
-    )
-
-    with patch('api.main.WORKSHOP_STATS', True):
-        with patch('api.main.update_readme') as mock_update_readme:
-            main()
-            mock_update_readme.assert_any_call(
-                ANY, "<!-- Steam-Stats start -->", "<!-- Steam-Stats end -->")
-            mock_update_readme.assert_any_call(
-                ANY, "<!-- Steam-Workshop start -->", "<!-- Steam-Workshop end -->")
-
-    with patch('api.main.generate_steam_stats', return_value=""):
-        with patch('api.main.logger') as mock_logger:
-            main()
-            mock_logger.error.assert_called_with(
-                "Failed to update README with latest Steam Stats")
-
-    with patch('api.main.WORKSHOP_STATS', True):
-        with patch('api.main.generate_workshop_stats', return_value=""):
-            with patch('api.main.logger') as mock_logger:
-                main()
-                mock_logger.error.assert_called_with(
-                    "Failed to update README with latest Workshop Stats")
+def test_collect_files_to_update():
+    """Test collection of files to update to Github"""
+    with patch('os.path.exists', return_value=True), \
+            patch('builtins.open', Mock()):
+        current_readme = 'New content'
+        original_readme = 'Old content'
+        result = collect_files_to_update(current_readme, original_readme)
+        if len(result) != 4:
+            pytest.fail(f"Expected 4 files to update, but got {len(result)}")
