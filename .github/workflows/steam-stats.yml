@@ -6,18 +6,20 @@ on:
         - cron: "30 18 * * 0"
     workflow_dispatch:
     push:
-        branches: [ "master" ]
+        branches: master
         paths:
             - '.github/workflows/steam-stats.yml'
             - 'api/*.py'
     pull_request:
-        branches: [ "master" ]
+        branches: master
 
 jobs:
     update-readme:
         if: github.actor != 'dependabot[bot]' || github.actor != 'github-actions[bot]' || github.actor != 'protected-auto-commits[bot]' && github.base_ref == 'master'
         name: Steam Stats
         runs-on: ubuntu-latest
+        permissions:
+            contents: write
         container:
             image: nicconike/steam-stats:latest
         steps:
@@ -26,11 +28,12 @@ jobs:
             with:
                 token: ${{ secrets.GH_TOKEN }}
 
-          - name: Update Steam Stats in README
+          - name: Update Steam Stats
             run: |
                 export PYTHONPATH=$(pwd)
                 python api/main.py
             env:
+                GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
                 INPUT_STEAM_API_KEY: ${{ secrets.STEAM_API_KEY }}
                 INPUT_STEAM_ID: ${{ vars.STEAM_ID }}
                 INPUT_STEAM_CUSTOM_ID: ${{ vars.STEAM_CUSTOM_ID }}

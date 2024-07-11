@@ -140,7 +140,7 @@ def generate_card_for_player_summary(player_data):
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Steam Player Summary</title>
+    <title>Steam Profile Summary</title>
     <style>
         .card {{
             width: 100%;
@@ -179,8 +179,9 @@ def generate_card_for_player_summary(player_data):
 <body>
     <div class="card">
         <div class="content">
+            <h2>Steam Profile Summary</h2>
             <img id="avatar" class="avatar" src="{avatarfull}" alt="Avatar">
-            <h2 id="name">Name: {personaname}</h2>
+            <h3 id="name">Name: {personaname}</h3>
             <div class="info-container">
                 <div class="info-left">
                     <p id="status">Status: {personastate_value}</p>
@@ -224,16 +225,26 @@ def generate_card_for_played_games(games_data):
         "INPUT_LOG_SCALE", "false").lower() in ("true", "1", "t")
     max_playtime = games_data["response"]["games"][0]["playtime_2weeks"]
 
+    # Placeholder image for Spacewar
+    placeholder_image = "https://i.imgur.com/DBnVqet.jpg"
+
     # Generate the progress bars with repeating styles
     progress_bars = ""
     for i, game in enumerate(games_data["response"]["games"]):
         if "name" in game and "playtime_2weeks" in game:
             name = game["name"]
             playtime = game["playtime_2weeks"]
-            img_icon_url = "https://media.steampowered.com/steamcommunity/public/images/apps/" + \
-                str(game["appid"]) + "/" + game["img_icon_url"] + ".jpg"
 
-            if log_scale is True:
+            # Check if the game is Spacewar
+            if game["name"] == "Spacewar":
+                img_icon_url = placeholder_image
+            else:
+                img_icon_url = (
+                    "https://media.steampowered.com/steamcommunity/public/images/apps/"
+                    + str(game["appid"]) + "/" + game["img_icon_url"] + ".jpg"
+                )
+
+            if log_scale:
                 normalized_playtime = math.log1p(playtime) / math.log1p(
                     max(game["playtime_2weeks"] for game in games_data["response"]["games"])) * 100
             else:
@@ -265,7 +276,7 @@ def generate_card_for_played_games(games_data):
 <body>
     <div class="card">
         <div class="content">
-            <h2>Recently Played Games</h2>
+            <h2>Recently Played Games (Last 2 Weeks)</h2>
             {progress_bars}
         </div>
     </div>

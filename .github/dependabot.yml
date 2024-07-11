@@ -16,7 +16,7 @@ updates:
           - dependabot
       rebase-strategy: auto
       versioning-strategy: "increase-if-necessary"
-      open-pull-requests-limit: 10
+      open-pull-requests-limit: 20
       groups:
           python-packages:
               patterns:
@@ -34,7 +34,7 @@ updates:
           - dependencies
           - dependabot
       rebase-strategy: auto
-      open-pull-requests-limit: 10
+      open-pull-requests-limit: 20
       reviewers:
           - "nicconike"
       groups:
@@ -53,6 +53,6 @@ updates:
           - dependencies
           - dependabot
       rebase-strategy: auto
-      open-pull-requests-limit: 10
+      open-pull-requests-limit: 20
       reviewers:
           - "nicconike"

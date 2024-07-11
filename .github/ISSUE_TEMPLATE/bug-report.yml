@@ -1,6 +1,6 @@
 name: Bug Report
 description: Report a bug to help me improve Steam Stats
-title: "[BUG] "
+title: " "
 labels: ["bug"]
 assignees: "nicconike"
 body:

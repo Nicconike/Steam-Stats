@@ -3,7 +3,119 @@
 All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
-and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html) and [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/).
+
+# v1.0.1 (2024-07-10)
+
+## Chore
+
+* chore: Update Pylint Badge ([`500c087`](https://github.com/Nicconike/Steam-Stats/commit/500c087a61ddddc9d61ece26b23ded382f0f8c30))
+
+## Fix
+
+* fix: Add INPUT_GH_TOKEN as a token env var
+docs: update readme
+ci: revert steam stats workflow
+chore: misc changes ([`a50764c`](https://github.com/Nicconike/Steam-Stats/commit/a50764c3ecc3df05187bfce3eefbeaa0ac0178f9))
+
+# v1.0.0 (2024-07-09)
+
+## Breaking
+
+* perf: Improve Card generation &amp; Main Runner Script Code
+
+BREAKING CHANGE: Major Release 🚀 ([`1e35e04`](https://github.com/Nicconike/Steam-Stats/commit/1e35e0431dd8d8742c7c566a81ebf0f3ff29af15))
+
+## Chore
+
+* chore: Update Steam Stats ([`984bfbf`](https://github.com/Nicconike/Steam-Stats/commit/984bfbfc121bd306b7af09baee69f34720042fce))
+
+* chore: Update Pylint Badge ([`860b652`](https://github.com/Nicconike/Steam-Stats/commit/860b6523d552a29a488591bff0101184586f6e07))
+
+* chore: Update Steam Stats ([`112176b`](https://github.com/Nicconike/Steam-Stats/commit/112176b0c93a5c7240fec84f7ad17d96491ab4f6))
+
+* chore(deps): bump pylint in the python-packages group (#8)
+
+Bumps the python-packages group with 1 update: [pylint](https://github.com/pylint-dev/pylint).
+
+
+Updates `pylint` from 3.2.3 to 3.2.5
+- [Release notes](https://github.com/pylint-dev/pylint/releases)
+- [Commits](https://github.com/pylint-dev/pylint/compare/v3.2.3...v3.2.5)
+
+---
+updated-dependencies:
+- dependency-name: pylint
+  dependency-type: direct:production
+  update-type: version-update:semver-patch
+  dependency-group: python-packages
+...
+
+Signed-off-by: dependabot[bot] &lt;support@github.com&gt;
+Co-authored-by: dependabot[bot] &lt;49699333+dependabot[bot]@users.noreply.github.com&gt;
+Co-authored-by: Nicco &lt;38905025+Nicconike@users.noreply.github.com&gt; ([`3915a4d`](https://github.com/Nicconike/Steam-Stats/commit/3915a4df619f620282d9356e91973196b6ce70ee))
+
+* chore: Update Steam Stats ([`bb5458c`](https://github.com/Nicconike/Steam-Stats/commit/bb5458c979a8bf370fe7e159956c249cc151eed5))
+
+* chore: Update Steam Stats ([`cc9f5fd`](https://github.com/Nicconike/Steam-Stats/commit/cc9f5fdab23f84973466a663c5d94063554cb047))
+
+* chore: Update Steam Stats ([`b2f031e`](https://github.com/Nicconike/Steam-Stats/commit/b2f031e57467f9fa951527e0158ba8a7899cd00a))
+
+## Ci
+
+* ci: update scoring for pylint badge ([`25fa44d`](https://github.com/Nicconike/Steam-Stats/commit/25fa44dfe840dae5dcc64124a3b1ff4ec2c1b015))
+
+* ci: update badge url &amp; codeql workflow ([`ee23446`](https://github.com/Nicconike/Steam-Stats/commit/ee23446bf6b43c6929816beb8fa1c99aa98b8807))
+
+* ci: move app token step at first ([`77cff48`](https://github.com/Nicconike/Steam-Stats/commit/77cff483c697a19f0e8f8c113f98ea60de5c5176))
+
+* ci: update pylint badge generation ([`17dc2ce`](https://github.com/Nicconike/Steam-Stats/commit/17dc2ce4f0b06fd9212fcf21cb0525153fc7d196))
+
+* ci: Update pylint workflow ([`11097f3`](https://github.com/Nicconike/Steam-Stats/commit/11097f3c1ba1c074cee36e04ecfdacd2633100db))
+
+* ci: Correct the pylint badge generation step ([`50be3f4`](https://github.com/Nicconike/Steam-Stats/commit/50be3f4fec1646f695202b78124961b85af0edfb))
+
+* ci: use custom pylint job instead of actions
+build: update dockerfile ([`ad37826`](https://github.com/Nicconike/Steam-Stats/commit/ad37826430dbe0ef308cb2fda461327f504c7ff8))
+
+* ci: pylint workflow should workflow if github actions bot does a commit ([`b958eea`](https://github.com/Nicconike/Steam-Stats/commit/b958eea2ba16d6fd684ac685cfedb4b37326114e))
+
+* ci: Update pylint workflow to commit to protected branch ([`c38fe71`](https://github.com/Nicconike/Steam-Stats/commit/c38fe7152f59a1dc16384a63be21aa9e1631fce3))
+
+* ci: update workflow ([`74c12c4`](https://github.com/Nicconike/Steam-Stats/commit/74c12c488febc0a51b34f76c7bae72e28a0ad5ba))
+
+* ci: update workflows to check for github actor ([`74e18a3`](https://github.com/Nicconike/Steam-Stats/commit/74e18a34e25ec67ff23ce70e6d7b696f82e2ca0c))
+
+* ci: Correct scout scan step ([`700840d`](https://github.com/Nicconike/Steam-Stats/commit/700840d2935e82a92815444cb39d10465c7f10af))
+
+* ci: correct the docker workflow for tags ([`b64b7d1`](https://github.com/Nicconike/Steam-Stats/commit/b64b7d1aed04032859e9c02fb53ed43be8632ab0))
+
+* ci: revert change ([`1b03955`](https://github.com/Nicconike/Steam-Stats/commit/1b03955877beecaf444e2d613ecb6ce1e95da5ce))
+
+* ci: update release workflow ([`28afc5a`](https://github.com/Nicconike/Steam-Stats/commit/28afc5a79cfa898331253dbddc5fa44d8e8bd921))
+
+* ci: update docker action
+refactor: remove logger info in steam_stats.py ([`82bf032`](https://github.com/Nicconike/Steam-Stats/commit/82bf032ab6e9b19ebd3ffc463f68a1710ecd1bfb))
+
+## Documentation
+
+* docs: correct changelog &amp; pyproject
+ci: misc changes ([`a84f81c`](https://github.com/Nicconike/Steam-Stats/commit/a84f81c82180caf45233b399799cc78125fe4a26))
+
+## Test
+
+* test: Improve codecov for card script to 84% ([`81d5f89`](https://github.com/Nicconike/Steam-Stats/commit/81d5f89eba3be0f68b2f142c8dd9c273d5d205be))
+
+* test: Improve code cov for main script to 95%
+ci: Check prev release ([`17383b6`](https://github.com/Nicconike/Steam-Stats/commit/17383b698613632351b16a3fc57aec4aac8f3989))
+
+* test: increase code coverage for main script ([`f0a7f52`](https://github.com/Nicconike/Steam-Stats/commit/f0a7f52e9f143c48f9fe2686c9e488a106fad5e1))
+
+* test: update test_steam_workshop.py for 100% coverage ([`72c964f`](https://github.com/Nicconike/Steam-Stats/commit/72c964faa4e7b7ce8838899554105324dd308709))
+
+## Unknown
+
+* Update Pylint Badge ([`f717f61`](https://github.com/Nicconike/Steam-Stats/commit/f717f61d39fca7561ea9f919019631ba0d5bd492))
 
 # v0.1.5 (2024-06-28)
 
