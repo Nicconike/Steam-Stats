@@ -19,10 +19,18 @@ jobs:
         name: Steam Stats
         runs-on: ubuntu-latest
         steps:
+          - name: GitHub App Token
+            uses: actions/create-github-app-token@v1
+            id: app-token
+            with:
+                app-id: ${{ secrets.APP_ID }}
+                private-key: ${{ secrets.APP_PRIVATE_KEY }}
+
+
           - name: Run Steam Stats
             uses: docker://nicconike/steam-stats:latest
             env:
-                GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
                 INPUT_STEAM_API_KEY: ${{ secrets.STEAM_API_KEY }}
                 INPUT_STEAM_ID: ${{ vars.STEAM_ID }}
                 INPUT_STEAM_CUSTOM_ID: ${{ vars.STEAM_CUSTOM_ID }}
