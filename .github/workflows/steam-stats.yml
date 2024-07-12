@@ -10,12 +10,14 @@ on:
         paths:
             - '.github/workflows/steam-stats.yml'
             - 'api/*.py'
-    pull_request:
-        branches: master
 
 jobs:
     update-readme:
-        if: github.actor != 'dependabot[bot]' || github.actor != 'github-actions[bot]' || github.actor != 'protected-auto-commits[bot]' && github.base_ref == 'master'
+        if: >
+            github.event_name != 'pull_request' &&
+            github.actor != 'dependabot[bot]' &&
+            github.actor != 'github-actions[bot]' &&
+            github.actor != 'protected-auto-commits[bot]'
         name: Steam Stats
         runs-on: ubuntu-latest
         steps:

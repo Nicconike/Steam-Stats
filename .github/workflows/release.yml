@@ -8,19 +8,16 @@ on:
             - 'api/*.py'
             - 'pyproject.toml'
             - 'Dockerfile'
-    pull_request:
-        branches: master
 
 jobs:
     release:
         if: github.actor != 'dependabot[bot]' || github.actor != 'github-actions[bot]' || github.actor != 'protected-auto-commits[bot]' && github.repository == 'nicconike/steam-stats'
+        name: Release
         runs-on: ubuntu-latest
         concurrency: release
         permissions:
             id-token: write
             contents: write
-            issues: write
-            pull-requests: write
         steps:
           - name: GitHub App Token
             uses: actions/create-github-app-token@v1
@@ -61,6 +58,7 @@ jobs:
                 github_token: ${{ steps.app-token.outputs.token }}
 
     docker:
+        name: Docker
         runs-on: ubuntu-latest
         concurrency:
             group: ${{ github.workflow }}-${{ github.ref }}
