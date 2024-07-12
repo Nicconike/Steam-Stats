@@ -92,7 +92,7 @@ If you are new to **Github Secrets** then you can checkout this official doc [he
 
 `steam-stats.yml`
 
-```yml
+```yaml
 name: Steam Stats
 
 on:
@@ -113,8 +113,8 @@ jobs:
                 STEAM_API_KEY: ${{ secrets.STEAM_API_KEY }} # Replace with your created key saved in actions secrets
                 STEAM_ID: ${{ vars.STEAM_ID }} # Replace with your Steam ID env var
                 STEAM_CUSTOM_ID: ${{ vars.STEAM_CUSTOM_ID }} # Replace with your custom ID env var
-                LOG_SCALE: True # Optional
 				WORKSHOP_STATS: True # Optional
+                LOG_SCALE: True # Optional
 ```
 
 Checkout this real time usage example in a github repo from [here](https://github.com/Nicconike/Nicconike?tab=readme-ov-file#gaming-) and also the github actions [workflow file](https://github.com/Nicconike/Nicconike/blob/master/.github/workflows/steam-stats.yml).
@@ -148,7 +148,7 @@ If you are using this project and are really happy with it, then there are few w
 - Donations through [GitHub Sponsers](https://github.com/sponsors/Nicconike) or whichever platform you like. So, that I can create more projects like these and play more games🎮🎧
 
 #### **Thanks!🫡**
-Other Major Platforms Coming Soon:tm:😉
+Other Major Platforms Coming Soon:tm: 😉
 
 ***
 Created with 🐍 & ❤️ by [Nicco](https://github.com/Nicconike)
