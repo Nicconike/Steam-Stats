@@ -1,0 +1,40 @@
+coverage:
+    status:
+        project:
+            default:
+                target: 80%
+                threshold: 5%
+            high:
+                target: 90%
+                threshold: 5%
+        patch:
+            default:
+                target: 80%
+                threshold: 5%
+
+comment:
+    layout: "reach, diff, flags, files"
+    behavior: default
+    require_changes: false
+    require_base: false
+    require_head: true
+
+github_checks:
+    annotations: true
+
+ignore:
+    - "tests/**/*"
+    - "assets/**/*"
+    - "templates/*"
+
+flag_management:
+    default_rules:
+        carryforward: true
+
+parsers:
+    gcov:
+        branch_detection:
+            conditional: yes
+            loop: yes
+            method: no
+            macro: no
