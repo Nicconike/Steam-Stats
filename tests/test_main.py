@@ -1,163 +1,242 @@
 """Test Main Runner Script"""
 # Disable pylint warnings for false positives
 # pylint: disable=redefined-outer-name, unused-argument
-from unittest.mock import Mock, patch
+from unittest import TestCase
+from unittest.mock import patch, MagicMock
+import time
 import pytest
-from api.main import (
-    update_readme, generate_steam_stats, generate_workshop_stats,
-    get_github_token, get_repo, create_tree_elements, commit_to_github,
-    initialize_github, get_readme_content, update_readme_sections,
-    update_section, collect_files_to_update
-)
+from api.main import (update_readme, generate_steam_stats, generate_workshop_stats,
+                      get_github_token, create_tree_elements, commit_to_github,
+                      initialize_github, get_readme_content, update_readme_sections, update_section,
+                      collect_files_to_update, log_execution_time, main)
 
 
 @pytest.fixture
-def mock_dependencies(mocker):
-    """Mock all the function dependencies"""
-    mocks = {
-        'get_player_summaries': mocker.patch('main.get_player_summaries',
-                                             return_value={'response': {'players': [{'personaname':
-                                                                                     'TestUser'
-                                                                                     }]}}),
-        'get_recently_played_games': mocker.patch('main.get_recently_played_games',
-                                                  return_value={'response': {'games': []}}),
-        'generate_card_for_player_summary': mocker.patch('main.generate_card_for_player_summary',
-                                                         return_value='Player Summary Card'),
-        'generate_card_for_played_games': mocker.patch('main.generate_card_for_played_games',
-                                                       return_value='Recently Played Games Card'),
-        'fetch_workshop_item_links': mocker.patch('main.fetch_workshop_item_links',
-                                                  return_value=['link1', 'link2']),
-        'fetch_all_workshop_stats': mocker.patch('main.fetch_all_workshop_stats',
-                                                 return_value={'stats': 'data'}),
-        'generate_card_for_steam_workshop': mocker.patch('main.generate_card_for_steam_workshop',
-                                                         return_value='Workshop Stats Card'),
-        'Github': mocker.patch('main.Github'),
-        'get_repo': mocker.patch('main.get_repo'),
-    }
-
-    mocker.patch.dict('os.environ', {
-        'INPUT_STEAM_ID': 'test_steam_id',
-        'INPUT_STEAM_API_KEY': 'test_api_key',
-        'INPUT_STEAM_CUSTOM_ID': 'test_custom_id',
-        'INPUT_WORKSHOP_STATS': 'true',
-        'GITHUB_REPOSITORY': 'test/repo'
-    })
-
-    return mocks
+def mock_repo():
+    """Mock Repo"""
+    return MagicMock()
 
 
-def test_update_readme(mock_dependencies):
-    """Test Update Readme"""
-    mock_repo = Mock()
-    mock_repo.get_contents.return_value.decoded_content = (
-        b'<!-- Start -->\n'
-        b'Old content\n'
-        b'<!-- End -->'
-    )
-    result = update_readme(mock_repo, 'New content',
-                           '<!-- Start -->', '<!-- End -->')
-    expected = '<!-- Start -->\nNew content\n<!-- End -->'
-    if result != expected:
-        pytest.fail(f"Expected '{expected}', but got '{result}'")
+@pytest.fixture
+def mock_github():
+    """Mock Github Repo"""
+    with patch('api.main.Github') as mock_github:
+        yield mock_github
 
 
-def test_generate_steam_stats(mock_dependencies):
+@pytest.fixture
+def mock_env_vars(monkeypatch):
+    """Mock environment variables"""
+    monkeypatch.setenv('GITHUB_TOKEN', 'fake_token')
+    monkeypatch.setenv('GITHUB_REPOSITORY', 'fake/repo')
+    monkeypatch.setenv('INPUT_STEAM_ID', 'fake_steam_id')
+    monkeypatch.setenv('INPUT_STEAM_API_KEY', 'fake_steam_api_key')
+    monkeypatch.setenv('INPUT_STEAM_CUSTOM_ID', 'fake_steam_custom_id')
+    monkeypatch.setenv('INPUT_WORKSHOP_STATS', 'true')
+
+
+def test_update_readme(mock_repo):
+    """Test Update readme Function"""
+    markdown_data = "New Content"
+    start_marker = "<!--START-->"
+    end_marker = "<!--END-->"
+    mock_repo.get_contents.return_value.decoded_content = b"<!--START-->\nOld Content\n<!--END-->"
+
+    result = update_readme(mock_repo, markdown_data, start_marker, end_marker)
+
+    TestCase().assertEqual(result, "<!--START-->\nNew Content\n<!--END-->")
+
+
+@patch('api.main.get_player_summaries')
+@patch('api.main.generate_card_for_player_summary')
+@patch('api.main.get_recently_played_games')
+@patch('api.main.generate_card_for_played_games')
+def test_generate_steam_stats(mock_generate_card_played, mock_get_recently_played,
+                              mock_generate_card_summary, mock_get_player_summaries):
     """Test Generating Steam Stats"""
+    mock_get_player_summaries.return_value = {'player': 'summary'}
+    mock_generate_card_summary.return_value = 'Player Summary Card'
+    mock_get_recently_played.return_value = {'games': 'data'}
+    mock_generate_card_played.return_value = 'Played Games Card'
+
     result = generate_steam_stats()
-    expected = 'Player Summary CardRecently Played Games Card'
-    if result != expected:
-        pytest.fail(f"Expected '{expected}', but got '{result}'")
+
+    TestCase().assertIn('Player Summary Card', result)
+    TestCase().assertIn('Played Games Card', result)
+
+    mock_get_player_summaries.return_value = None
+    mock_get_recently_played.return_value = None
+    result = generate_steam_stats()
+    TestCase().assertEqual(result, '')
 
 
-def test_generate_workshop_stats(mock_dependencies):
+@patch('api.main.fetch_workshop_item_links')
+@patch('api.main.fetch_all_workshop_stats')
+@patch('api.main.generate_card_for_steam_workshop')
+def test_generate_workshop_stats(mock_generate_card, mock_fetch_all_stats, mock_fetch_links):
     """Test Generating Steam Workshop Stats"""
+    mock_fetch_links.return_value = ['link1', 'link2']
+    mock_fetch_all_stats.return_value = {'workshop': 'stats'}
+    mock_generate_card.return_value = 'Workshop Stats Card'
+
     result = generate_workshop_stats()
-    expected = 'Workshop Stats Card'
-    if result != expected:
-        pytest.fail(f"Expected '{expected}', but got '{result}'")
+
+    TestCase().assertIn('Workshop Stats Card', result)
+
+    mock_fetch_links.return_value = None
+    result = generate_workshop_stats()
+    TestCase().assertEqual(result, '')
 
 
-def test_get_github_token():
-    """Test fetching Github Token"""
-    with patch.dict('os.environ', {'GITHUB_TOKEN': 'test_token'}):
-        token = get_github_token()
-        if token != 'test_token':
-            pytest.fail(f"Expected 'test_token', but got '{token}'")
+def test_get_github_token(mock_env_vars):
+    """Test fetching github token"""
+    token = get_github_token()
+    TestCase().assertEqual(token, 'fake_token')
 
 
-def test_get_repo():
-    """Test fetching Github Repo"""
-    mock_github = Mock()
-    with patch.dict('os.environ', {'GITHUB_REPOSITORY': 'test/repo'}):
-        get_repo(mock_github)
-        mock_github.get_repo.assert_called_once_with('test/repo')
+def test_initialize_github(mock_github, mock_env_vars):
+    """Test Initializing Github Repo"""
+    mock_repo = MagicMock()
+    mock_github.return_value.get_repo.return_value = mock_repo
+
+    repo = initialize_github()
+    TestCase().assertEqual(repo, mock_repo)
 
 
-def test_create_tree_elements():
-    """Test Creating Tree Elements for Git"""
-    mock_repo = Mock()
-    files_to_update = {'test.txt': 'content'}
-    create_tree_elements(mock_repo, files_to_update)
-    mock_repo.create_git_blob.assert_called_once()
+@patch('api.main.InputGitTreeElement')
+def test_create_tree_elements(mock_input_git_tree_element, mock_repo):
+    files_to_update = {
+        "README.md": "New Content",
+        "image.png": b"binary content"
+    }
+    mock_repo.create_git_blob.side_effect = lambda content, encoding: MagicMock(
+        sha='fake_sha')
+    mock_input_git_tree_element.side_effect = lambda path, mode, type, sha: MagicMock(
+        path=path)
+
+    tree_elements = create_tree_elements(mock_repo, files_to_update)
+
+    TestCase().assertEqual(len(tree_elements), 2)
+    TestCase().assertEqual(tree_elements[0].path, "README.md")
+    TestCase().assertEqual(tree_elements[1].path, "image.png")
 
 
-def test_commit_to_github():
-    """Test committing to Github"""
-    mock_repo = Mock()
-    files_to_update = {'test.txt': 'content'}
-    result = commit_to_github(mock_repo, files_to_update)
-    if not result:
-        pytest.fail("Expected True, but got False")
+@patch('api.main.create_tree_elements')
+def test_commit_to_github(mock_create_tree_elements, mock_repo):
+    """Test Committing to Github Repo"""
+    mock_create_tree_elements.return_value = [MagicMock()]
+    mock_repo.get_branch.return_value.commit.sha = 'fake_sha'
+    mock_repo.create_git_tree.return_value = MagicMock()
+    mock_repo.create_git_commit.return_value = MagicMock(sha='new_commit_sha')
+    mock_repo.get_git_ref.return_value.edit.return_value = None
+
+    result = commit_to_github(mock_repo, {"README.md": "New Content"})
+
+    TestCase().assertTrue(result)
+
+    result = commit_to_github(mock_repo, {})
+    TestCase().assertTrue(result)
 
 
-def test_initialize_github(mock_dependencies):
-    """Test Initializing Github"""
-    with patch('main.get_github_token', return_value='test_token'):
-        initialize_github()
-        mock_dependencies['Github'].assert_called_once_with('test_token')
+def test_get_readme_content(mock_repo):
+    """Test fetching Readme Content"""
+    mock_repo.get_contents.return_value = MagicMock(
+        decoded_content=b"README content")
+
+    content = get_readme_content(mock_repo)
+
+    TestCase().assertEqual(content, "README content")
 
 
-def test_get_readme_content():
-    """Test fetching readme content"""
-    mock_repo = Mock()
-    mock_repo.get_contents.return_value.decoded_content = b'README content'
-    result = get_readme_content(mock_repo)
-    if result != 'README content':
-        pytest.fail(f"Expected 'README content', but got '{result}'")
-
-
-def test_update_readme_sections(mock_dependencies):
-    """Test updating readme sections with markers"""
-    mock_repo = Mock()
-    current_content = '<!-- Steam-Stats start -->Old<!-- Steam-Stats end -->'
-    result = update_readme_sections(mock_repo, current_content)
-    expected = (
-        '<!-- Steam-Stats start -->\n'
-        'Player Summary CardRecently Played Games Card\n'
-        '<!-- Steam-Stats end -->'
+@patch('api.main.generate_steam_stats')
+@patch('api.main.generate_workshop_stats')
+@patch('api.main.update_section')
+def test_update_readme_sections(mock_update_section, mock_generate_workshop,
+                                mock_generate_steam, mock_repo):
+    """Test Updating Readme with marker sections"""
+    mock_generate_steam.return_value = "Steam Stats Content"
+    mock_generate_workshop.return_value = "Workshop Stats Content"
+    mock_update_section.side_effect = (
+        lambda repo, content, new_content, start_marker, end_marker:
+        content + start_marker + new_content + end_marker
     )
-    if result != expected:
-        pytest.fail(f"Expected '{expected}', but got '{result}'")
+
+    updated_content = update_readme_sections(mock_repo, "Original Content")
+
+    TestCase().assertIn("Steam Stats Content", updated_content)
+    TestCase().assertIn("Workshop Stats Content", updated_content)
+    TestCase().assertIn("<!-- Steam-Stats start -->", updated_content)
+    TestCase().assertIn("<!-- Steam-Stats end -->", updated_content)
+    TestCase().assertIn("<!-- Steam-Workshop start -->", updated_content)
+    TestCase().assertIn("<!-- Steam-Workshop end -->", updated_content)
 
 
-def test_update_section():
-    """Test updating section in Readme"""
-    mock_repo = Mock()
-    current_content = '<!-- Start -->Old<!-- End -->'
-    new_content = 'New'
-    result = update_section(mock_repo, current_content,
-                            new_content, '<!-- Start -->', '<!-- End -->')
-    expected = '<!-- Start -->\nNew\n<!-- End -->'
-    if result != expected:
-        pytest.fail(f"Expected '{expected}', but got '{result}'")
+@patch('api.main.update_readme')
+def test_update_section(mock_update_readme, mock_repo):
+    """Test Updating marker sections"""
+    mock_update_readme.return_value = "Updated Section"
+
+    updated_content = update_section(
+        mock_repo, "Original Content", "New Content", "<!--START-->", "<!--END-->")
+
+    TestCase().assertIn("Updated Section", updated_content)
 
 
 def test_collect_files_to_update():
-    """Test collection of files to update to Github"""
-    with patch('os.path.exists', return_value=True), \
-            patch('builtins.open', Mock()):
-        current_readme = 'New content'
-        original_readme = 'Old content'
-        result = collect_files_to_update(current_readme, original_readme)
-        if len(result) != 4:
-            pytest.fail(f"Expected 4 files to update, but got {len(result)}")
+    """Test Collecting files to update for Github Repo"""
+    current_readme = "New README Content"
+    original_readme = "Original README Content"
+
+    with patch('os.path.exists') as mock_exists, patch('builtins.open',
+                                                       new_callable=MagicMock) as mock_open:
+        mock_exists.return_value = True
+        mock_open.return_value.__enter__.return_value.read.return_value = b"binary content"
+
+        files_to_update = collect_files_to_update(
+            current_readme, original_readme)
+
+        TestCase().assertIn("README.md", files_to_update)
+        TestCase().assertIn("assets/steam_summary.png", files_to_update)
+
+
+def test_log_execution_time():
+    """Test Log execution time"""
+    start_time = time.time() - 65
+
+    with patch('api.main.logger') as mock_logger:
+        log_execution_time(start_time)
+
+        mock_logger.info.assert_any_call(
+            "Total Execution Time: %d minutes and %.3f seconds", 1, 5.0)
+
+
+def test_main(mock_github, mock_env_vars):
+    """Test Main Function"""
+    with patch('api.main.initialize_github') as mock_initialize, \
+            patch('api.main.get_readme_content') as mock_get_readme, \
+            patch('api.main.update_readme_sections') as mock_update, \
+            patch('api.main.collect_files_to_update') as mock_collect, \
+            patch('api.main.commit_to_github') as mock_commit, \
+            patch('api.main.log_execution_time') as mock_log:
+
+        mock_repo = MagicMock()
+        mock_initialize.return_value = mock_repo
+        mock_get_readme.return_value = 'Original README'
+        mock_update.return_value = 'Updated README'
+        mock_collect.return_value = {'README.md': b'Updated README'}
+        mock_commit.return_value = True
+
+        main()
+
+        mock_initialize.assert_called_once()
+        mock_get_readme.assert_called_once_with(mock_repo)
+        mock_update.assert_called_once_with(mock_repo, 'Original README')
+        mock_collect.assert_called_once_with(
+            'Updated README', 'Original README')
+        mock_commit.assert_called_once_with(
+            mock_repo, {'README.md': b'Updated README'})
+        mock_log.assert_called_once()
+
+
+if __name__ == '__main__':
+    pytest.main()

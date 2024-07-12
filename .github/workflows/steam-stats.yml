@@ -23,8 +23,8 @@ jobs:
             uses: docker://nicconike/steam-stats:latest
             env:
                 GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-                STEAM_API_KEY: ${{ secrets.STEAM_API_KEY }}
-                STEAM_ID: ${{ vars.STEAM_ID }}
-                STEAM_CUSTOM_ID: ${{ vars.STEAM_CUSTOM_ID }}
+                INPUT_STEAM_API_KEY: ${{ secrets.STEAM_API_KEY }}
+                INPUT_STEAM_ID: ${{ vars.STEAM_ID }}
+                INPUT_STEAM_CUSTOM_ID: ${{ vars.STEAM_CUSTOM_ID }}
                 WORKSHOP_STATS: True
                 GITHUB_REPOSITORY: ${{ github.repository }}
