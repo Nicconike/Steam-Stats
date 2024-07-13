@@ -96,8 +96,8 @@ If you are new to **Github Secrets** then you can checkout this official doc [he
 name: Steam Stats
 
 on:
-	push:
-		branches: master
+ push:
+	 branches: master
     schedule:
         # Runs every Monday at 12AM IST (UTC+5:30)
         - cron: "30 18 * * 0"
@@ -113,7 +113,7 @@ jobs:
                 STEAM_API_KEY: ${{ secrets.STEAM_API_KEY }} # Replace with your created key saved in actions secrets
                 STEAM_ID: ${{ vars.STEAM_ID }} # Replace with your Steam ID env var
                 STEAM_CUSTOM_ID: ${{ vars.STEAM_CUSTOM_ID }} # Replace with your custom ID env var
-				WORKSHOP_STATS: True # Optional
+			 WORKSHOP_STATS: True # Optional
                 LOG_SCALE: True # Optional
 ```
 
@@ -137,7 +137,7 @@ And thank you for considering to contribute.
 	- **[CodeQL](https://github.com/github/codeql-action)**
 	- **[Codecov](https://github.com/codecov/codecov-action)**
 - **Styles**
-	- [Progress Bar Design](https://github.com/Nicconike/Steam-Stats/blob/master/assets/style.css)[^2] - [Ana Tudor](https://codepen.io/thebabydino)
+	- **[Progress Bar Design](https://github.com/Nicconike/Steam-Stats/blob/master/assets/style.css)**[^2] - [Ana Tudor](https://codepen.io/thebabydino)
 
 ***
 ## Support💙
@@ -148,7 +148,7 @@ If you are using this project and are really happy with it, then there are few w
 - Donations through [GitHub Sponsers](https://github.com/sponsors/Nicconike) or whichever platform you like. So, that I can create more projects like these and play more games🎮🎧
 
 #### **Thanks!🫡**
-Other Major Platforms Coming Soon:tm: 😉
+Other Major Platforms Coming Soon :tm: 😉
 
 ***
 Created with 🐍 & ❤️ by [Nicco](https://github.com/Nicconike)
