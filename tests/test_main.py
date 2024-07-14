@@ -41,17 +41,28 @@ def test_update_readme(mock_repo):
     start_marker = "<!--START-->"
     end_marker = "<!--END-->"
     mock_repo.get_contents.return_value.decoded_content = b"<!--START-->\nOld Content\n<!--END-->"
-
     result = update_readme(mock_repo, markdown_data, start_marker, end_marker)
-
     TestCase().assertEqual(result, "<!--START-->\nNew Content\n<!--END-->")
+
+    mock_repo.get_contents.return_value.decoded_content = b"Some content without markers"
+    result = update_readme(mock_repo, markdown_data, start_marker, end_marker)
+    TestCase().assertIsNone(result)
+
+    mock_repo.get_contents.side_effect = FileNotFoundError
+    result = update_readme(mock_repo, markdown_data, start_marker, end_marker)
+    TestCase().assertIsNone(result)
+
+    mock_repo.get_contents.return_value.decoded_content = b"<!--START-->\nNew Content\n<!--END-->"
+    result = update_readme(mock_repo, markdown_data, start_marker, end_marker)
+    TestCase().assertIsNone(result)
 
 
 @patch('api.main.get_player_summaries')
 @patch('api.main.generate_card_for_player_summary')
 @patch('api.main.get_recently_played_games')
 @patch('api.main.generate_card_for_played_games')
-def test_generate_steam_stats(mock_generate_card_played, mock_get_recently_played,
+@patch('api.main.logger')
+def test_generate_steam_stats(mock_logger, mock_generate_card_played, mock_get_recently_played,
                               mock_generate_card_summary, mock_get_player_summaries):
     """Test Generating Steam Stats"""
     mock_get_player_summaries.return_value = {'player': 'summary'}
@@ -63,11 +74,35 @@ def test_generate_steam_stats(mock_generate_card_played, mock_get_recently_playe
 
     TestCase().assertIn('Player Summary Card', result)
     TestCase().assertIn('Played Games Card', result)
+    mock_logger.info.assert_any_call("Retrieved Steam User Data")
+    mock_logger.info.assert_any_call("Generated Card for Steam User Data")
+    mock_logger.info.assert_any_call("Retrieved Recently Played Games Data")
+    mock_logger.info.assert_any_call(
+        "Generated Card for Recently Played Games")
 
     mock_get_player_summaries.return_value = None
+    result = generate_steam_stats()
+    TestCase().assertEqual(result, '')
+    mock_logger.info.assert_any_call("No Steam User Summary data found")
+
     mock_get_recently_played.return_value = None
     result = generate_steam_stats()
     TestCase().assertEqual(result, '')
+    mock_logger.info.assert_any_call("No Recently Played Games data found")
+
+    mock_get_player_summaries.return_value = {'player': 'summary'}
+    mock_generate_card_summary.return_value = None
+    result = generate_steam_stats()
+    TestCase().assertEqual(result, '')
+    mock_logger.error.assert_any_call(
+        "Failed to generate card for Steam Summary")
+
+    mock_get_recently_played.return_value = {'games': 'data'}
+    mock_generate_card_played.return_value = None
+    result = generate_steam_stats()
+    TestCase().assertEqual(result, '')
+    mock_logger.info.assert_any_call(
+        "No Games data found, skipping card generation")
 
 
 @patch('api.main.fetch_workshop_item_links')
@@ -105,6 +140,7 @@ def test_initialize_github(mock_github, mock_env_vars):
 
 @patch('api.main.InputGitTreeElement')
 def test_create_tree_elements(mock_input_git_tree_element, mock_repo):
+    """Test Create Tree elements"""
     files_to_update = {
         "README.md": "New Content",
         "image.png": b"binary content"

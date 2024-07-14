@@ -6,7 +6,7 @@ on:
     push:
         branches: master
         paths:
-            - ".github/workflows/sast.yml"
+            - ".github/workflows/bandit.yml"
             - "**/*.py"
     pull_request:
         branches: master
