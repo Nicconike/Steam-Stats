@@ -36,4 +36,5 @@ jobs:
                 INPUT_STEAM_ID: ${{ vars.STEAM_ID }}
                 INPUT_STEAM_CUSTOM_ID: ${{ vars.STEAM_CUSTOM_ID }}
                 WORKSHOP_STATS: True
+                LOG_SCALE: True
                 GITHUB_REPOSITORY: ${{ github.repository }}

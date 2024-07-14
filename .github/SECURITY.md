@@ -75,7 +75,7 @@ Please see the docs of how to [Privately reporting a security vulnerability](htt
 
 | Version | Supported          |
 | ------- | ------------------ |
-| > 0.1.3 | :white_check_mark: |
-| < 0.1.2 | :x:                |
+| > 1.0.1 | :white_check_mark: |
+| < 1.0.0 | :x:                |
 
 Thank you for helping to keep the project **secure!**
