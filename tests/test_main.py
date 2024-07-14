@@ -81,26 +81,38 @@ def test_generate_steam_stats(mock_logger, mock_generate_card_played, mock_get_r
         "Generated Card for Recently Played Games")
 
     mock_get_player_summaries.return_value = None
+    mock_get_recently_played.return_value = {'games': 'data'}
+    mock_generate_card_played.return_value = 'Played Games Card'
     result = generate_steam_stats()
-    TestCase().assertEqual(result, '')
+    TestCase().assertIn('Played Games Card', result)
+    TestCase().assertEqual(result, 'Played Games Card')
     mock_logger.info.assert_any_call("No Steam User Summary data found")
 
+    mock_get_player_summaries.return_value = {'player': 'summary'}
+    mock_generate_card_summary.return_value = 'Player Summary Card'
     mock_get_recently_played.return_value = None
     result = generate_steam_stats()
-    TestCase().assertEqual(result, '')
+    TestCase().assertIn('Player Summary Card', result)
+    TestCase().assertEqual(result, 'Player Summary Card')
     mock_logger.info.assert_any_call("No Recently Played Games data found")
 
     mock_get_player_summaries.return_value = {'player': 'summary'}
     mock_generate_card_summary.return_value = None
+    mock_get_recently_played.return_value = {'games': 'data'}
+    mock_generate_card_played.return_value = 'Played Games Card'
     result = generate_steam_stats()
-    TestCase().assertEqual(result, '')
+    TestCase().assertIn('Played Games Card', result)
+    TestCase().assertEqual(result, 'Played Games Card')
     mock_logger.error.assert_any_call(
         "Failed to generate card for Steam Summary")
 
+    mock_get_player_summaries.return_value = {'player': 'summary'}
+    mock_generate_card_summary.return_value = 'Player Summary Card'
     mock_get_recently_played.return_value = {'games': 'data'}
     mock_generate_card_played.return_value = None
     result = generate_steam_stats()
-    TestCase().assertEqual(result, '')
+    TestCase().assertIn('Player Summary Card', result)
+    TestCase().assertEqual(result, 'Player Summary Card')
     mock_logger.info.assert_any_call(
         "No Games data found, skipping card generation")
 
