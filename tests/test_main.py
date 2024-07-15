@@ -327,7 +327,8 @@ def test_log_execution_time():
 @patch("api.main.commit_to_github")
 @patch("api.main.log_execution_time")
 @patch("api.main.logger")
-def test_main(mock_logger, mock_log, mock_commit, mock_collect, mock_update, mock_get_readme, mock_initialize):
+def test_main(mock_logger, mock_log, mock_commit, mock_collect, mock_update,
+              mock_get_readme, mock_initialize):
     """Test Main Function"""
     mock_repo = MagicMock()
     mock_initialize.return_value = mock_repo
@@ -359,13 +360,12 @@ def test_main(mock_logger, mock_log, mock_commit, mock_collect, mock_update, moc
     mock_initialize.side_effect = ValueError("Test ValueError")
     main()
     mock_logger.error.assert_any_call(
-        "%s error occurred: %s", "ValueError", "Test ValueError")
+        "ValueError error occurred: Test ValueError")
     mock_initialize.side_effect = None
 
     mock_initialize.side_effect = IOError("Test IOError")
     main()
-    mock_logger.error.assert_any_call(
-        "%s error occurred: %s", "IOError", "Test IOError")
+    mock_logger.error.assert_any_call("IOError error occurred: Test IOError")
 
 
 if __name__ == "__main__":
