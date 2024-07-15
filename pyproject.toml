@@ -31,7 +31,7 @@ test = [
     "requests-mock==1.12.1"
 ]
 dev = [
-    "pipdeptree==2.23.0",
+    "pipdeptree==2.23.1",
     "pylint==3.2.5"
 ]
 
