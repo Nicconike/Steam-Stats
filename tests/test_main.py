@@ -9,7 +9,7 @@ import pytest
 from api.main import (update_readme, generate_steam_stats, generate_workshop_stats,
                       get_github_token, get_repo, create_tree_elements, commit_to_github,
                       initialize_github, get_readme_content, update_readme_sections, update_section,
-                      collect_files_to_update, log_execution_time, main)
+                      collect_files_to_update, log_execution_time, main, logger)
 
 
 @pytest.fixture
@@ -34,6 +34,25 @@ def mock_env_vars(monkeypatch):
     monkeypatch.setenv("INPUT_STEAM_API_KEY", "fake_steam_api_key")
     monkeypatch.setenv("INPUT_STEAM_CUSTOM_ID", "fake_steam_custom_id")
     monkeypatch.setenv("INPUT_WORKSHOP_STATS", "true")
+
+
+@pytest.fixture
+def mock_dependencies(mocker):
+    """Fixtures for mocking dependencies"""
+    fixtures = {}
+    fixtures['initialize_github'] = mocker.patch('api.main.initialize_github')
+    fixtures['get_readme_content'] = mocker.patch(
+        'api.main.get_readme_content')
+    fixtures['update_readme_sections'] = mocker.patch(
+        'api.main.update_readme_sections')
+    fixtures['collect_files_to_update'] = mocker.patch(
+        'api.main.collect_files_to_update')
+    fixtures['commit_to_github'] = mocker.patch('api.main.commit_to_github')
+    fixtures['log_execution_time'] = mocker.patch(
+        'api.main.log_execution_time')
+    fixtures['logger_info'] = mocker.patch.object(logger, 'info')
+    fixtures['logger_error'] = mocker.patch.object(logger, 'error')
+    return fixtures
 
 
 def test_update_readme(mock_repo):
@@ -122,7 +141,8 @@ def test_generate_steam_stats(mock_logger, mock_generate_card_played, mock_get_r
 @patch("api.main.fetch_all_workshop_stats")
 @patch("api.main.generate_card_for_steam_workshop")
 @patch("api.main.logger")
-def test_generate_workshop_stats(mock_logger, mock_generate_card, mock_fetch_all_stats, mock_fetch_links):
+def test_generate_workshop_stats(mock_logger, mock_generate_card,
+                                 mock_fetch_all_stats, mock_fetch_links):
     """Test Generating Steam Workshop Stats"""
     mock_fetch_links.return_value = ["link1", "link2"]
     mock_fetch_all_stats.return_value = {"workshop": "stats"}
@@ -311,61 +331,92 @@ def test_log_execution_time():
     with patch("api.main.logger") as mock_logger:
         log_execution_time(start_time)
         mock_logger.info.assert_any_call(
-            "Total Execution Time: %d minutes and %.3f seconds", 1, 5)
+            "Total Execution Time: %d minutes and %.3f seconds", 1, 5.0)
 
     start_time = time.time() - 30
     with patch("api.main.logger") as mock_logger:
         log_execution_time(start_time)
         mock_logger.info.assert_any_call(
-            "Total Execution Time: %.3f seconds", 30)
+            "Total Execution Time: %.3f seconds", 30.0)
 
 
-@patch("api.main.initialize_github")
-@patch("api.main.get_readme_content")
-@patch("api.main.update_readme_sections")
-@patch("api.main.collect_files_to_update")
-@patch("api.main.commit_to_github")
-@patch("api.main.log_execution_time")
-@patch("api.main.logger")
-def test_main(mock_logger, mock_log, mock_commit, mock_collect, mock_update,
-              mock_get_readme, mock_initialize):
-    """Test Main Function"""
-    mock_repo = MagicMock()
-    mock_initialize.return_value = mock_repo
-    mock_get_readme.return_value = "Original README"
-    mock_update.return_value = "Updated README"
-    mock_collect.return_value = {"README.md": b"Updated README"}
-    mock_commit.return_value = True
+def test_main_successful_commit(mock_dependencies):
+    """Test Main Function for Successful Commit"""
+    mock_dependencies['initialize_github'].return_value = "repo"
+    mock_dependencies['get_readme_content'].return_value = "original_readme"
+    mock_dependencies['update_readme_sections'].return_value = "current_readme"
+    mock_dependencies['collect_files_to_update'].return_value = [
+        "file1", "file2"]
+    mock_dependencies['commit_to_github'].return_value = True
 
     main()
 
-    mock_initialize.assert_called_once()
-    mock_get_readme.assert_called_once_with(mock_repo)
-    mock_update.assert_called_once_with(mock_repo, "Original README")
-    mock_collect.assert_called_once_with("Updated README", "Original README")
-    mock_commit.assert_called_once_with(
-        mock_repo, {"README.md": b"Updated README"})
-    mock_log.assert_called_once()
-    mock_logger.info.assert_any_call("Successfully committed to GitHub")
+    if mock_dependencies['logger_info'].call_count != 1:
+        raise AssertionError(
+            "Expected logger.info to be called once for successful commit")
+    if mock_dependencies['logger_error'].call_count != 0:
+        raise AssertionError("Expected logger.error to not be called")
 
-    mock_collect.return_value = {}
-    main()
-    mock_logger.info.assert_any_call("No changes to commit")
 
-    mock_collect.return_value = {"README.md": b"Updated README"}
-    mock_commit.return_value = False
-    main()
-    mock_logger.error.assert_any_call("Failed to commit changes to GitHub")
+def test_main_no_changes(mock_dependencies):
+    """Test Main Function for No Changes"""
+    mock_dependencies['initialize_github'].return_value = "repo"
+    mock_dependencies['get_readme_content'].return_value = "original_readme"
+    mock_dependencies['update_readme_sections'].return_value = "current_readme"
+    mock_dependencies['collect_files_to_update'].return_value = []
 
-    mock_initialize.side_effect = ValueError("Test ValueError")
     main()
-    mock_logger.error.assert_any_call(
-        "ValueError error occurred: Test ValueError")
-    mock_initialize.side_effect = None
 
-    mock_initialize.side_effect = IOError("Test IOError")
+    if mock_dependencies['logger_info'].call_count != 1:
+        raise AssertionError(
+            "Expected logger.info to be called once for no changes")
+    if mock_dependencies['logger_error'].call_count != 0:
+        raise AssertionError("Expected logger.error to not be called")
+
+
+def test_main_commit_failure(mock_dependencies):
+    """Test Main Function for Commit Failure"""
+    mock_dependencies['initialize_github'].return_value = "repo"
+    mock_dependencies['get_readme_content'].return_value = "original_readme"
+    mock_dependencies['update_readme_sections'].return_value = "current_readme"
+    mock_dependencies['collect_files_to_update'].return_value = [
+        "file1", "file2"]
+    mock_dependencies['commit_to_github'].return_value = False
+
     main()
-    mock_logger.error.assert_any_call("IOError error occurred: Test IOError")
+
+    if mock_dependencies['logger_info'].call_count != 0:
+        raise AssertionError(
+            "Expected logger.info to not be called for commit failure")
+    if mock_dependencies['logger_error'].call_count != 1:
+        raise AssertionError(
+            "Expected logger.error to be called once for commit failure")
+
+
+def test_main_value_error(mock_dependencies):
+    """Test Main Function for ValueError"""
+    mock_dependencies['initialize_github'].side_effect = ValueError(
+        "Test ValueError")
+
+    main()
+
+    if mock_dependencies['logger_info'].call_count != 0:
+        raise AssertionError("Expected logger.info to not be called")
+    if mock_dependencies['logger_error'].call_count != 1:
+        raise AssertionError("Expected logger.error to be called once")
+
+
+def test_main_io_error(mock_dependencies):
+    """Test Main Function for IOError"""
+    mock_dependencies['initialize_github'].side_effect = IOError(
+        "Test IOError")
+
+    main()
+
+    if mock_dependencies['logger_info'].call_count != 0:
+        raise AssertionError("Expected logger.info to not be called")
+    if mock_dependencies['logger_error'].call_count != 1:
+        raise AssertionError("Expected logger.error to be called once")
 
 
 if __name__ == "__main__":

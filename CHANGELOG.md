@@ -5,9 +5,9 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html) and [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/).
 
-# v1.0.2 (2024-07-11)
+## v1.0.2 (2024-07-11)
 
-## Chore
+#### Chore
 
 * chore(deps): bump the python-packages group with 2 updates (#9)
 
@@ -39,39 +39,39 @@ Signed-off-by: dependabot[bot] &lt;support@github.com&gt;
 Co-authored-by: dependabot[bot] &lt;49699333+dependabot[bot]@users.noreply.github.com&gt;
 Co-authored-by: Nicco &lt;38905025+Nicconike@users.noreply.github.com&gt; ([`dc42d6b`](https://github.com/Nicconike/Steam-Stats/commit/dc42d6b3e8533901dc0cfcb2a9475ee3a20a6ef6))
 
-## Ci
+#### Ci
 
 * ci: use token in steam stats workflow
 docs: update template ([`2101012`](https://github.com/Nicconike/Steam-Stats/commit/2101012f7facb26a9ca0e0edc1c93a43cd4551dd))
 
-## Fix
+#### Fix
 
 * fix: Update code to gracefully handle loccountrycode var
 docs: Update Readme
 ci: update steam stats workflow ([`e50ca76`](https://github.com/Nicconike/Steam-Stats/commit/e50ca76e1b6bb9582b41a347f163d84cfb26c425))
 
-# v1.0.1 (2024-07-10)
+## v1.0.1 (2024-07-10)
 
-## Chore
+#### Chore
 
 * chore: Update Pylint Badge ([`500c087`](https://github.com/Nicconike/Steam-Stats/commit/500c087a61ddddc9d61ece26b23ded382f0f8c30))
 
-## Fix
+#### Fix
 
 * fix: Add INPUT_GH_TOKEN as a token env var
 docs: update readme
 ci: revert steam stats workflow
 chore: misc changes ([`a50764c`](https://github.com/Nicconike/Steam-Stats/commit/a50764c3ecc3df05187bfce3eefbeaa0ac0178f9))
 
-# v1.0.0 (2024-07-09)
+## v1.0.0 (2024-07-09)
 
-## Breaking
+#### Breaking
 
 * perf: Improve Card generation &amp; Main Runner Script Code
 
 BREAKING CHANGE: Major Release 🚀 ([`1e35e04`](https://github.com/Nicconike/Steam-Stats/commit/1e35e0431dd8d8742c7c566a81ebf0f3ff29af15))
 
-## Chore
+#### Chore
 
 * chore: Update Steam Stats ([`984bfbf`](https://github.com/Nicconike/Steam-Stats/commit/984bfbfc121bd306b7af09baee69f34720042fce))
 
@@ -106,7 +106,7 @@ Co-authored-by: Nicco &lt;38905025+Nicconike@users.noreply.github.com&gt; ([`391
 
 * chore: Update Steam Stats ([`b2f031e`](https://github.com/Nicconike/Steam-Stats/commit/b2f031e57467f9fa951527e0158ba8a7899cd00a))
 
-## Ci
+#### Ci
 
 * ci: update scoring for pylint badge ([`25fa44d`](https://github.com/Nicconike/Steam-Stats/commit/25fa44dfe840dae5dcc64124a3b1ff4ec2c1b015))
 
@@ -142,12 +142,12 @@ build: update dockerfile ([`ad37826`](https://github.com/Nicconike/Steam-Stats/c
 * ci: update docker action
 refactor: remove logger info in steam_stats.py ([`82bf032`](https://github.com/Nicconike/Steam-Stats/commit/82bf032ab6e9b19ebd3ffc463f68a1710ecd1bfb))
 
-## Documentation
+#### Documentation
 
 * docs: correct changelog &amp; pyproject
 ci: misc changes ([`a84f81c`](https://github.com/Nicconike/Steam-Stats/commit/a84f81c82180caf45233b399799cc78125fe4a26))
 
-## Test
+#### Test
 
 * test: Improve codecov for card script to 84% ([`81d5f89`](https://github.com/Nicconike/Steam-Stats/commit/81d5f89eba3be0f68b2f142c8dd9c273d5d205be))
 
@@ -158,17 +158,17 @@ ci: Check prev release ([`17383b6`](https://github.com/Nicconike/Steam-Stats/com
 
 * test: update test_steam_workshop.py for 100% coverage ([`72c964f`](https://github.com/Nicconike/Steam-Stats/commit/72c964faa4e7b7ce8838899554105324dd308709))
 
-## Unknown
+#### Unknown
 
 * Update Pylint Badge ([`f717f61`](https://github.com/Nicconike/Steam-Stats/commit/f717f61d39fca7561ea9f919019631ba0d5bd492))
 
 # v0.1.5 (2024-06-28)
 
-## Build
+#### Build
 
 * build: Missed dockerfile change ([`1de324b`](https://github.com/Nicconike/Steam-Stats/commit/1de324b9d28883ae0ce967c149c954a49b35cac6))
 
-## Chore
+#### Chore
 
 * chore: template update ([`2370d9b`](https://github.com/Nicconike/Steam-Stats/commit/2370d9b31a226a2ac6b9ddd0f48151e8c6ef2a29))
 
@@ -180,7 +180,7 @@ ci: Check prev release ([`17383b6`](https://github.com/Nicconike/Steam-Stats/com
 
 * chore: update dependabot.yml ([`3c3fe46`](https://github.com/Nicconike/Steam-Stats/commit/3c3fe46f3d976b67f6b78568dced5b29c5994ffa))
 
-## Ci
+#### Ci
 
 * ci: update release workflow ([`21fcc97`](https://github.com/Nicconike/Steam-Stats/commit/21fcc97842f0fb7589ebe5cfac522523e00bdd15))
 
@@ -229,7 +229,7 @@ chore: update toml ([`1080d6b`](https://github.com/Nicconike/Steam-Stats/commit/
 * ci: update workflow &amp; dockerfile
 Update changelog template ([`771a869`](https://github.com/Nicconike/Steam-Stats/commit/771a86987075102d47d523427bf9ee7a5d32d193))
 
-## Documentation
+#### Documentation
 
 * docs: update readme ([`94a89a3`](https://github.com/Nicconike/Steam-Stats/commit/94a89a3a023599a205ce3f2f0f7da6026551d534))
 
@@ -245,11 +245,11 @@ chore: move requirements.txt to api ([`cb5d35b`](https://github.com/Nicconike/St
 
 * docs: update issue templates ([`dc23769`](https://github.com/Nicconike/Steam-Stats/commit/dc23769b0e7f3283bb90294f67aac282c504055d))
 
-## Fix
+#### Fix
 
 * fix: correct the assertion error ([`16e7217`](https://github.com/Nicconike/Steam-Stats/commit/16e7217e93a8c2529b7464c91c1a12f06b9e4871))
 
-## Refactor
+#### Refactor
 
 * refactor: Update pyproject.toml and template ([`666332e`](https://github.com/Nicconike/Steam-Stats/commit/666332e2a002dfaaba3f9ee4d43cba07b595e2e0))
 
@@ -259,31 +259,31 @@ docs: update readme ([`04db6ea`](https://github.com/Nicconike/Steam-Stats/commit
 
 ## v0.1.4 (2024-06-20)
 
-### Chore
+#### Chore
 
 * chore: update dependencies (#3)
 
 Merge ([`99d0f2e`](https://github.com/Nicconike/Steam-Stats/commit/99d0f2ed378f052dc66b882fcd5cb40ea5ffc91e))
 
 
-### Ci
+#### Ci
 
 * ci: Update workflow to upload reports correctly ([`721ec76`](https://github.com/Nicconike/Steam-Stats/commit/721ec76b8e0345816fc9fd2ee7ab445ee98cbb59))
 
 * ci: Update workflows ([`b648032`](https://github.com/Nicconike/Steam-Stats/commit/b648032537ea8b667054a3d65ee5e4a2149cc46c))
 
 
-### Documentation
+#### Documentation
 
 * docs: Add issue templates ([`cffa8f9`](https://github.com/Nicconike/Steam-Stats/commit/cffa8f9e6b02afab0593c3aa86bf7c79e47d56e0))
 
 
-### Fix
+#### Fix
 
 * fix: update main python script to remvoe setup ([`ebfd9e0`](https://github.com/Nicconike/Steam-Stats/commit/ebfd9e01ac097efba2f507f8948084888da51a91))
 
 
-### Unknown
+#### Unknown
 
 * Create FUNDING.yml
 
@@ -292,64 +292,64 @@ Signed-off-by: Nicco &lt;38905025+Nicconike@users.noreply.github.com&gt; ([`2740
 
 ## v0.1.3 (2024-06-19)
 
-### Ci
+#### Ci
 
 * ci: run with python3 ([`7c0829b`](https://github.com/Nicconike/Steam-Stats/commit/7c0829b0a2a78f8752e0704672b7f317999b2688))
 
 * ci: Update release workflow &amp; add templates ([`8a7e376`](https://github.com/Nicconike/Steam-Stats/commit/8a7e3765ec89b18a03112e24445bfa18c1747cb6))
 
 
-### Fix
+#### Fix
 
 * fix(workflow): Test release ([`e8c3ddb`](https://github.com/Nicconike/Steam-Stats/commit/e8c3ddba57368f21e9c29207fcb2eb9029ef99db))
 
 
 ## v0.1.2 (2024-06-17)
 
-### Build
+#### Build
 
 * build: Addressing the autobuild warning to use v3 for CodeQL ([`abc130a`](https://github.com/Nicconike/Steam-Stats/commit/abc130a2641fb29f5b3fb4ef231d059d788b7e35))
 
 
-### Chore
+#### Chore
 
 * chore: CodeQL &amp; Pylint Setup ([`8ddb1d6`](https://github.com/Nicconike/Steam-Stats/commit/8ddb1d6e75ff4f760192cfeab82ec314357101ee))
 
 
-### Fix
+#### Fix
 
 * fix: Update action.yml to pull docker image ([`130bc91`](https://github.com/Nicconike/Steam-Stats/commit/130bc91bcc9fcc4d229f5d87fc2b05bc1472ce18))
 
 
 ## v0.1.1 (2024-06-16)
 
-### Ci
+#### Ci
 
 * ci: Trigger workflow ([`68cbea7`](https://github.com/Nicconike/Steam-Stats/commit/68cbea77858ad335336571d81d2904c414478f6f))
 
 * ci: Trigger workflow ([`96348ee`](https://github.com/Nicconike/Steam-Stats/commit/96348ee1154e7c2257fbf8080794b0afb7baf4c8))
 
 
-### Documentation
+#### Documentation
 
 * docs: Update Readme ([`2a9d8f3`](https://github.com/Nicconike/Steam-Stats/commit/2a9d8f347bcab6d0b9746ecb9e4f3a0a65bcbf5b))
 
 
-### Performance
+#### Performance
 
 * perf: Remove redundancy ([`64cbf13`](https://github.com/Nicconike/Steam-Stats/commit/64cbf13cb3af82c3b1d2e150f3e572a6964d91ff))
 
 
 ## v0.1.0 (2024-06-14)
 
-### Feature
+#### Feature
 
 * feat(docker): Update dockerfile &amp; workflow ([`9e04f61`](https://github.com/Nicconike/Steam-Stats/commit/9e04f61fa42c44f92e4604cf0e8a7c7993174c51))
 
 * feat(workflow): Add release action &amp; update docker ([`baf85c6`](https://github.com/Nicconike/Steam-Stats/commit/baf85c6f89eb2f9e8cb48163b6ce9cff40a70ea5))
 
 
-### Fix
+#### Fix
 
 * fix(workflow): Sign Commit ([`74ee9fb`](https://github.com/Nicconike/Steam-Stats/commit/74ee9fb0ca888b9c5a3be42936da3ec610596079))
 
@@ -364,11 +364,11 @@ Added codespaces support ([`8046a1b`](https://github.com/Nicconike/Steam-Stats/c
 
 ## v0.0.1 (2024-06-12)
 
-### Ci
+#### Ci
 
 * ci(workflow): update Docker CICD workflow to use semantic-release ([`4eb4ac9`](https://github.com/Nicconike/Steam-Stats/commit/4eb4ac9566e07a83d90916042423c1164d77795d))
 
 
-### Fix
+#### Fix
 
 * fix(workflow): correct &amp; update github workflow for automated release ([`44cc88e`](https://github.com/Nicconike/Steam-Stats/commit/44cc88ef4e80c47c0d750f4576aba3d3cdedbc25))
