@@ -13,7 +13,7 @@ dependencies = [
     "DateTime==5.5",
     "playwright==1.45.0",
     "PyGithub==2.3.0",
-    "python-semantic-release==9.8.5"
+    "python-semantic-release==9.8.6"
 ]
 requires-python = ">= 3.8"
 readme = "README.md"
@@ -33,7 +33,7 @@ test = [
 ]
 dev = [
     "pipdeptree==2.23.1",
-    "pylint==3.2.5"
+    "pylint==3.2.6"
 ]
 
 [tool.semantic_release]
