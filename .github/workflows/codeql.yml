@@ -89,9 +89,11 @@ jobs:
                 if (( $(echo "$score == 10" | bc -l) )); then
                     color="brightgreen"
                 elif (( $(echo "$score >= 9" | bc -l) )); then
-                    color="yellow"
+                    color="darkgreen"
                 elif (( $(echo "$score >= 8" | bc -l) )); then
                     color="orange"
+                elif (( $(echo "$score >= 7" | bc -l) )); then
+                    color="lightred"
                 elif (( $(echo "$score >= 6" | bc -l) )); then
                     color="red"
                 fi

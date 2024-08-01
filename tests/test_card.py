@@ -36,45 +36,79 @@ def test_handle_file_not_found_error(mock_logger, caplog):
     """Test handle_exception with FileNotFoundError"""
     exception = FileNotFoundError("Test File Not Found Error")
     handle_exception(exception)
-    assert len(caplog.records) == 1
-    assert caplog.records[0].levelname == "ERROR"
-    assert caplog.records[0].message == "File Not Found Error: Test File Not Found Error"
+    if len(caplog.records) != 1:
+        pytest.fail("Expected one log record, found " +
+                    str(len(caplog.records)))
+    if caplog.records[0].levelname != "ERROR":
+        pytest.fail("Expected log level ERROR, found " +
+                    caplog.records[0].levelname)
+    if caplog.records[0].message != "File Not Found Error: Test File Not Found Error":
+        pytest.fail(
+            "Expected log message 'File Not Found Error: Test File Not Found Error', found " +
+            caplog.records[0].message)
 
 
 def test_handle_playwright_error(mock_logger, caplog):
     """Test handle_exception with PlaywrightError"""
     exception = PlaywrightError("Test Playwright Error")
     handle_exception(exception)
-    assert len(caplog.records) == 1
-    assert caplog.records[0].levelname == "ERROR"
-    assert caplog.records[0].message == "Playwright Error: Test Playwright Error"
+    if len(caplog.records) != 1:
+        pytest.fail("Expected one log record, found " +
+                    str(len(caplog.records)))
+    if caplog.records[0].levelname != "ERROR":
+        pytest.fail("Expected log level ERROR, found " +
+                    caplog.records[0].levelname)
+    if caplog.records[0].message != "Playwright Error: Test Playwright Error":
+        pytest.fail(
+            "Expected log message 'Playwright Error: Test Playwright Error', found " +
+            caplog.records[0].message)
 
 
 def test_handle_key_error(mock_logger, caplog):
     """Test handle_exception with KeyError"""
     exception = KeyError("Test Key Error")
     handle_exception(exception)
-    assert len(caplog.records) == 1
-    assert caplog.records[0].levelname == "ERROR"
-    assert caplog.records[0].message == "Key Error: 'Test Key Error'"
+    if len(caplog.records) != 1:
+        pytest.fail("Expected one log record, found " +
+                    str(len(caplog.records)))
+    if caplog.records[0].levelname != "ERROR":
+        pytest.fail("Expected log level ERROR, found " +
+                    caplog.records[0].levelname)
+    if caplog.records[0].message != "Key Error: 'Test Key Error'":
+        pytest.fail(
+            "Expected log message 'Key Error: Test Key Error', found " + caplog.records[0].message)
 
 
 def test_handle_timeout_error(mock_logger, caplog):
     """Test handle_exception with asyncio.TimeoutError"""
     exception = asyncio.TimeoutError("Test Timeout Error")
     handle_exception(exception)
-    assert len(caplog.records) == 1
-    assert caplog.records[0].levelname == "ERROR"
-    assert caplog.records[0].message == "Timeout Error: Test Timeout Error"
+    if len(caplog.records) != 1:
+        pytest.fail("Expected one log record, found " +
+                    str(len(caplog.records)))
+    if caplog.records[0].levelname != "ERROR":
+        pytest.fail("Expected log level ERROR, found " +
+                    caplog.records[0].levelname)
+    if caplog.records[0].message != "Timeout Error: Test Timeout Error":
+        pytest.fail(
+            "Expected log message 'Timeout Error: Test Timeout Error', found " +
+            caplog.records[0].message)
 
 
 def test_handle_unexpected_error(mock_logger, caplog):
     """Test handle_exception with an unexpected error"""
     exception = Exception("Test Unexpected Error")
     handle_exception(exception)
-    assert len(caplog.records) == 1
-    assert caplog.records[0].levelname == "ERROR"
-    assert caplog.records[0].message == "Unexpected Error: Test Unexpected Error"
+    if len(caplog.records) != 1:
+        pytest.fail("Expected one log record, found " +
+                    str(len(caplog.records)))
+    if caplog.records[0].levelname != "ERROR":
+        pytest.fail("Expected log level ERROR, found " +
+                    caplog.records[0].levelname)
+    if caplog.records[0].message != "Unexpected Error: Test Unexpected Error":
+        pytest.fail(
+            "Expected log message 'Unexpected Error: Test Unexpected Error', found " +
+            caplog.records[0].message)
 
 
 @pytest.mark.asyncio
