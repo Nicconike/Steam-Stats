@@ -1,12 +1,13 @@
 """Test Card Generation Script"""
 # Disable pylint warnings for false positives
-# pylint: disable=duplicate-code
+# pylint: disable=duplicate-code,redefined-outer-name,unused-argument,unused-variable
+import asyncio
 from unittest import mock
 from unittest.mock import patch, MagicMock, AsyncMock
 from playwright.async_api import Error as PlaywrightError
-
 import pytest
 from api.card import (
+    handle_exception,
     get_element_bounding_box,
     html_to_png,
     convert_html_to_png,
@@ -22,6 +23,58 @@ def mock_env_vars(monkeypatch):
     """Mock environment variables"""
     monkeypatch.setenv("GITHUB_REPOSITORY", "owner/repo")
     monkeypatch.setenv("GITHUB_REF_NAME", "main")
+
+
+@pytest.fixture
+def mock_logger():
+    """Mock logger"""
+    with patch("api.main.logger") as mock_logger:
+        yield mock_logger
+
+
+def test_handle_file_not_found_error(mock_logger, caplog):
+    """Test handle_exception with FileNotFoundError"""
+    exception = FileNotFoundError("Test File Not Found Error")
+    handle_exception(exception)
+    assert len(caplog.records) == 1
+    assert caplog.records[0].levelname == "ERROR"
+    assert caplog.records[0].message == "File Not Found Error: Test File Not Found Error"
+
+
+def test_handle_playwright_error(mock_logger, caplog):
+    """Test handle_exception with PlaywrightError"""
+    exception = PlaywrightError("Test Playwright Error")
+    handle_exception(exception)
+    assert len(caplog.records) == 1
+    assert caplog.records[0].levelname == "ERROR"
+    assert caplog.records[0].message == "Playwright Error: Test Playwright Error"
+
+
+def test_handle_key_error(mock_logger, caplog):
+    """Test handle_exception with KeyError"""
+    exception = KeyError("Test Key Error")
+    handle_exception(exception)
+    assert len(caplog.records) == 1
+    assert caplog.records[0].levelname == "ERROR"
+    assert caplog.records[0].message == "Key Error: 'Test Key Error'"
+
+
+def test_handle_timeout_error(mock_logger, caplog):
+    """Test handle_exception with asyncio.TimeoutError"""
+    exception = asyncio.TimeoutError("Test Timeout Error")
+    handle_exception(exception)
+    assert len(caplog.records) == 1
+    assert caplog.records[0].levelname == "ERROR"
+    assert caplog.records[0].message == "Timeout Error: Test Timeout Error"
+
+
+def test_handle_unexpected_error(mock_logger, caplog):
+    """Test handle_exception with an unexpected error"""
+    exception = Exception("Test Unexpected Error")
+    handle_exception(exception)
+    assert len(caplog.records) == 1
+    assert caplog.records[0].levelname == "ERROR"
+    assert caplog.records[0].message == "Unexpected Error: Test Unexpected Error"
 
 
 @pytest.mark.asyncio

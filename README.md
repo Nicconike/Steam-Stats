@@ -41,7 +41,6 @@ schedule:
 
 **Example for Steam Workshop Stats**
 <!-- Steam-Workshop start -->
-![Steam Workshop Stats](https://github.com/Nicconike/Steam-Stats/blob/master/assets/steam_workshop_stats.png)
 <!-- Steam-Workshop end -->
 ***
 ## Update README
@@ -96,7 +95,7 @@ name: Steam Stats
 
 on:
  push:
-	 branches: master
+	branches: master
     schedule:
         # Runs every Monday at 12AM IST (UTC+5:30)
         - cron: "30 18 * * 0"
@@ -112,7 +111,7 @@ jobs:
                 STEAM_API_KEY: ${{ secrets.STEAM_API_KEY }} # Replace with your created key saved in actions secrets
                 STEAM_ID: ${{ vars.STEAM_ID }} # Replace with your Steam ID env var
                 STEAM_CUSTOM_ID: ${{ vars.STEAM_CUSTOM_ID }} # Replace with your custom ID env var
-			 WORKSHOP_STATS: True # Optional
+			 	WORKSHOP_STATS: True # Optional
                 LOG_SCALE: True # Optional
 ```
 

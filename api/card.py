@@ -26,6 +26,20 @@ personastate_map = {
 }
 
 
+def handle_exception(e):
+    """Handle exceptions and log appropriate error messages"""
+    if isinstance(e, FileNotFoundError):
+        logger.error("File Not Found Error: %s", str(e))
+    elif isinstance(e, PlaywrightError):
+        logger.error("Playwright Error: %s", str(e))
+    elif isinstance(e, KeyError):
+        logger.error("Key Error: %s", str(e))
+    elif isinstance(e, asyncio.TimeoutError):
+        logger.error("Timeout Error: %s", str(e))
+    else:
+        logger.error("Unexpected Error: %s", str(e))
+
+
 async def get_element_bounding_box(html_file, selector):
     """Get the bounding box of the specified element using Playwright"""
     browser = None
@@ -54,14 +68,8 @@ async def get_element_bounding_box(html_file, selector):
         bounding_box["width"] += 2 * MARGIN
         bounding_box["height"] += 2 * MARGIN
         return bounding_box
-    except FileNotFoundError as e:
-        logger.error("File Not Found Error: %s", str(e))
-    except PlaywrightError as e:
-        logger.error("Playwright Error: %s", str(e))
-    except KeyError as e:
-        logger.error("Key Error: %s", str(e))
-    except asyncio.TimeoutError as e:
-        logger.error("Timeout Error: %s", str(e))
+    except (FileNotFoundError, PlaywrightError, KeyError, asyncio.TimeoutError) as e:
+        handle_exception(e)
     finally:
         if browser:
             await browser.close()
@@ -78,14 +86,8 @@ async def html_to_png(html_file, output_file, selector):
             await page.goto("file://" + os.path.abspath(html_file))
             await page.screenshot(path=output_file, clip=bounding_box)
             await page.close()
-    except FileNotFoundError as e:
-        logger.error("File Not Found Error: %s", str(e))
-    except PlaywrightError as e:
-        logger.error("Playwright Error: %s", str(e))
-    except KeyError as e:
-        logger.error("Key Error: %s", str(e))
-    except asyncio.TimeoutError as e:
-        logger.error("Timeout Error: %s", str(e))
+    except (FileNotFoundError, PlaywrightError, KeyError, asyncio.TimeoutError) as e:
+        handle_exception(e)
     finally:
         if browser:
             await browser.close()
@@ -97,14 +99,8 @@ def convert_html_to_png(html_file, output_file, selector):
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
         loop.run_until_complete(html_to_png(html_file, output_file, selector))
-    except FileNotFoundError as e:
-        logger.error("File Not Found Error: %s", str(e))
-    except PlaywrightError as e:
-        logger.error("Playwright Error: %s", str(e))
-    except KeyError as e:
-        logger.error("Key Error: %s", str(e))
-    except asyncio.TimeoutError as e:
-        logger.error("Timeout Error: %s", str(e))
+    except (FileNotFoundError, PlaywrightError, KeyError, asyncio.TimeoutError) as e:
+        handle_exception(e)
 
 
 def format_unix_time(unix_time):
