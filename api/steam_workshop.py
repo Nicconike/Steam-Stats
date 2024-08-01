@@ -143,21 +143,9 @@ def fetch_individual_workshop_stats(item_url):
                         stats[key] = 0
         else:
             logger.info("Could not find stats table at %s", str(item_url))
-    except requests.exceptions.ConnectionError:
-        logger.error(
-            "Connection error occurred. Please check your network connection")
-    except requests.exceptions.Timeout:
-        logger.error("Request timed out. Please try again later")
-    except requests.exceptions.TooManyRedirects:
-        logger.error("Too many redirects. Check the URL and try again")
-    except requests.exceptions.HTTPError as e:
-        logger.error("HTTP error occurred: %s - %s",
-                     str(e.response.status_code), str(e.response.reason))
-    except requests.exceptions.RequestException as e:
-        logger.error("Request failed: %s", str(e))
-    except AttributeError as e:
-        logger.error(
-            "Parsing error: %s. The structure of the page might have changed", str(e))
+    except (requests.exceptions.RequestException, AttributeError) as e:
+        handle_request_exception(e)
+        return {}
 
     # Ensure all expected stats are present, even if they are zero
     stats["unique_visitors"] = stats.get("unique_visitors", 0)
@@ -176,24 +164,9 @@ def fetch_all_workshop_stats(item_links):
             stats = fetch_individual_workshop_stats(link)
             if stats:
                 all_stats.append(stats)
-        except requests.exceptions.ConnectionError:
-            logger.error(
-                "Connection error occurred while fetching stats for %s."
-                "Please check your network connection.", str(link))
-        except requests.exceptions.Timeout:
-            logger.error(
-                "Request timed out while fetching stats for %s. Please try again later.", str(link))
-        except requests.exceptions.TooManyRedirects:
-            logger.error(
-                "Too many redirects while fetching stats for %s."
-                "Check the URL and try again.", str(link))
-        except requests.exceptions.HTTPError as e:
-            logger.error("HTTP error occurred while fetching stats for %s: %s - %s",
-                         str(link), str(e.response.status_code), str(e.response.reason))
-        except requests.exceptions.RequestException as e:
-            logger.error("Request failed for %s: %s", str(link), str(e))
+        except (requests.exceptions.RequestException, AttributeError) as e:
+            handle_request_exception(e)
 
-    # Calculate the totals
     total_unique_visitors = sum(item.get("unique_visitors", 0)
                                 for item in all_stats)
     total_current_subscribers = sum(

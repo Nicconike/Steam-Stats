@@ -1,6 +1,6 @@
 name: Question
 description: Ask a question about this project
-title: " "
+title: "Ques:"
 labels: ["question"]
 assignees: "nicconike"
 body:

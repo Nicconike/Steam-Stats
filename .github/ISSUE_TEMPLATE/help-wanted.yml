@@ -1,6 +1,6 @@
 name: Help Wanted
 description: Request help for a specific issue or concern
-title: " "
+title: "Help:"
 labels: ["help wanted"]
 assignees: "nicconike"
 body:
