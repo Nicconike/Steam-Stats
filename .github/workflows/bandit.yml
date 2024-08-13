@@ -12,9 +12,13 @@ on:
         branches: master
 
 jobs:
-    sast_scan:
-        if: github.actor != 'dependabot[bot]' || github.actor != 'github-actions[bot]' || github.actor != 'protected-auto-commits[bot]'
+    sast-scan:
+        if: |
+            github.actor != 'dependabot[bot]' &&
+            github.actor != 'github-actions[bot]' &&
+            github.actor != 'protected-auto-commits[bot]'
         name: Bandit Scan
+        concurrency: sast-scan
         runs-on: ubuntu-latest
 
         steps:

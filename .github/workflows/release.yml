@@ -11,7 +11,10 @@ on:
 
 jobs:
     release:
-        if: github.actor != 'dependabot[bot]' || github.actor != 'github-actions[bot]' || github.actor != 'protected-auto-commits[bot]' && github.repository == 'nicconike/steam-stats'
+        if: |
+            github.actor != 'dependabot[bot]' &&
+            github.actor != 'github-actions[bot]' &&
+            github.actor != 'protected-auto-commits[bot]'
         name: Release
         runs-on: ubuntu-latest
         concurrency: release

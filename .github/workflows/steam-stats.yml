@@ -12,14 +12,14 @@ on:
             - 'api/*.py'
 
 jobs:
-    update-readme:
-        if: >
-            github.event_name != 'pull_request' &&
+    steam-stats:
+        if: |
             github.actor != 'dependabot[bot]' &&
             github.actor != 'github-actions[bot]' &&
             github.actor != 'protected-auto-commits[bot]'
         name: Steam Stats
         runs-on: ubuntu-latest
+        concurrency: steam-stats
         steps:
           - name: GitHub App Token
             uses: actions/create-github-app-token@v1

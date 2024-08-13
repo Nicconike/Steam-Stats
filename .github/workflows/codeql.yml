@@ -11,9 +11,13 @@ on:
 
 jobs:
     codeql:
-        if: github.actor != 'dependabot[bot]' || github.actor != 'protected-auto-commits[bot]'
+        if: |
+            github.actor != 'dependabot[bot]' &&
+            github.actor != 'github-actions[bot]' &&
+            github.actor != 'protected-auto-commits[bot]'
         name: CodeQL
         runs-on: ubuntu-latest
+        concurrency: codeql
         permissions:
             actions: read
             contents: read

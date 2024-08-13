@@ -12,9 +12,13 @@ on:
 
 jobs:
     code-coverage:
-        if: github.actor != 'dependabot[bot]' || github.actor != 'github-actions[bot]' || github.actor != 'protected-auto-commits[bot]'
+        if: |
+            github.actor != 'dependabot[bot]' &&
+            github.actor != 'github-actions[bot]' &&
+            github.actor != 'protected-auto-commits[bot]'
         name: Codecov
         runs-on: ubuntu-latest
+        concurrency: code-coverage
         steps:
           - name: Checkout
             uses: actions/checkout@v4
