@@ -62,7 +62,6 @@ dist_glob_patterns = [
 ]
 
 [tool.semantic_release.changelog]
-template_dir = "templates"
 changelog_file = "CHANGELOG.md"
 exclude_commit_patterns = []
 
