@@ -8,6 +8,7 @@ on:
             - 'api/*.py'
             - 'pyproject.toml'
             - 'Dockerfile'
+            - 'requirements.txt'
 
 jobs:
     release:
