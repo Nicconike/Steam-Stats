@@ -1,12 +1,14 @@
 """Scrape Steam Workshop Data"""
+
 import os
 import logging
 import requests
 from bs4 import BeautifulSoup, Tag
 
 # Configure logging
-logging.basicConfig(level=logging.INFO,
-                    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+logging.basicConfig(
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+)
 logger = logging.getLogger(__name__)
 
 # Required Secrets Configuration
@@ -16,14 +18,15 @@ STEAM_CUSTOM_ID = os.environ["INPUT_STEAM_CUSTOM_ID"]
 # A reasonable timeout for the request (connection and read timeout)
 REQUEST_TIMEOUT = (25, 30)
 
-GET_SERVER_INFO_URL = 'https://api.steampowered.com/ISteamWebAPIUtil/GetServerInfo/v1/'
+GET_SERVER_INFO_URL = "https://api.steampowered.com/ISteamWebAPIUtil/GetServerInfo/v1/"
 
 
 def get_server_info(api_key):
     """Fetch server information from the Steam Web API"""
     try:
-        response = requests.get(GET_SERVER_INFO_URL, params={
-                                'key': api_key}, timeout=REQUEST_TIMEOUT)
+        response = requests.get(
+            GET_SERVER_INFO_URL, params={"key": api_key}, timeout=REQUEST_TIMEOUT
+        )
         response.raise_for_status()
         return response.json()
     except requests.exceptions.RequestException as e:
@@ -34,7 +37,7 @@ def get_server_info(api_key):
 def is_server_online(api_key):
     """Check if the server is online based on the GetServerInfo response"""
     serverinfo = get_server_info(api_key)
-    if serverinfo and 'servertime' in serverinfo:
+    if serverinfo and "servertime" in serverinfo:
         return True
     return False
 
@@ -53,8 +56,7 @@ def has_next_page(soup):
     """Check if there is a next page"""
     paging_controls = soup.find("div", class_="workshopBrowsePagingControls")
     if paging_controls:
-        next_page_link = paging_controls.find(
-            "a", class_="pagebtn", string=">")
+        next_page_link = paging_controls.find("a", class_="pagebtn", string=">")
         return next_page_link is not None
     return False
 
@@ -62,15 +64,17 @@ def has_next_page(soup):
 def handle_request_exception(e):
     """Handle request exceptions"""
     if isinstance(e, requests.exceptions.ConnectionError):
-        logger.error(
-            "Connection error occurred. Please check your network connection")
+        logger.error("Connection error occurred. Please check your network connection")
     elif isinstance(e, requests.exceptions.Timeout):
         logger.error("Request timed out. Please try again later")
     elif isinstance(e, requests.exceptions.TooManyRedirects):
         logger.error("Too many redirects. Check the URL and try again")
     elif isinstance(e, requests.exceptions.HTTPError):
-        logger.error("HTTP error occurred: %s - %s",
-                     str(e.response.status_code), str(e.response.reason))
+        logger.error(
+            "HTTP error occurred: %s - %s",
+            str(e.response.status_code),
+            str(e.response.reason),
+        )
     else:
         logger.error("An error occurred: %s", str(e))
 
@@ -79,10 +83,10 @@ def fetch_workshop_item_links(steam_id, api_key):
     """Fetch each workshop item's link, navigating through all pages"""
     if not is_server_online(api_key):
         raise ConnectionError(
-            "Steam Community is currently offline. Please try again later")
+            "Steam Community is currently offline. Please try again later"
+        )
 
-    base_url = "https://steamcommunity.com/id/" + \
-        str(steam_id) + "/myworkshopfiles/"
+    base_url = "https://steamcommunity.com/id/" + str(steam_id) + "/myworkshopfiles/"
     item_links = []
     page_number = 1
 
@@ -110,7 +114,9 @@ def fetch_workshop_item_links(steam_id, api_key):
             break
         except AttributeError as e:
             logger.error(
-                "Parsing error: %s. The structure of the page might have changed", str(e))
+                "Parsing error: %s. The structure of the page might have changed",
+                str(e),
+            )
             break
 
     if not item_links and page_number == 1:
@@ -138,8 +144,7 @@ def fetch_individual_workshop_stats(item_url):
                     try:
                         stats[key] = int(value) if value else 0
                     except ValueError:
-                        logger.error(
-                            "Could not convert value to int: %s", str(value))
+                        logger.error("Could not convert value to int: %s", str(value))
                         stats[key] = 0
         else:
             logger.info("Could not find stats table at %s", str(item_url))
@@ -167,16 +172,17 @@ def fetch_all_workshop_stats(item_links):
         except (requests.exceptions.RequestException, AttributeError) as e:
             handle_request_exception(e)
 
-    total_unique_visitors = sum(item.get("unique_visitors", 0)
-                                for item in all_stats)
+    total_unique_visitors = sum(item.get("unique_visitors", 0) for item in all_stats)
     total_current_subscribers = sum(
-        item.get("current_subscribers", 0) for item in all_stats)
+        item.get("current_subscribers", 0) for item in all_stats
+    )
     total_current_favorites = sum(
-        item.get("current_favorites", 0) for item in all_stats)
+        item.get("current_favorites", 0) for item in all_stats
+    )
 
     return {
         "total_unique_visitors": total_unique_visitors,
         "total_current_subscribers": total_current_subscribers,
         "total_current_favorites": total_current_favorites,
-        "individual_stats": all_stats
+        "individual_stats": all_stats,
     }

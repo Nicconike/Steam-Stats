@@ -1,4 +1,5 @@
 """Main Runner Script"""
+
 # Disable pylint warnings for false positives
 # pylint: disable=duplicate-code
 import base64
@@ -10,13 +11,14 @@ from api.steam_workshop import fetch_workshop_item_links, fetch_all_workshop_sta
 from api.card import (
     generate_card_for_player_summary,
     generate_card_for_played_games,
-    generate_card_for_steam_workshop
+    generate_card_for_steam_workshop,
 )
 from github import Github, InputGitTreeElement
 
 # Configure logging
-logging.basicConfig(level=logging.INFO,
-                    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+logging.basicConfig(
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+)
 logger = logging.getLogger(__name__)
 
 # Required Secrets Configuration
@@ -25,8 +27,11 @@ STEAM_API_KEY = os.environ["INPUT_STEAM_API_KEY"]
 STEAM_CUSTOM_ID = os.environ["INPUT_STEAM_CUSTOM_ID"]
 
 # Optional Feature Flag
-WORKSHOP_STATS = os.getenv("INPUT_WORKSHOP_STATS",
-                           "false").lower() in ("true", "1", "t")
+WORKSHOP_STATS = os.getenv("INPUT_WORKSHOP_STATS", "false").lower() in (
+    "true",
+    "1",
+    "t",
+)
 
 # Version Identifier for Changelog
 __version__ = "1.1.0"
@@ -47,7 +52,10 @@ def update_readme(repo, markdown_data, start_marker, end_marker):
 
         new_section_content = start_marker + "\n" + markdown_data + "\n" + end_marker
 
-        if new_section_content != readme_content[start_index:end_index + len(end_marker)]:
+        if (
+            new_section_content
+            != readme_content[start_index : end_index + len(end_marker)]
+        ):
             return new_section_content
 
         return None
@@ -107,11 +115,15 @@ def generate_workshop_stats():
 
 def get_github_token():
     """Get GitHub token from environment variables"""
-    token = os.environ.get("GITHUB_TOKEN") or os.environ.get(
-        "GH_TOKEN") or os.environ.get("INPUT_GH_TOKEN")
+    token = (
+        os.environ.get("GITHUB_TOKEN")
+        or os.environ.get("GH_TOKEN")
+        or os.environ.get("INPUT_GH_TOKEN")
+    )
     if not token:
         raise ValueError(
-            "No GitHub token found in env vars (GITHUB_TOKEN, GH_TOKEN or INPUT_GH_TOKEN")
+            "No GitHub token found in env vars (GITHUB_TOKEN, GH_TOKEN or INPUT_GH_TOKEN"
+        )
     return token
 
 
@@ -136,7 +148,8 @@ def create_tree_elements(repo, files_to_update):
 
         blob = repo.create_git_blob(content, encoding)
         element = InputGitTreeElement(
-            path=file_path, mode="100644", type="blob", sha=blob.sha)
+            path=file_path, mode="100644", type="blob", sha=blob.sha
+        )
         tree_elements.append(element)
     return tree_elements
 
@@ -153,12 +166,13 @@ def commit_to_github(repo, files_to_update):
 
         tree_elements = create_tree_elements(repo, files_to_update)
         new_tree = repo.create_git_tree(
-            tree_elements, repo.get_git_tree(last_commit_sha))
+            tree_elements, repo.get_git_tree(last_commit_sha)
+        )
 
         new_commit = repo.create_git_commit(
             message="chore: Update Steam Stats",
             tree=new_tree,
-            parents=[repo.get_git_commit(last_commit_sha)]
+            parents=[repo.get_git_commit(last_commit_sha)],
         )
 
         ref = repo.get_git_ref("heads/" + branch.name)
@@ -191,8 +205,13 @@ def update_readme_sections(repo, current_content):
 
     steam_stats_content = generate_steam_stats()
     if steam_stats_content:
-        updated_content = update_section(repo, updated_content, steam_stats_content,
-                                         "<!-- Steam-Stats start -->", "<!-- Steam-Stats end -->")
+        updated_content = update_section(
+            repo,
+            updated_content,
+            steam_stats_content,
+            "<!-- Steam-Stats start -->",
+            "<!-- Steam-Stats end -->",
+        )
         logger.info("Steam stats updated")
     else:
         logger.info("No Steam stats content generated")
@@ -200,9 +219,13 @@ def update_readme_sections(repo, current_content):
     if WORKSHOP_STATS:
         workshop_content = generate_workshop_stats()
         if workshop_content:
-            updated_content = update_section(repo, updated_content, workshop_content,
-                                             "<!-- Steam-Workshop start -->",
-                                             "<!-- Steam-Workshop end -->")
+            updated_content = update_section(
+                repo,
+                updated_content,
+                workshop_content,
+                "<!-- Steam-Workshop start -->",
+                "<!-- Steam-Workshop end -->",
+            )
             logger.info("Workshop stats updated")
         else:
             logger.info("No Workshop stats content generated")
@@ -212,13 +235,15 @@ def update_readme_sections(repo, current_content):
 
 def update_section(repo, current_content, new_content, start_marker, end_marker):
     """Update a section of the README using markers"""
-    updated_section = update_readme(
-        repo, new_content, start_marker, end_marker)
+    updated_section = update_readme(repo, new_content, start_marker, end_marker)
     if updated_section:
         start_index = current_content.find(start_marker)
-        end_index = current_content.find(
-            end_marker, start_index) + len(end_marker)
-        return current_content[:start_index] + updated_section + current_content[end_index:]
+        end_index = current_content.find(end_marker, start_index) + len(end_marker)
+        return (
+            current_content[:start_index]
+            + updated_section
+            + current_content[end_index:]
+        )
     return current_content
 
 
@@ -228,7 +253,11 @@ def collect_files_to_update(current_readme, original_readme):
     if current_readme != original_readme:
         files_to_update["README.md"] = current_readme.encode("utf-8")
 
-    for png_file in ["steam_summary.png", "recently_played_games.png", "steam_workshop_stats.png"]:
+    for png_file in [
+        "steam_summary.png",
+        "recently_played_games.png",
+        "steam_workshop_stats.png",
+    ]:
         png_path = "assets/" + png_file
         if os.path.exists(png_path):
             with open(png_path, "rb") as file:
@@ -243,7 +272,8 @@ def log_execution_time(start_time):
     if total_time > 60:
         minutes, seconds = divmod(total_time, 60)
         logger.info(
-            "Total Execution Time: %d minutes and %.3f seconds", minutes, seconds)
+            "Total Execution Time: %d minutes and %.3f seconds", minutes, seconds
+        )
     else:
         logger.info("Total Execution Time: %.3f seconds", total_time)
 
@@ -256,8 +286,7 @@ def main():
         repo = initialize_github()
         original_readme = get_readme_content(repo)
         current_readme = update_readme_sections(repo, original_readme)
-        files_to_update = collect_files_to_update(
-            current_readme, original_readme)
+        files_to_update = collect_files_to_update(current_readme, original_readme)
 
         if files_to_update:
             if commit_to_github(repo, files_to_update):

@@ -1,4 +1,5 @@
 """Generate Cards for Steam Stats"""
+
 import datetime
 import logging
 import math
@@ -7,8 +8,9 @@ import asyncio
 from playwright.async_api import async_playwright, Error as PlaywrightError
 
 # Configure logging
-logging.basicConfig(level=logging.INFO,
-                    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+logging.basicConfig(
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+)
 logger = logging.getLogger(__name__)
 
 
@@ -16,13 +18,18 @@ REQUEST_TIMEOUT = (25, 30)
 MARGIN = 10
 
 # Get Github Repo's Details where the action is being ran
-repo_owner, repo_name = os.environ["GITHUB_REPOSITORY"].split('/')
+repo_owner, repo_name = os.environ["GITHUB_REPOSITORY"].split("/")
 branch_name = os.environ["GITHUB_REF_NAME"]
 
 # Personastate mapping for Steam Profile Status
 personastate_map = {
-    0: "Offline", 1: "Online", 2: "Busy", 3: "Away",
-    4: "Snooze", 5: "Looking to trade", 6: "Looking to play"
+    0: "Offline",
+    1: "Online",
+    2: "Busy",
+    3: "Away",
+    4: "Snooze",
+    5: "Looking to trade",
+    6: "Looking to play",
 }
 
 
@@ -53,9 +60,9 @@ async def get_element_bounding_box(html_file, selector):
             await page.goto("file://" + os.path.abspath(html_file))
             bounding_box = await page.evaluate(
                 "() => {"
-                " var element = document.querySelector(\"" + selector + "\");"
+                ' var element = document.querySelector("' + selector + '");'
                 " if (!element) {"
-                " throw new Error(\"Element not found: " + selector + "\");"
+                ' throw new Error("Element not found: ' + selector + '");'
                 " }"
                 " var rect = element.getBoundingClientRect();"
                 " return {x: rect.x, y: rect.y, width: rect.width, height: rect.height};"
@@ -116,8 +123,7 @@ def generate_card_for_player_summary(player_data):
     personaname = summary_data["personaname"]
     personastate = summary_data["personastate"]
     avatarfull = summary_data["avatarfull"]
-    loccountrycode = summary_data.get(
-        "loccountrycode", "")
+    loccountrycode = summary_data.get("loccountrycode", "")
     lastlogoff = summary_data["lastlogoff"]
     timecreated = summary_data["timecreated"]
     gameextrainfo = summary_data.get("gameextrainfo", None)
@@ -131,12 +137,12 @@ def generate_card_for_player_summary(player_data):
     # Create country section only if loccountrycode exists
     country_section = ""
     if loccountrycode:
-        country_section = f'''
+        country_section = f"""
             <p id="country">Country: <span id="country-code">{loccountrycode}</span>
                 <img id="flag" class="flag"
                 src="https://flagcdn.com/w320/{loccountrycode.lower()}.png" alt="Flag">
             </p>
-        '''
+        """
 
     html_content = f"""
 <!DOCTYPE html>
@@ -206,13 +212,19 @@ def generate_card_for_player_summary(player_data):
     with open("assets/steam_summary.html", "w", encoding="utf-8") as file:
         file.write(html_content)
 
-    convert_html_to_png("assets/steam_summary.html",
-                        "assets/steam_summary.png", ".card")
+    convert_html_to_png(
+        "assets/steam_summary.html", "assets/steam_summary.png", ".card"
+    )
 
     return (
         "![Steam Summary]"
-        "(https://github.com/" + repo_owner + "/" + repo_name +
-        "/blob/" + branch_name + "/assets/steam_summary.png)\n"
+        "(https://github.com/"
+        + repo_owner
+        + "/"
+        + repo_name
+        + "/blob/"
+        + branch_name
+        + "/assets/steam_summary.png)\n"
     )
 
 
@@ -222,8 +234,7 @@ def generate_card_for_played_games(games_data):
         return None
 
     # Check if LOG_SCALE is set to true(Optional Feature Flag)
-    log_scale = os.getenv(
-        "INPUT_LOG_SCALE", "false").lower() in ("true", "1", "t")
+    log_scale = os.getenv("INPUT_LOG_SCALE", "false").lower() in ("true", "1", "t")
     max_playtime = games_data["response"]["games"][0]["playtime_2weeks"]
 
     # Placeholder image for Spacewar
@@ -242,20 +253,42 @@ def generate_card_for_played_games(games_data):
             else:
                 img_icon_url = (
                     "https://media.steampowered.com/steamcommunity/public/images/apps/"
-                    + str(game["appid"]) + "/" + game["img_icon_url"] + ".jpg"
+                    + str(game["appid"])
+                    + "/"
+                    + game["img_icon_url"]
+                    + ".jpg"
                 )
 
             if log_scale:
-                normalized_playtime = math.log1p(playtime) / math.log1p(
-                    max(game["playtime_2weeks"] for game in games_data["response"]["games"])) * 100
+                normalized_playtime = (
+                    math.log1p(playtime)
+                    / math.log1p(
+                        max(
+                            game["playtime_2weeks"]
+                            for game in games_data["response"]["games"]
+                        )
+                    )
+                    * 100
+                )
             else:
                 normalized_playtime = (playtime / max_playtime) * 100
 
             normalized_playtime = round(normalized_playtime)
             if playtime < 60:
-                display_time = str(playtime) + " mins"
+                if playtime == 1:
+                    display_time = str(playtime) + " min"
+                else:
+                    display_time = str(playtime) + " mins"
             else:
-                display_time = str(round(playtime / 60, 2)) + " hrs"
+                hours = playtime // 60
+                minutes = playtime % 60
+                if minutes == 0:
+                    display_time = str(hours) + " hrs"
+                elif minutes == 1:
+                    display_time = str(hours) + " hrs and " + str(minutes) + " min"
+                else:
+                    display_time = str(hours) + " hrs and " + str(minutes) + " mins"
+
             progress_bars += f"""
             <div class="bar-container">
                 <img src="{img_icon_url}" alt="{name}" class="game-icon">
@@ -288,13 +321,19 @@ def generate_card_for_played_games(games_data):
     with open("assets/recently_played_games.html", "w", encoding="utf-8") as file:
         file.write(html_content)
 
-    convert_html_to_png("assets/recently_played_games.html",
-                        "assets/recently_played_games.png", ".card")
+    convert_html_to_png(
+        "assets/recently_played_games.html", "assets/recently_played_games.png", ".card"
+    )
 
     return (
         "![Recently Played Games]"
-        "(https://github.com/" + repo_owner + "/" + repo_name +
-        "/blob/" + branch_name + "/assets/recently_played_games.png)"
+        "(https://github.com/"
+        + repo_owner
+        + "/"
+        + repo_name
+        + "/blob/"
+        + branch_name
+        + "/assets/recently_played_games.png)"
     )
 
 
@@ -377,11 +416,17 @@ def generate_card_for_steam_workshop(workshop_stats):
     with open("assets/steam_workshop_stats.html", "w", encoding="utf-8") as file:
         file.write(html_content)
 
-    convert_html_to_png("assets/steam_workshop_stats.html",
-                        "assets/steam_workshop_stats.png", ".card")
+    convert_html_to_png(
+        "assets/steam_workshop_stats.html", "assets/steam_workshop_stats.png", ".card"
+    )
 
     return (
         "![Steam Workshop Stats]"
-        "(https://github.com/" + repo_owner + "/" + repo_name +
-        "/blob/" + branch_name + "/assets/steam_workshop_stats.png)"
+        "(https://github.com/"
+        + repo_owner
+        + "/"
+        + repo_name
+        + "/blob/"
+        + branch_name
+        + "/assets/steam_workshop_stats.png)"
     )

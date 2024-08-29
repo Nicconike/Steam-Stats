@@ -1,4 +1,5 @@
 """Retrieves Steam User Stats using Steam Web API"""
+
 # Disable pylint warnings for false positives
 # pylint: disable=duplicate-code
 import os
@@ -6,8 +7,9 @@ import logging
 import requests
 
 # Configure logging
-logging.basicConfig(level=logging.INFO,
-                    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+logging.basicConfig(
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+)
 logger = logging.getLogger(__name__)
 
 # Required Secrets Configuration
@@ -19,7 +21,9 @@ REQUEST_TIMEOUT = (25, 30)
 
 # Steam Web API endpoints
 PLAYER_SUMMARIES = "http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/"
-RECENTLY_PLAYED_GAMES = "http://api.steampowered.com/IPlayerService/GetRecentlyPlayedGames/v0001/"
+RECENTLY_PLAYED_GAMES = (
+    "http://api.steampowered.com/IPlayerService/GetRecentlyPlayedGames/v0001/"
+)
 
 
 def get_player_summaries():
@@ -42,8 +46,14 @@ def get_player_summaries():
 
 def get_recently_played_games():
     """Fetch a list of games a player has played in the last two weeks"""
-    url = RECENTLY_PLAYED_GAMES + "?key=" + STEAM_API_KEY + \
-        "&steamid=" + STEAM_ID + "&format=json"
+    url = (
+        RECENTLY_PLAYED_GAMES
+        + "?key="
+        + STEAM_API_KEY
+        + "&steamid="
+        + STEAM_ID
+        + "&format=json"
+    )
     try:
         response = requests.get(url, timeout=REQUEST_TIMEOUT)
         response.raise_for_status()
