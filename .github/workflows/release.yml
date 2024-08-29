@@ -55,6 +55,11 @@ jobs:
                 python -m pip install --upgrade pip
                 pip install python-semantic-release
 
+          - name: Update to Latest Commit
+            run: |
+                git fetch origin
+                git rebase origin/master
+
           - name: Semantic Release
             id: github-release
             uses: python-semantic-release/python-semantic-release@v9.8.7
