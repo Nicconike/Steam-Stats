@@ -95,25 +95,25 @@ If you are new to **Github Secrets** then you can checkout this official doc [he
 name: Steam Stats
 
 on:
- push:
-	branches: master
+  push:
+    branches: master
     schedule:
-        # Runs every Monday at 12AM IST (UTC+5:30)
-        - cron: "30 18 * * 0"
+      # Runs every Monday at 12AM IST (UTC+5:30)
+      - cron: "30 18 * * 0"
     workflow_dispatch:
 
 jobs:
-    steam-stats:
-        name: Steam Stats
-        runs-on: ubuntu-latest
-        steps:
-          - uses: nicconike/steam-stats@master
-            with:
-                STEAM_API_KEY: ${{ secrets.STEAM_API_KEY }} # Replace with your created key saved in actions secrets
-                STEAM_ID: ${{ vars.STEAM_ID }} # Replace with your Steam ID env var
-                STEAM_CUSTOM_ID: ${{ vars.STEAM_CUSTOM_ID }} # Replace with your custom ID env var
-			 	WORKSHOP_STATS: True # Optional
-                LOG_SCALE: True # Optional
+  steam-stats:
+    name: Steam Stats
+    runs-on: ubuntu-latest
+    steps:
+      - uses: nicconike/steam-stats@master
+        with:
+          STEAM_API_KEY: ${{ secrets.STEAM_API_KEY }} # Created Steam API key env var
+          STEAM_ID: ${{ vars.STEAM_ID }} # Steam ID env var
+          STEAM_CUSTOM_ID: ${{ vars.STEAM_CUSTOM_ID }} # Custom ID env var
+          WORKSHOP_STATS: True # Optional
+          LOG_SCALE: True # Optional
 ```
 
 Checkout this real time usage example in a github repo from [here](https://github.com/Nicconike/Nicconike?tab=readme-ov-file#gaming-) and also the github actions [workflow file](https://github.com/Nicconike/Nicconike/blob/master/.github/workflows/steam-stats.yml).
@@ -150,7 +150,7 @@ If you are using this project and are really happy with it, then there are few w
 Other Major Platforms Coming Soon :tm: 😉
 
 ***
-Created with 🐍 & ❤️ by [Nicco](https://github.com/Nicconike)
+Created with 🐍 & ❤️ by [Nicco](https://x.com/Nicco_nike)
 
 [^1]: Unfortunately, Steam Web API doesn't support Web Sockets so the profile status cannot be updated in real time as it gets updated in steam profile 🥲
 
