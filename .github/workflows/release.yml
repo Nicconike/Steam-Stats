@@ -114,7 +114,7 @@ jobs:
                 file: Dockerfile
 
           - name: Docker Scout Scan
-            uses: docker/scout-action@v1.13.0
+            uses: docker/scout-action@v1.14.0
             with:
                 command: quickview, cves
                 image: ${{ vars.DOCKER_USERNAME }}/steam-stats:latest
