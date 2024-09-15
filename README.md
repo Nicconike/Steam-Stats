@@ -10,6 +10,7 @@
 ![GitHub Release](https://img.shields.io/github/v/release/nicconike/steam-stats)
 ![Python Version from PEP 621 TOML](https://img.shields.io/python/required-version-toml?tomlFilePath=https%3A%2F%2Fgithub.com%2FNicconike%2FSteam-Stats%2Fblob%2Fmaster%2Fpyproject.toml%3Fraw%3Dtrue)
 ![GitHub License](https://img.shields.io/github/license/nicconike/Steam-Stats)
+[![wakatime](https://wakatime.com/badge/user/018e538b-3f55-4e8e-95fa-6c3225418eed/project/018e62a4-056d-49fd-babd-b079ee94859f.svg)](https://wakatime.com/badge/user/018e538b-3f55-4e8e-95fa-6c3225418eed/project/018e62a4-056d-49fd-babd-b079ee94859f)
 [![Visitor Badge](https://badges.pufler.dev/visits/nicconike/steam-stats)](https://badges.pufler.dev)
 
 > ### From one Passionate Gamer and Developer to Another 🍻
