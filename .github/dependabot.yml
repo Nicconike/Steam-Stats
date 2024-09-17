@@ -14,9 +14,10 @@ updates:
       labels:
           - dependencies
           - dependabot
+          - python
       rebase-strategy: auto
       versioning-strategy: "increase-if-necessary"
-      open-pull-requests-limit: 20
+      open-pull-requests-limit: 10
       groups:
           python-packages:
               patterns:
@@ -33,8 +34,9 @@ updates:
       labels:
           - dependencies
           - dependabot
+          - github_actions
       rebase-strategy: auto
-      open-pull-requests-limit: 20
+      open-pull-requests-limit: 10
       reviewers:
           - "nicconike"
       groups:
@@ -52,7 +54,12 @@ updates:
       labels:
           - dependencies
           - dependabot
+          - docker
       rebase-strategy: auto
-      open-pull-requests-limit: 20
+      open-pull-requests-limit: 10
+      groups:
+          docker:
+              patterns:
+                  - "*"
       reviewers:
           - "nicconike"
