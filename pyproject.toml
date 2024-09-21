@@ -32,8 +32,8 @@ test = [
     "requests-mock==1.12.1"
 ]
 dev = [
-    "pipdeptree==2.23.3",
-    "pylint==3.2.7"
+    "pipdeptree==2.23.4",
+    "pylint==3.3.0"
 ]
 
 [tool.semantic_release]
