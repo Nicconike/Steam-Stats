@@ -70,7 +70,7 @@ jobs:
 
           - name: Semantic Release
             id: semantic
-            uses: python-semantic-release/python-semantic-release@v9.15.1
+            uses: python-semantic-release/python-semantic-release@v9.15.2
             with:
                 github_token: ${{ steps.app-token.outputs.token }}
 
@@ -170,7 +170,7 @@ jobs:
                 push-to-registry: true
 
           - name: Docker Scout Scan
-            uses: docker/scout-action@v1.15.1
+            uses: docker/scout-action@v1.16.1
             with:
                 command: quickview, cves
                 image: ${{ vars.DOCKER_USERNAME }}/steam-stats:master
