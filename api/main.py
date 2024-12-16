@@ -34,7 +34,7 @@ WORKSHOP_STATS = os.getenv("INPUT_WORKSHOP_STATS", "false").lower() in (
 )
 
 # Version Identifier for Changelog
-__version__ = "1.1.1"
+__version__ = "1.2.0"
 
 
 def update_readme(repo, markdown_data, start_marker, end_marker):
