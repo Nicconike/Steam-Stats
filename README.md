@@ -136,8 +136,6 @@ And thank you for considering to contribute.
 	- **[Docker](https://github.com/docker)**
 	- **[CodeQL](https://github.com/github/codeql-action)**
 	- **[Codecov](https://github.com/codecov/codecov-action)**
-- **Styles**
-	- **[Progress Bar Design](https://github.com/Nicconike/Steam-Stats/blob/master/assets/style.css)**[^2] - [Ana Tudor](https://codepen.io/thebabydino)
 
 ***
 ## Support💙

@@ -3,6 +3,8 @@ name: Release
 on:
     push:
         branches: master
+        tags:
+            - '*'
         paths:
             - '.github/workflows/release.yml'
             - 'api/*.py'
@@ -18,10 +20,16 @@ jobs:
             github.actor != 'protected-auto-commits[bot]'
         name: Release
         runs-on: ubuntu-latest
-        concurrency: release
+        concurrency:
+            group: ${{ github.workflow }}-${{ github.ref }}
+            cancel-in-progress: ${{ github.ref != 'refs/heads/master' }}
         permissions:
             id-token: write
             contents: write
+            issues: write
+            pull-requests: write
+        outputs:
+            new_release_version: ${{ steps.semantic.outputs.version }}
         steps:
           - name: GitHub App Token
             uses: actions/create-github-app-token@v1
@@ -36,7 +44,7 @@ jobs:
                 fetch-depth: 0
                 token: ${{ steps.app-token.outputs.token }}
 
-          - name: Set up Python
+          - name: Setup Python
             uses: actions/setup-python@v5
             with:
                 python-version: '3.12'
@@ -58,10 +66,10 @@ jobs:
           - name: Update to Latest Commit
             run: |
                 git fetch origin
-                git rebase origin/master
+                git reset --hard origin/${{ github.ref_name }}
 
           - name: Semantic Release
-            id: github-release
+            id: semantic
             uses: python-semantic-release/python-semantic-release@v9.15.1
             with:
                 github_token: ${{ steps.app-token.outputs.token }}
@@ -69,58 +77,105 @@ jobs:
     docker:
         name: Docker
         runs-on: ubuntu-latest
+        if: needs.semantic-release.outputs.new_release_version != ''
         concurrency:
             group: ${{ github.workflow }}-${{ github.ref }}
             cancel-in-progress: ${{ github.ref != 'refs/heads/master' }}
+        permissions:
+            contents: read
+            attestations: write
+            id-token: write
+            packages: write
         needs: release
         steps:
+          - name: GitHub App Token
+            uses: actions/create-github-app-token@v1
+            id: app-token
+            with:
+                app-id: ${{ secrets.APP_ID }}
+                private-key: ${{ secrets.APP_PRIVATE_KEY }}
+
           - name: Checkout Code
             uses: actions/checkout@v4
             with:
                 fetch-depth: 0
+                fetch-tags: true
+                token: ${{ steps.app-token.outputs.token }}
 
-          - name: Set up Docker Buildx
+          - name: Install CoSign
+            if: github.event_name != 'pull_request'
+            uses: sigstore/cosign-installer@v3.7.0
+            with:
+                cosign-release: 'v2.4.0'
+
+          - name: Setup Docker Buildx
             uses: docker/setup-buildx-action@v3
 
-          - name: Log in to Docker Hub
+          - name: Login to Docker Hub
             uses: docker/login-action@v3
             with:
                 username: ${{ vars.DOCKER_USERNAME }}
                 password: ${{ secrets.DOCKER_TOKEN }}
 
+          - name: Login to GitHub Container Registry
+            uses: docker/login-action@v3
+            with:
+                registry: ghcr.io
+                username: ${{ github.actor }}
+                password: ${{ secrets.GITHUB_TOKEN }}
+
+          - name: Get latest Release
+            id: get_latest_release
+            run: |
+                latest_release=$(gh release list --limit 1 --json tagName --jq '.[0].tagName')
+                echo "LATEST_RELEASE=${latest_release}" >> $GITHUB_ENV
+            env:
+                GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
           - name: Extract Docker Metadata
             id: meta
             uses: docker/metadata-action@v5
             with:
-                images: ${{ vars.DOCKER_USERNAME }}/steam-stats
+                images: |
+                    ${{ vars.DOCKER_USERNAME }}/steam-stats
+                    ghcr.io/${{ github.repository_owner }}/steam-stats
                 tags: |
-                    type=ref,event=branch
-                    type=ref,event=pr
-                    type=semver,pattern={{version}}
-                    type=sha
+                    type=raw,value=master
+                    type=raw,value=${{ env.LATEST_RELEASE }}
 
           - name: Build & Push Docker Image
             uses: docker/build-push-action@v6
             with:
                 context: .
-                sbom: ${{ github.event_name != 'pull_request' }}
-                push: ${{ github.event_name != 'pull_request' }}
-                load: ${{ github.event_name == 'pull_request' }}
-                tags: |
-                    ${{ vars.DOCKER_USERNAME }}/steam-stats:latest
+                file: ./Dockerfile
+                push: true
+                tags: ${{ steps.meta.outputs.tags }}
                 labels: ${{ steps.meta.outputs.labels }}
+                platforms: linux/amd64
                 cache-from: type=gha
                 cache-to: type=gha,mode=max
-                file: Dockerfile
+                secrets: |
+                    GITHUB_TOKEN=${{ steps.app-token.outputs.token }}
+
+          - name: Sign the published Docker Image
+            if: ${{ github.event_name != 'pull_request' }}
+            env:
+                TAGS: ${{ steps.meta.outputs.tags }}
+                DIGEST: ${{ steps.push.outputs.digest }}
+            run: echo "${TAGS}" | xargs -I {} cosign sign --yes {}@${DIGEST}
+
+          - name: Generate Artifact Attestation
+            uses: actions/attest-build-provenance@v2
+            with:
+                subject-name: ghcr.io/${{ github.repository_owner }}/steam-stats
+                subject-digest: ${{ steps.push.outputs.digest }}
+                push-to-registry: true
 
           - name: Docker Scout Scan
             uses: docker/scout-action@v1.15.1
             with:
                 command: quickview, cves
-                image: ${{ vars.DOCKER_USERNAME }}/steam-stats:latest
-                to: ${{ vars.DOCKER_USERNAME }}/steam-stats:latest
-                only-severities: critical, high
-                only-fixed: true
+                image: ${{ vars.DOCKER_USERNAME }}/steam-stats:master
                 write-comment: true
                 github-token: ${{ secrets.GITHUB_TOKEN }}
                 sarif-file: docker-scout-results.sarif
@@ -131,3 +186,83 @@ jobs:
             with:
                 name: docker-scout-results
                 path: docker-scout-results.sarif
+
+    cleanup:
+        runs-on: ubuntu-latest
+        name: Cleanup
+        needs: docker
+        permissions:
+            contents: read
+            packages: write
+        steps:
+          - name: Checkout Repo
+            uses: actions/checkout@v4
+
+          - name: Login to Docker Hub
+            uses: docker/login-action@v3
+            with:
+                username: ${{ vars.DOCKER_USERNAME }}
+                password: ${{ secrets.DOCKER_TOKEN }}
+
+          - name: Login to GitHub Container Registry
+            uses: docker/login-action@v3
+            with:
+                registry: ghcr.io
+                username: ${{ github.actor }}
+                password: ${{ secrets.GITHUB_TOKEN }}
+
+          - name: Delete Old Docker Hub Tags
+            run: |
+                echo "Fetching Docker Hub tags..."
+                tags=$(curl -s -H "Authorization: Bearer ${{ secrets.DOCKER_TOKEN }}" "https://hub.docker.com/v2/repositories/${{ vars.DOCKER_USERNAME }}/steam-stats/tags" | jq -r '.results[].name')
+                echo "Tags found in Docker Hub:"
+                echo "$tags"
+                latest_tag=$(echo "$tags" | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' | sort -rV | head -n 1)
+                echo "Latest semantic version tag is $latest_tag"
+                for tag in $tags; do
+                    if [[ "$tag" != "master" && "$tag" != "$latest_tag" ]]; then
+                        echo "Deleting tag $tag from Docker Hub"
+                        curl -X DELETE -H "Authorization: Bearer ${{ secrets.DOCKER_TOKEN }}" "https://hub.docker.com/v2/repositories/${{ vars.DOCKER_USERNAME }}/steam-stats/tags/$tag/"
+                    else
+                        echo "Keeping tag $tag"
+                    fi
+                done
+
+          - name: Delete Old GHCR Tags
+            env:
+                GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                REPO_OWNER: ${{ github.repository_owner }}
+                PACKAGE_NAME: "steam-stats"
+            run: |
+                echo "Fetching GHCR tags..."
+                page=1
+                all_tags=""
+                while true; do
+                    tags=$(curl -s -H "Authorization: Bearer $GITHUB_TOKEN" \
+                        "https://api.github.com/user/packages/container/$PACKAGE_NAME/versions?per_page=100&page=$page" | jq -r '.[].metadata.container.tags[]')
+                    if [ -z "$tags" ]; then
+                        break
+                    fi
+                    all_tags="$all_tags $tags"
+                    ((page++))
+                done
+                echo "Tags found in GHCR:"
+                echo "$all_tags"
+                latest_tag=$(echo "$all_tags" | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' | sort -rV | head -n 1)
+                echo "Latest semantic version tag is $latest_tag"
+                for tag in $all_tags; do
+                    if [[ "$tag" != "master" && "$tag" != "$latest_tag" ]]; then
+                        echo "Deleting tag $tag from GHCR"
+                        version_id=$(curl -s -H "Authorization: Bearer $GITHUB_TOKEN" \
+                        "https://api.github.com/user/packages/container/$PACKAGE_NAME/versions" | \
+                        jq -r ".[] | select(.metadata.container.tags[] == \"$tag\") | .id")
+                        if [ -n "$version_id" ]; then
+                            curl -X DELETE -H "Authorization: Bearer $GITHUB_TOKEN" \
+                                "https://api.github.com/user/packages/container/$PACKAGE_NAME/versions/$version_id"
+                        else
+                            echo "Warning: Could not find version ID for tag $tag"
+                        fi
+                    else
+                        echo "Keeping tag $tag"
+                    fi
+                done

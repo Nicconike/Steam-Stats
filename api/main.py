@@ -6,14 +6,14 @@ import base64
 import logging
 import os
 import time
-from api.steam_stats import get_player_summaries, get_recently_played_games
-from api.steam_workshop import fetch_workshop_item_links, fetch_all_workshop_stats
-from api.card import (
+from github import Github, InputGitTreeElement
+from .steam_stats import get_player_summaries, get_recently_played_games
+from .steam_workshop import fetch_workshop_item_links, fetch_all_workshop_stats
+from .card import (
     generate_card_for_player_summary,
     generate_card_for_played_games,
     generate_card_for_steam_workshop,
 )
-from github import Github, InputGitTreeElement
 
 # Configure logging
 logging.basicConfig(

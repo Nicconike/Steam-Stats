@@ -25,7 +25,7 @@ inputs:
         default: "False"
 runs:
     using: docker
-    image: "docker://nicconike/steam-stats:latest"
+    image: "docker://nicconike/steam-stats:master"
 branding:
     icon: bar-chart-2
     color: blue

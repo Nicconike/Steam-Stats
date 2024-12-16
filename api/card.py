@@ -233,12 +233,19 @@ def generate_card_for_played_games(games_data):
     if not games_data:
         return None
 
-    # Check if LOG_SCALE is set to true(Optional Feature Flag)
+    # Check if LOG_SCALE is set to true (Optional Feature Flag)
     log_scale = os.getenv("INPUT_LOG_SCALE", "false").lower() in ("true", "1", "t")
     max_playtime = games_data["response"]["games"][0]["playtime_2weeks"]
 
     # Placeholder image for Spacewar
     placeholder_image = "https://i.imgur.com/DBnVqet.jpg"
+
+    # Label to indicate if Log Scale is enabled
+    watermark = ""
+
+    # Calculate dynamic height based on the number of games
+    num_games = games_data["response"]["total_count"]
+    total_height = num_games * 70
 
     # Generate the progress bars with repeating styles
     progress_bars = ""
@@ -247,17 +254,15 @@ def generate_card_for_played_games(games_data):
             name = game["name"]
             playtime = game["playtime_2weeks"]
 
-            # Check if the game is Spacewar
-            if game["name"] == "Spacewar":
-                img_icon_url = placeholder_image
-            else:
-                img_icon_url = (
-                    "https://media.steampowered.com/steamcommunity/public/images/apps/"
-                    + str(game["appid"])
-                    + "/"
-                    + game["img_icon_url"]
-                    + ".jpg"
-                )
+            img_icon_url = (
+                placeholder_image
+                if game["name"] == "Spacewar"
+                else "https://media.steampowered.com/steamcommunity/public/images/apps/"
+                + str(game["appid"])
+                + "/"
+                + game["img_icon_url"]
+                + ".jpg"
+            )
 
             if log_scale:
                 normalized_playtime = (
@@ -270,8 +275,14 @@ def generate_card_for_played_games(games_data):
                     )
                     * 100
                 )
+                watermark = """
+                    <div class="watermark">
+                        Log Scale Enabled
+                    </div>
+                """
             else:
                 normalized_playtime = (playtime / max_playtime) * 100
+                watermark = ""
 
             normalized_playtime = round(normalized_playtime)
             if playtime < 60:
@@ -294,28 +305,34 @@ def generate_card_for_played_games(games_data):
                 <img src="{img_icon_url}" alt="{name}" class="game-icon">
                 <progress class="progress-style-{(i % 6) + 1}" value="{normalized_playtime}"
                 max="100"></progress>
-                <span class="game-info">{name} ({display_time})</span>
+                <div class="game-info">
+                    <span class="game-name">{name}</span><br>
+                    <span class="game-time">{display_time}</span>
+                </div>
             </div>
             """
 
     html_content = f"""
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Recently Played Games in Last 2 Weeks</title>
-    <link rel="stylesheet" href="style.css">
-</head>
-<body>
-    <div class="card">
-        <div class="content">
-            <h2>Recently Played Games (Last 2 Weeks)</h2>
-            {progress_bars}
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Recently Played Games in Last 2 Weeks</title>
+        <link rel="stylesheet" href="style.css">
+    </head>
+    <body>
+        <div class="card" style="height: {total_height}px; position: relative;">
+            <div class="content" style="position: relative;">
+                <h2>Recently Played Games (Last 2 Weeks)</h2>
+                {progress_bars}
+            </div>
+            <div class="watermark">
+                {watermark}
+            </div>
         </div>
-    </div>
-</body>
-</html>
+    </body>
+    </html>
     """
 
     with open("assets/recently_played_games.html", "w", encoding="utf-8") as file:

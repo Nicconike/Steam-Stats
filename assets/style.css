@@ -5,6 +5,7 @@ body {
     margin: 0;
     min-height: 100vh;
     background: #ffffff;
+    position: relative;
 }
 
 progress {
@@ -31,6 +32,17 @@ progress::-moz-progress-bar {
     border-radius: 0.35em;
     box-shadow: inset 0 0.05em 0.05em rgba(255, 255, 255, 0.35);
     background: var(--fill);
+}
+
+.watermark {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 0.7em;
+    color: rgba(85, 53, 53, 0.5);
+    pointer-events: none;
+    z-index: 1000;
+    font-weight: bold;
 }
 
 .progress-style-1 {
@@ -73,4 +85,31 @@ progress::-moz-progress-bar {
         repeating-linear-gradient(90deg,
             transparent 0 0.15em, #f1c00c 0 0.5em) 0.25em,
         linear-gradient(#f3c402, #ed7401);
+}
+
+.bar-container {
+    display: flex;
+    align-items: center;
+    gap: 1vmin;
+}
+
+.game-icon {
+    width: 50px;
+    height: 50px;
+}
+
+.game-info {
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+}
+
+.game-name {
+    font-weight: bold;
+    font-size: 1em;
+}
+
+.game-time {
+    font-size: 0.9em;
+    color: #555;
 }
