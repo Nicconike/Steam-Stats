@@ -143,6 +143,7 @@ jobs:
 
           - name: Build & Push Docker Image
             uses: docker/build-push-action@v6
+            id: push
             with:
                 context: .
                 file: ./Dockerfile
