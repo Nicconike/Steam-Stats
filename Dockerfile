@@ -40,4 +40,4 @@ RUN chown -R steam-stats:steam-stats /steam-stats
 USER steam-stats
 
 # Command to run the application
-ENTRYPOINT ["sh", "-c", "cd /steam-stats && python api/main.py"]
+ENTRYPOINT ["sh", "-c", "cd /steam-stats && python -m api.main"]
