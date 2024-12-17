@@ -146,11 +146,7 @@ If you are using this project and are really happy with it, then there are few w
 - Donations through [GitHub Sponsers](https://github.com/sponsors/Nicconike) or whichever platform you like. So, that I can create more projects like these and play more games🎮🎧
 
 #### **Thanks!🫡**
-Other Major Platforms Coming Soon :tm: 😉
-
 ***
 Created with 🐍 & ❤️ by [Nicco](https://x.com/Nicco_nike)
 
 [^1]: Unfortunately, Steam Web API doesn't support Web Sockets so the profile status cannot be updated in real time as it gets updated in steam profile 🥲
-
-[^2]: Modified design code according to project requirements
