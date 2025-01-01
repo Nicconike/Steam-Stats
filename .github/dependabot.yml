@@ -56,9 +56,6 @@ updates:
           - dependabot
           - docker
       rebase-strategy: auto
-      ignore:
-          - dependency-name: "playwright/python"
-            versions: ["*"]
       open-pull-requests-limit: 10
       groups:
           docker:
