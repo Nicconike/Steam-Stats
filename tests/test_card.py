@@ -1,4 +1,5 @@
 """Test Card Generation Script"""
+
 # Disable pylint warnings for false positives
 # pylint: disable=duplicate-code,redefined-outer-name,unused-argument,unused-variable
 import asyncio
@@ -14,7 +15,7 @@ from api.card import (
     format_unix_time,
     generate_card_for_player_summary,
     generate_card_for_played_games,
-    generate_card_for_steam_workshop
+    generate_card_for_steam_workshop,
 )
 
 
@@ -37,15 +38,14 @@ def test_handle_file_not_found_error(mock_logger, caplog):
     exception = FileNotFoundError("Test File Not Found Error")
     handle_exception(exception)
     if len(caplog.records) != 1:
-        pytest.fail("Expected one log record, found " +
-                    str(len(caplog.records)))
+        pytest.fail("Expected one log record, found " + str(len(caplog.records)))
     if caplog.records[0].levelname != "ERROR":
-        pytest.fail("Expected log level ERROR, found " +
-                    caplog.records[0].levelname)
+        pytest.fail("Expected log level ERROR, found " + caplog.records[0].levelname)
     if caplog.records[0].message != "File Not Found Error: Test File Not Found Error":
         pytest.fail(
-            "Expected log message 'File Not Found Error: Test File Not Found Error', found " +
-            caplog.records[0].message)
+            "Expected log message 'File Not Found Error: Test File Not Found Error', found "
+            + caplog.records[0].message
+        )
 
 
 def test_handle_playwright_error(mock_logger, caplog):
@@ -53,15 +53,14 @@ def test_handle_playwright_error(mock_logger, caplog):
     exception = PlaywrightError("Test Playwright Error")
     handle_exception(exception)
     if len(caplog.records) != 1:
-        pytest.fail("Expected one log record, found " +
-                    str(len(caplog.records)))
+        pytest.fail("Expected one log record, found " + str(len(caplog.records)))
     if caplog.records[0].levelname != "ERROR":
-        pytest.fail("Expected log level ERROR, found " +
-                    caplog.records[0].levelname)
+        pytest.fail("Expected log level ERROR, found " + caplog.records[0].levelname)
     if caplog.records[0].message != "Playwright Error: Test Playwright Error":
         pytest.fail(
-            "Expected log message 'Playwright Error: Test Playwright Error', found " +
-            caplog.records[0].message)
+            "Expected log message 'Playwright Error: Test Playwright Error', found "
+            + caplog.records[0].message
+        )
 
 
 def test_handle_key_error(mock_logger, caplog):
@@ -69,14 +68,14 @@ def test_handle_key_error(mock_logger, caplog):
     exception = KeyError("Test Key Error")
     handle_exception(exception)
     if len(caplog.records) != 1:
-        pytest.fail("Expected one log record, found " +
-                    str(len(caplog.records)))
+        pytest.fail("Expected one log record, found " + str(len(caplog.records)))
     if caplog.records[0].levelname != "ERROR":
-        pytest.fail("Expected log level ERROR, found " +
-                    caplog.records[0].levelname)
+        pytest.fail("Expected log level ERROR, found " + caplog.records[0].levelname)
     if caplog.records[0].message != "Key Error: 'Test Key Error'":
         pytest.fail(
-            "Expected log message 'Key Error: Test Key Error', found " + caplog.records[0].message)
+            "Expected log message 'Key Error: Test Key Error', found "
+            + caplog.records[0].message
+        )
 
 
 def test_handle_timeout_error(mock_logger, caplog):
@@ -84,15 +83,14 @@ def test_handle_timeout_error(mock_logger, caplog):
     exception = asyncio.TimeoutError("Test Timeout Error")
     handle_exception(exception)
     if len(caplog.records) != 1:
-        pytest.fail("Expected one log record, found " +
-                    str(len(caplog.records)))
+        pytest.fail("Expected one log record, found " + str(len(caplog.records)))
     if caplog.records[0].levelname != "ERROR":
-        pytest.fail("Expected log level ERROR, found " +
-                    caplog.records[0].levelname)
+        pytest.fail("Expected log level ERROR, found " + caplog.records[0].levelname)
     if caplog.records[0].message != "Timeout Error: Test Timeout Error":
         pytest.fail(
-            "Expected log message 'Timeout Error: Test Timeout Error', found " +
-            caplog.records[0].message)
+            "Expected log message 'Timeout Error: Test Timeout Error', found "
+            + caplog.records[0].message
+        )
 
 
 def test_handle_unexpected_error(mock_logger, caplog):
@@ -100,103 +98,133 @@ def test_handle_unexpected_error(mock_logger, caplog):
     exception = Exception("Test Unexpected Error")
     handle_exception(exception)
     if len(caplog.records) != 1:
-        pytest.fail("Expected one log record, found " +
-                    str(len(caplog.records)))
+        pytest.fail("Expected one log record, found " + str(len(caplog.records)))
     if caplog.records[0].levelname != "ERROR":
-        pytest.fail("Expected log level ERROR, found " +
-                    caplog.records[0].levelname)
+        pytest.fail("Expected log level ERROR, found " + caplog.records[0].levelname)
     if caplog.records[0].message != "Unexpected Error: Test Unexpected Error":
         pytest.fail(
-            "Expected log message 'Unexpected Error: Test Unexpected Error', found " +
-            caplog.records[0].message)
+            "Expected log message 'Unexpected Error: Test Unexpected Error', found "
+            + caplog.records[0].message
+        )
 
 
-@pytest.mark.asyncio
-async def test_get_element_bounding_box():
-    """Test get_element_bounding_box function"""
-    html_file = "test.html"
-    selector = ".test-element"
-    bounding_box = {"x": 10, "y": 20, "width": 100, "height": 200}
-
-    # Test FileNotFoundError
+async def _test_file_not_found_error(html_file, selector):
+    """Helper function to test FileNotFoundError"""
     with mock.patch("os.path.exists", return_value=False):
         with mock.patch("api.card.logger") as mock_logger:
             result = await get_element_bounding_box(html_file, selector)
             if result is not None:
-                raise AssertionError(
-                    "Expected result to be None for FileNotFoundError")
+                raise AssertionError("Expected result to be None for FileNotFoundError")
             if not mock_logger.error.called:
                 raise AssertionError(
-                    "Expected logger.error to be called for FileNotFoundError")
-            if mock_logger.error.call_args[0][0] != "File Not Found Error: %s" or \
-                    mock_logger.error.call_args[0][1] != "HTML file not found:" + str(html_file):
+                    "Expected logger.error to be called for FileNotFoundError"
+                )
+            if mock_logger.error.call_args[0][
+                0
+            ] != "File Not Found Error: %s" or mock_logger.error.call_args[0][
+                1
+            ] != "HTML file not found:" + str(
+                html_file
+            ):
                 raise AssertionError(
                     "Expected logger.error to be called with 'File Not Found Error: %s',"
-                    "'HTML file not found:" + str(html_file) + "'")
+                    "'HTML file not found:" + str(html_file) + "'"
+                )
 
-    # Test PlaywrightError
+
+async def _test_playwright_error(html_file, selector):
+    """Helper function to test PlaywrightError"""
     with mock.patch("os.path.exists", return_value=True):
         with mock.patch("api.card.async_playwright") as mock_playwright:
             mock_playwright.return_value.__aenter__.side_effect = PlaywrightError(
-                "Playwright error")
+                "Playwright error"
+            )
             with mock.patch("api.card.logger") as mock_logger:
                 result = await get_element_bounding_box(html_file, selector)
                 if result is not None:
                     raise AssertionError(
-                        "Expected result to be None for PlaywrightError")
+                        "Expected result to be None for PlaywrightError"
+                    )
                 if not mock_logger.error.called:
                     raise AssertionError(
-                        "Expected logger.error to be called for PlaywrightError")
-                if mock_logger.error.call_args[0][0] != "Playwright Error: %s" or \
-                        mock_logger.error.call_args[0][1] != "Playwright error":
+                        "Expected logger.error to be called for PlaywrightError"
+                    )
+                if (
+                    mock_logger.error.call_args[0][0] != "Playwright Error: %s"
+                    or mock_logger.error.call_args[0][1] != "Playwright error"
+                ):
                     raise AssertionError(
                         "Expected logger.error to be called with 'Playwright Error: %s',"
-                        "'Playwright error'")
+                        "'Playwright error'"
+                    )
 
-    # Test KeyError
+
+async def _test_key_error(html_file, selector):
+    """Helper function to test KeyError"""
     with mock.patch("os.path.exists", return_value=True):
         with mock.patch("api.card.async_playwright") as mock_playwright:
             mock_browser = mock.AsyncMock()
             mock_page = mock.AsyncMock()
             mock_playwright.return_value.__aenter__.return_value.firefox.launch.return_value = (
-                mock_browser)
+                mock_browser
+            )
             mock_browser.new_page.return_value = mock_page
             mock_page.evaluate.side_effect = KeyError("Key error")
             with mock.patch("api.card.logger") as mock_logger:
                 result = await get_element_bounding_box(html_file, selector)
                 if result is not None:
-                    raise AssertionError(
-                        "Expected result to be None for KeyError")
+                    raise AssertionError("Expected result to be None for KeyError")
                 if not mock_logger.error.called:
                     raise AssertionError(
-                        "Expected logger.error to be called for KeyError")
-                if mock_logger.error.call_args[0][0] != "Key Error: %s" or \
-                        mock_logger.error.call_args[0][1] != "'Key error'":
+                        "Expected logger.error to be called for KeyError"
+                    )
+                if (
+                    mock_logger.error.call_args[0][0] != "Key Error: %s"
+                    or mock_logger.error.call_args[0][1] != "'Key error'"
+                ):
                     raise AssertionError(
-                        "Expected logger.error to be called with 'Key Error: %s', 'Key error'")
+                        "Expected logger.error to be called with 'Key Error: %s', 'Key error'"
+                    )
 
-    # Test asyncio.TimeoutError
+
+async def _test_timeout_error(html_file, selector):
+    """Helper function to test asyncio.TimeoutError"""
     with mock.patch("os.path.exists", return_value=True):
         with mock.patch("api.card.async_playwright") as mock_playwright:
             mock_browser = mock.AsyncMock()
             mock_page = mock.AsyncMock()
             mock_playwright.return_value.__aenter__.return_value.firefox.launch.return_value = (
-                mock_browser)
+                mock_browser
+            )
             mock_browser.new_page.return_value = mock_page
             mock_page.goto.side_effect = TimeoutError("Timeout error")
             with mock.patch("api.card.logger") as mock_logger:
                 result = await get_element_bounding_box(html_file, selector)
                 if result is not None:
-                    raise AssertionError(
-                        "Expected result to be None for TimeoutError")
+                    raise AssertionError("Expected result to be None for TimeoutError")
                 if not mock_logger.error.called:
                     raise AssertionError(
-                        "Expected logger.error to be called for TimeoutError")
-                if mock_logger.error.call_args[0][0] != "Timeout Error: %s" or \
-                        mock_logger.error.call_args[0][1] != "Timeout error":
+                        "Expected logger.error to be called for TimeoutError"
+                    )
+                if (
+                    mock_logger.error.call_args[0][0] != "Timeout Error: %s"
+                    or mock_logger.error.call_args[0][1] != "Timeout error"
+                ):
                     raise AssertionError(
                         "Expected logger.error to be called with 'Timeout Error: %s',"
-                        "'Timeout error'")
+                        "'Timeout error'"
+                    )
+
+
+def test_get_element_bounding_box():
+    """Test get_element_bounding_box function"""
+    html_file = "test.html"
+    selector = ".test-element"
+
+    asyncio.run(_test_file_not_found_error(html_file, selector))
+    asyncio.run(_test_playwright_error(html_file, selector))
+    asyncio.run(_test_key_error(html_file, selector))
+    asyncio.run(_test_timeout_error(html_file, selector))
 
 
 @pytest.mark.asyncio
@@ -207,10 +235,11 @@ async def test_html_to_png():
     selector = ".test-element"
     bounding_box = {"x": 10, "y": 20, "width": 100, "height": 200}
 
-    with patch("os.path.exists", return_value=True), \
-            patch("api.card.get_element_bounding_box", new_callable=AsyncMock,
-                  return_value=bounding_box), \
-            patch("api.card.async_playwright") as mock_playwright:
+    with patch("os.path.exists", return_value=True), patch(
+        "api.card.get_element_bounding_box",
+        new_callable=AsyncMock,
+        return_value=bounding_box,
+    ), patch("api.card.async_playwright") as mock_playwright:
         mock_browser = MagicMock()
         mock_page = MagicMock()
         mock_page.goto = AsyncMock()
@@ -219,11 +248,13 @@ async def test_html_to_png():
         mock_browser.new_page = AsyncMock(return_value=mock_page)
         mock_browser.close = AsyncMock()
         mock_playwright.return_value.__aenter__.return_value.firefox.launch = AsyncMock(
-            return_value=mock_browser)
+            return_value=mock_browser
+        )
 
         await html_to_png(html_file, output_file, selector)
         mock_page.screenshot.assert_called_once_with(
-            path=output_file, clip=bounding_box)
+            path=output_file, clip=bounding_box
+        )
 
 
 def test_convert_html_to_png():
@@ -234,8 +265,7 @@ def test_convert_html_to_png():
 
     with patch("api.card.html_to_png", new_callable=AsyncMock) as mock_html_to_png:
         convert_html_to_png(html_file, output_file, selector)
-        mock_html_to_png.assert_called_once_with(
-            html_file, output_file, selector)
+        mock_html_to_png.assert_called_once_with(html_file, output_file, selector)
 
 
 def test_format_unix_time():
@@ -251,15 +281,17 @@ def test_generate_card_for_player_summary():
     """Test generate_card_for_player_summary function"""
     player_data = {
         "response": {
-            "players": [{
-                "personaname": "TestUser",
-                "personastate": 1,
-                "avatarfull": "http://example.com/avatar.jpg",
-                "loccountrycode": "US",
-                "lastlogoff": 1609459200,
-                "timecreated": 1609459200,
-                "gameextrainfo": "TestGame"
-            }]
+            "players": [
+                {
+                    "personaname": "TestUser",
+                    "personastate": 1,
+                    "avatarfull": "http://example.com/avatar.jpg",
+                    "loccountrycode": "US",
+                    "lastlogoff": 1609459200,
+                    "timecreated": 1609459200,
+                    "gameextrainfo": "TestGame",
+                }
+            ]
         }
     }
     result = generate_card_for_player_summary(player_data)
@@ -273,20 +305,21 @@ def test_generate_card_for_played_games():
     """Test generate_card_for_played_games function"""
     games_data = {
         "response": {
-            "games": [{
-                "name": "TestGame",
-                "playtime_2weeks": 120,
-                "appid": 12345,
-                "img_icon_url": "icon.jpg"
-            }]
+            "games": [
+                {
+                    "name": "TestGame",
+                    "playtime_2weeks": 120,
+                    "appid": 12345,
+                    "img_icon_url": "icon.jpg",
+                }
+            ]
         }
     }
     result = generate_card_for_played_games(games_data)
     if result is None:
         raise AssertionError("Result should not be None")
     if "![Recently Played Games]" not in result:
-        raise AssertionError(
-            "Result should contain '![Recently Played Games]'")
+        raise AssertionError("Result should contain '![Recently Played Games]'")
 
 
 def test_generate_card_for_steam_workshop():
@@ -294,7 +327,7 @@ def test_generate_card_for_steam_workshop():
     workshop_stats = {
         "total_unique_visitors": 1000,
         "total_current_subscribers": 500,
-        "total_current_favorites": 200
+        "total_current_favorites": 200,
     }
     result = generate_card_for_steam_workshop(workshop_stats)
     if result is None:

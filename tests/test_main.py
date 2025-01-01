@@ -1,4 +1,5 @@
 """Test Main Runner Script"""
+
 # Disable pylint warnings for false positives
 # pylint: disable=redefined-outer-name, unused-argument
 import os
@@ -6,10 +7,23 @@ from unittest import TestCase
 from unittest.mock import patch, MagicMock
 import time
 import pytest
-from api.main import (update_readme, generate_steam_stats, generate_workshop_stats,
-                      get_github_token, get_repo, create_tree_elements, commit_to_github,
-                      initialize_github, get_readme_content, update_readme_sections, update_section,
-                      collect_files_to_update, log_execution_time, main, logger)
+from api.main import (
+    update_readme,
+    generate_steam_stats,
+    generate_workshop_stats,
+    get_github_token,
+    get_repo,
+    create_tree_elements,
+    commit_to_github,
+    initialize_github,
+    get_readme_content,
+    update_readme_sections,
+    update_section,
+    collect_files_to_update,
+    log_execution_time,
+    main,
+    logger,
+)
 
 
 @pytest.fixture
@@ -40,18 +54,16 @@ def mock_env_vars(monkeypatch):
 def mock_dependencies(mocker):
     """Fixtures for mocking dependencies"""
     fixtures = {}
-    fixtures['initialize_github'] = mocker.patch('api.main.initialize_github')
-    fixtures['get_readme_content'] = mocker.patch(
-        'api.main.get_readme_content')
-    fixtures['update_readme_sections'] = mocker.patch(
-        'api.main.update_readme_sections')
-    fixtures['collect_files_to_update'] = mocker.patch(
-        'api.main.collect_files_to_update')
-    fixtures['commit_to_github'] = mocker.patch('api.main.commit_to_github')
-    fixtures['log_execution_time'] = mocker.patch(
-        'api.main.log_execution_time')
-    fixtures['logger_info'] = mocker.patch.object(logger, 'info')
-    fixtures['logger_error'] = mocker.patch.object(logger, 'error')
+    fixtures["initialize_github"] = mocker.patch("api.main.initialize_github")
+    fixtures["get_readme_content"] = mocker.patch("api.main.get_readme_content")
+    fixtures["update_readme_sections"] = mocker.patch("api.main.update_readme_sections")
+    fixtures["collect_files_to_update"] = mocker.patch(
+        "api.main.collect_files_to_update"
+    )
+    fixtures["commit_to_github"] = mocker.patch("api.main.commit_to_github")
+    fixtures["log_execution_time"] = mocker.patch("api.main.log_execution_time")
+    fixtures["logger_info"] = mocker.patch.object(logger, "info")
+    fixtures["logger_error"] = mocker.patch.object(logger, "error")
     return fixtures
 
 
@@ -60,11 +72,15 @@ def test_update_readme(mock_repo):
     markdown_data = "New Content"
     start_marker = "<!--START-->"
     end_marker = "<!--END-->"
-    mock_repo.get_contents.return_value.decoded_content = b"<!--START-->\nOld Content\n<!--END-->"
+    mock_repo.get_contents.return_value.decoded_content = (
+        b"<!--START-->\nOld Content\n<!--END-->"
+    )
     result = update_readme(mock_repo, markdown_data, start_marker, end_marker)
     TestCase().assertEqual(result, "<!--START-->\nNew Content\n<!--END-->")
 
-    mock_repo.get_contents.return_value.decoded_content = b"Some content without markers"
+    mock_repo.get_contents.return_value.decoded_content = (
+        b"Some content without markers"
+    )
     result = update_readme(mock_repo, markdown_data, start_marker, end_marker)
     TestCase().assertIsNone(result)
 
@@ -72,7 +88,9 @@ def test_update_readme(mock_repo):
     result = update_readme(mock_repo, markdown_data, start_marker, end_marker)
     TestCase().assertIsNone(result)
 
-    mock_repo.get_contents.return_value.decoded_content = b"<!--START-->\nNew Content\n<!--END-->"
+    mock_repo.get_contents.return_value.decoded_content = (
+        b"<!--START-->\nNew Content\n<!--END-->"
+    )
     result = update_readme(mock_repo, markdown_data, start_marker, end_marker)
     TestCase().assertIsNone(result)
 
@@ -82,8 +100,13 @@ def test_update_readme(mock_repo):
 @patch("api.main.get_recently_played_games")
 @patch("api.main.generate_card_for_played_games")
 @patch("api.main.logger")
-def test_generate_steam_stats(mock_logger, mock_generate_card_played, mock_get_recently_played,
-                              mock_generate_card_summary, mock_get_player_summaries):
+def test_generate_steam_stats(
+    mock_logger,
+    mock_generate_card_played,
+    mock_get_recently_played,
+    mock_generate_card_summary,
+    mock_get_player_summaries,
+):
     """Test Generating Steam Stats"""
     mock_get_player_summaries.return_value = {"player": "summary"}
     mock_generate_card_summary.return_value = "Player Summary Card"
@@ -97,8 +120,7 @@ def test_generate_steam_stats(mock_logger, mock_generate_card_played, mock_get_r
     mock_logger.info.assert_any_call("Retrieved Steam User Data")
     mock_logger.info.assert_any_call("Generated Card for Steam User Data")
     mock_logger.info.assert_any_call("Retrieved Recently Played Games Data")
-    mock_logger.info.assert_any_call(
-        "Generated Card for Recently Played Games")
+    mock_logger.info.assert_any_call("Generated Card for Recently Played Games")
 
     mock_get_player_summaries.return_value = None
     mock_get_recently_played.return_value = {"games": "data"}
@@ -123,8 +145,7 @@ def test_generate_steam_stats(mock_logger, mock_generate_card_played, mock_get_r
     result = generate_steam_stats()
     TestCase().assertIn("Played Games Card", result)
     TestCase().assertEqual(result, "Played Games Card")
-    mock_logger.error.assert_any_call(
-        "Failed to generate card for Steam Summary")
+    mock_logger.error.assert_any_call("Failed to generate card for Steam Summary")
 
     mock_get_player_summaries.return_value = {"player": "summary"}
     mock_generate_card_summary.return_value = "Player Summary Card"
@@ -133,16 +154,16 @@ def test_generate_steam_stats(mock_logger, mock_generate_card_played, mock_get_r
     result = generate_steam_stats()
     TestCase().assertIn("Player Summary Card", result)
     TestCase().assertEqual(result, "Player Summary Card")
-    mock_logger.info.assert_any_call(
-        "No Games data found, skipping card generation")
+    mock_logger.info.assert_any_call("No Games data found, skipping card generation")
 
 
 @patch("api.main.fetch_workshop_item_links")
 @patch("api.main.fetch_all_workshop_stats")
 @patch("api.main.generate_card_for_steam_workshop")
 @patch("api.main.logger")
-def test_generate_workshop_stats(mock_logger, mock_generate_card,
-                                 mock_fetch_all_stats, mock_fetch_links):
+def test_generate_workshop_stats(
+    mock_logger, mock_generate_card, mock_fetch_all_stats, mock_fetch_links
+):
     """Test Generating Steam Workshop Stats"""
     mock_fetch_links.return_value = ["link1", "link2"]
     mock_fetch_all_stats.return_value = {"workshop": "stats"}
@@ -159,8 +180,7 @@ def test_generate_workshop_stats(mock_logger, mock_generate_card,
     mock_generate_card.return_value = None
     result = generate_workshop_stats()
     TestCase().assertEqual(result, "")
-    mock_logger.error.assert_any_call(
-        "Failed to generate card data for Workshop Stats")
+    mock_logger.error.assert_any_call("Failed to generate card data for Workshop Stats")
 
 
 def test_get_github_token(mock_env_vars):
@@ -183,7 +203,9 @@ def test_get_repo(mock_github):
         TestCase().assertEqual(repo, mock_repo)
 
     with patch.dict(os.environ, {}, clear=True):
-        with pytest.raises(ValueError, match="GITHUB_REPOSITORY environment variable not set"):
+        with pytest.raises(
+            ValueError, match="GITHUB_REPOSITORY environment variable not set"
+        ):
             get_repo(mock_github.return_value)
 
 
@@ -199,14 +221,13 @@ def test_initialize_github(mock_github, mock_env_vars):
 @patch("api.main.InputGitTreeElement")
 def test_create_tree_elements(mock_input_git_tree_element, mock_repo):
     """Test Create Tree elements"""
-    files_to_update = {
-        "README.md": "New Content",
-        "image.png": b"binary content"
-    }
+    files_to_update = {"README.md": "New Content", "image.png": b"binary content"}
     mock_repo.create_git_blob.side_effect = lambda content, encoding: MagicMock(
-        sha="fake_sha")
+        sha="fake_sha"
+    )
     mock_input_git_tree_element.side_effect = lambda path, mode, type, sha: MagicMock(
-        path=path)
+        path=path
+    )
 
     tree_elements = create_tree_elements(mock_repo, files_to_update)
 
@@ -235,24 +256,24 @@ def test_commit_to_github(mock_logger, mock_create_tree_elements, mock_repo):
     result = commit_to_github(mock_repo, {"README.md": "New Content"})
     TestCase().assertFalse(result)
     mock_logger.error.assert_any_call(
-        "Error occurred while committing to GitHub: %s", "Test ValueError")
+        "Error occurred while committing to GitHub: %s", "Test ValueError"
+    )
 
     mock_repo.get_branch.side_effect = IOError("Test IOError")
     result = commit_to_github(mock_repo, {"README.md": "New Content"})
     TestCase().assertFalse(result)
     mock_logger.error.assert_any_call(
-        "Error occurred while committing to GitHub: %s", "Test IOError")
+        "Error occurred while committing to GitHub: %s", "Test IOError"
+    )
 
 
 def test_get_readme_content(mock_repo):
     """Test fetching Readme Content"""
-    mock_repo.get_contents.return_value = MagicMock(
-        decoded_content=b"README content")
+    mock_repo.get_contents.return_value = MagicMock(decoded_content=b"README content")
     content = get_readme_content(mock_repo)
     TestCase().assertEqual(content, "README content")
 
-    mock_repo.get_contents.return_value = [
-        MagicMock(decoded_content=b"README content")]
+    mock_repo.get_contents.return_value = [MagicMock(decoded_content=b"README content")]
     content = get_readme_content(mock_repo)
     TestCase().assertEqual(content, "README content")
 
@@ -261,14 +282,21 @@ def test_get_readme_content(mock_repo):
 @patch("api.main.generate_workshop_stats")
 @patch("api.main.update_section")
 @patch("api.main.logger")
-def test_update_readme_sections(mock_logger, mock_update_section, mock_generate_workshop,
-                                mock_generate_steam, mock_repo):
+def test_update_readme_sections(
+    mock_logger,
+    mock_update_section,
+    mock_generate_workshop,
+    mock_generate_steam,
+    mock_repo,
+):
     """Test Updating Readme with marker sections"""
     mock_generate_steam.return_value = "Steam Stats Content"
     mock_generate_workshop.return_value = "Workshop Stats Content"
     mock_update_section.side_effect = (
-        lambda repo, content, new_content, start_marker, end_marker:
-        content + start_marker + new_content + end_marker
+        lambda repo, content, new_content, start_marker, end_marker: content
+        + start_marker
+        + new_content
+        + end_marker
     )
 
     updated_content = update_readme_sections(mock_repo, "Original Content")
@@ -290,7 +318,9 @@ def test_update_readme_sections(mock_logger, mock_update_section, mock_generate_
     updated_content = update_readme_sections(mock_repo, "Original Content")
     TestCase().assertIn("Steam Stats Content", updated_content)
     TestCase().assertIn(
-        "<!-- Steam-Stats start -->Steam Stats Content<!-- Steam-Stats end -->", updated_content)
+        "<!-- Steam-Stats start -->Steam Stats Content<!-- Steam-Stats end -->",
+        updated_content,
+    )
     mock_logger.info.assert_any_call("No Workshop stats content generated")
 
 
@@ -299,12 +329,14 @@ def test_update_section(mock_update_readme, mock_repo):
     """Test Updating marker sections"""
     mock_update_readme.return_value = "Updated Section"
     updated_content = update_section(
-        mock_repo, "Original Content", "New Content", "<!--START-->", "<!--END-->")
+        mock_repo, "Original Content", "New Content", "<!--START-->", "<!--END-->"
+    )
     TestCase().assertIn("Updated Section", updated_content)
 
     mock_update_readme.return_value = None
     updated_content = update_section(
-        mock_repo, "Original Content", "New Content", "<!--START-->", "<!--END-->")
+        mock_repo, "Original Content", "New Content", "<!--START-->", "<!--END-->"
+    )
     TestCase().assertEqual(updated_content, "Original Content")
 
 
@@ -313,13 +345,15 @@ def test_collect_files_to_update():
     current_readme = "New README Content"
     original_readme = "Original README Content"
 
-    with patch("os.path.exists") as mock_exists, patch("builtins.open",
-                                                       new_callable=MagicMock) as mock_open:
+    with patch("os.path.exists") as mock_exists, patch(
+        "builtins.open", new_callable=MagicMock
+    ) as mock_open:
         mock_exists.return_value = True
-        mock_open.return_value.__enter__.return_value.read.return_value = b"binary content"
+        mock_open.return_value.__enter__.return_value.read.return_value = (
+            b"binary content"
+        )
 
-        files_to_update = collect_files_to_update(
-            current_readme, original_readme)
+        files_to_update = collect_files_to_update(current_readme, original_readme)
 
         TestCase().assertIn("README.md", files_to_update)
         TestCase().assertIn("assets/steam_summary.png", files_to_update)
@@ -331,91 +365,87 @@ def test_log_execution_time():
     with patch("api.main.logger") as mock_logger:
         log_execution_time(start_time)
         mock_logger.info.assert_any_call(
-            "Total Execution Time: %d minutes and %.3f seconds", 1, 5.0)
+            "Total Execution Time: %d minutes and %.3f seconds", 1, 5.0
+        )
 
     start_time = time.time() - 30
     with patch("api.main.logger") as mock_logger:
         log_execution_time(start_time)
-        mock_logger.info.assert_any_call(
-            "Total Execution Time: %.3f seconds", 30.0)
+        mock_logger.info.assert_any_call("Total Execution Time: %.3f seconds", 30.0)
 
 
 def test_main_successful_commit(mock_dependencies):
     """Test Main Function for Successful Commit"""
-    mock_dependencies['initialize_github'].return_value = "repo"
-    mock_dependencies['get_readme_content'].return_value = "original_readme"
-    mock_dependencies['update_readme_sections'].return_value = "current_readme"
-    mock_dependencies['collect_files_to_update'].return_value = [
-        "file1", "file2"]
-    mock_dependencies['commit_to_github'].return_value = True
+    mock_dependencies["initialize_github"].return_value = "repo"
+    mock_dependencies["get_readme_content"].return_value = "original_readme"
+    mock_dependencies["update_readme_sections"].return_value = "current_readme"
+    mock_dependencies["collect_files_to_update"].return_value = ["file1", "file2"]
+    mock_dependencies["commit_to_github"].return_value = True
 
     main()
 
-    if mock_dependencies['logger_info'].call_count != 1:
+    if mock_dependencies["logger_info"].call_count != 1:
         raise AssertionError(
-            "Expected logger.info to be called once for successful commit")
-    if mock_dependencies['logger_error'].call_count != 0:
+            "Expected logger.info to be called once for successful commit"
+        )
+    if mock_dependencies["logger_error"].call_count != 0:
         raise AssertionError("Expected logger.error to not be called")
 
 
 def test_main_no_changes(mock_dependencies):
     """Test Main Function for No Changes"""
-    mock_dependencies['initialize_github'].return_value = "repo"
-    mock_dependencies['get_readme_content'].return_value = "original_readme"
-    mock_dependencies['update_readme_sections'].return_value = "current_readme"
-    mock_dependencies['collect_files_to_update'].return_value = []
+    mock_dependencies["initialize_github"].return_value = "repo"
+    mock_dependencies["get_readme_content"].return_value = "original_readme"
+    mock_dependencies["update_readme_sections"].return_value = "current_readme"
+    mock_dependencies["collect_files_to_update"].return_value = []
 
     main()
 
-    if mock_dependencies['logger_info'].call_count != 1:
-        raise AssertionError(
-            "Expected logger.info to be called once for no changes")
-    if mock_dependencies['logger_error'].call_count != 0:
+    if mock_dependencies["logger_info"].call_count != 1:
+        raise AssertionError("Expected logger.info to be called once for no changes")
+    if mock_dependencies["logger_error"].call_count != 0:
         raise AssertionError("Expected logger.error to not be called")
 
 
 def test_main_commit_failure(mock_dependencies):
     """Test Main Function for Commit Failure"""
-    mock_dependencies['initialize_github'].return_value = "repo"
-    mock_dependencies['get_readme_content'].return_value = "original_readme"
-    mock_dependencies['update_readme_sections'].return_value = "current_readme"
-    mock_dependencies['collect_files_to_update'].return_value = [
-        "file1", "file2"]
-    mock_dependencies['commit_to_github'].return_value = False
+    mock_dependencies["initialize_github"].return_value = "repo"
+    mock_dependencies["get_readme_content"].return_value = "original_readme"
+    mock_dependencies["update_readme_sections"].return_value = "current_readme"
+    mock_dependencies["collect_files_to_update"].return_value = ["file1", "file2"]
+    mock_dependencies["commit_to_github"].return_value = False
 
     main()
 
-    if mock_dependencies['logger_info'].call_count != 0:
+    if mock_dependencies["logger_info"].call_count != 0:
+        raise AssertionError("Expected logger.info to not be called for commit failure")
+    if mock_dependencies["logger_error"].call_count != 1:
         raise AssertionError(
-            "Expected logger.info to not be called for commit failure")
-    if mock_dependencies['logger_error'].call_count != 1:
-        raise AssertionError(
-            "Expected logger.error to be called once for commit failure")
+            "Expected logger.error to be called once for commit failure"
+        )
 
 
 def test_main_value_error(mock_dependencies):
     """Test Main Function for ValueError"""
-    mock_dependencies['initialize_github'].side_effect = ValueError(
-        "Test ValueError")
+    mock_dependencies["initialize_github"].side_effect = ValueError("Test ValueError")
 
     main()
 
-    if mock_dependencies['logger_info'].call_count != 0:
+    if mock_dependencies["logger_info"].call_count != 0:
         raise AssertionError("Expected logger.info to not be called")
-    if mock_dependencies['logger_error'].call_count != 1:
+    if mock_dependencies["logger_error"].call_count != 1:
         raise AssertionError("Expected logger.error to be called once")
 
 
 def test_main_io_error(mock_dependencies):
     """Test Main Function for IOError"""
-    mock_dependencies['initialize_github'].side_effect = IOError(
-        "Test IOError")
+    mock_dependencies["initialize_github"].side_effect = IOError("Test IOError")
 
     main()
 
-    if mock_dependencies['logger_info'].call_count != 0:
+    if mock_dependencies["logger_info"].call_count != 0:
         raise AssertionError("Expected logger.info to not be called")
-    if mock_dependencies['logger_error'].call_count != 1:
+    if mock_dependencies["logger_error"].call_count != 1:
         raise AssertionError("Expected logger.error to be called once")
 
 

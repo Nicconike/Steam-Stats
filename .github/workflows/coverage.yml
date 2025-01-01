@@ -6,7 +6,7 @@ on:
         branches: master
         paths:
             - ".github/workflows/coverage.yml"
-            - "tests/*.py"
+            - "**/*.py"
     pull_request:
         branches: master
 
