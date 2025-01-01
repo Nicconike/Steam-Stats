@@ -12,8 +12,8 @@ dependencies = [
     "bs4==0.0.2",
     "DateTime==5.5",
     "playwright==1.48.0",
-    "PyGithub==2.4.0",
-    "python-semantic-release==9.12.0"
+    "PyGithub==2.5.0",
+    "python-semantic-release==9.15.2"
 ]
 requires-python = ">= 3.8"
 readme = "README.md"
@@ -26,14 +26,15 @@ wiki = "https://github.com/Nicconike/Steam-Stats/wiki"
 
 [project.optional-dependencies]
 test = [
-    "pytest-asyncio==0.24.0",
+    "pytest-asyncio==0.25.0",
     "pytest-cov==6.0.0",
     "pytest-mock==3.14.0",
     "requests-mock==1.12.1"
 ]
 dev = [
-    "pipdeptree==2.23.4",
-    "pylint==3.3.1"
+    "bandit==1.8.0",
+    "pipdeptree==2.24.0",
+    "pylint==3.3.3"
 ]
 
 [tool.semantic_release]

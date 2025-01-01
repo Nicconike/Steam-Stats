@@ -13,8 +13,6 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-
-REQUEST_TIMEOUT = (25, 30)
 MARGIN = 10
 
 # Get Github Repo's Details where the action is being ran
@@ -111,8 +109,16 @@ def convert_html_to_png(html_file, output_file, selector):
 
 
 def format_unix_time(unix_time):
-    """Convert Unix time to human-readable format"""
-    return datetime.datetime.fromtimestamp(unix_time).strftime("%d/%m/%Y")
+    """Convert Unix time to human-readable format with ordinal day"""
+    dt = datetime.datetime.fromtimestamp(unix_time)
+    day = dt.day
+
+    if 11 <= day <= 13:
+        suffix = "th"
+    else:
+        suffix = {1: "st", 2: "nd", 3: "rd"}.get(day % 10, "th")
+
+    return str(day) + suffix + " " + dt.strftime("%b %Y")
 
 
 def generate_card_for_player_summary(player_data):
@@ -145,69 +151,72 @@ def generate_card_for_player_summary(player_data):
         """
 
     html_content = f"""
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Steam Profile Summary</title>
-    <style>
-        .card {{
-            width: 100%;
-            max-width: 400px;
-            margin: auto;
-            border: 2px solid #000;
-            padding: 15px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            border-radius: 10px;
-            background-color: #fff;
-        }}
-        .avatar {{
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-            margin: auto;
-        }}
-        .content {{
-            text-align: center;
-        }}
-        .flag {{
-            width: 32px;
-            height: 24px;
-            vertical-align: middle;
-        }}
-        .info-container {{
-            display: flex;
-            justify-content: space-between;
-            margin-top: 10px;
-        }}
-        .info-left, .info-right {{
-            width: 48%;
-        }}
-    </style>
-</head>
-<body>
-    <div class="card">
-        <div class="content">
-            <h2>Steam Profile Summary</h2>
-            <img id="avatar" class="avatar" src="{avatarfull}" alt="Avatar">
-            <h3 id="name">Name: {personaname}</h3>
-            <div class="info-container">
-                <div class="info-left">
-                    <p id="status">Status: {personastate_value}</p>
-                    {country_section}
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Steam Profile Summary</title>
+        <style>
+            .card {{
+                width: 100%;
+                max-width: 400px;
+                margin: auto;
+                border: 2px solid #000;
+                padding: 15px;
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+                border-radius: 10px;
+                background-color: #fff;
+            }}
+            .avatar {{
+                width: 80px;
+                height: 80px;
+                border-radius: 50%;
+                margin: auto;
+            }}
+            .content {{
+                text-align: center;
+            }}
+            .flag {{
+                width: 32px;
+                height: 24px;
+                vertical-align: middle;
+            }}
+            .info-container {{
+                display: flex;
+                justify-content: space-between;
+                margin-top: 10px;
+            }}
+            .info-left {{
+                width: 45%;
+            }}
+            .info-right {{
+                width: 55%;
+            }}
+        </style>
+    </head>
+    <body>
+        <div class="card">
+            <div class="content">
+                <h2>Steam Profile Summary</h2>
+                <img id="avatar" class="avatar" src="{avatarfull}" alt="Avatar">
+                <h2 id="name">{personaname}</h2>
+                <div class="info-container">
+                    <div class="info-left">
+                        <p id="status">Status: {personastate_value}</p>
+                        {country_section}
+                    </div>
+                    <div class="info-right">
+                        <p id="lastlogoff">Last Logoff: {lastlogoff_str}</p>
+                        <p id="timecreated">PC Gaming Since: {timecreated_str}</p>
+                    </div>
                 </div>
-                <div class="info-right">
-                    <p id="lastlogoff">Last Logoff: {lastlogoff_str}</p>
-                    <p id="timecreated">PC Gaming Since: {timecreated_str}</p>
-                </div>
+                {"<p id='game'>Currently Playing: <span id='game-info'>" +
+                gameextrainfo + "</span></p>" if gameextrainfo else ""}
             </div>
-            {"<p id='game'>Currently Playing: <span id='game-info'>" +
-             gameextrainfo + "</span></p>" if gameextrainfo else ""}
         </div>
-    </div>
-</body>
-</html>
+    </body>
+    </html>
     """
     with open("assets/steam_summary.html", "w", encoding="utf-8") as file:
         file.write(html_content)
@@ -233,86 +242,91 @@ def generate_card_for_played_games(games_data):
     if not games_data:
         return None
 
-    # Check if LOG_SCALE is set to true (Optional Feature Flag)
-    log_scale = os.getenv("INPUT_LOG_SCALE", "false").lower() in ("true", "1", "t")
-    max_playtime = games_data["response"]["games"][0]["playtime_2weeks"]
-
     # Placeholder image for Spacewar
     placeholder_image = "https://i.imgur.com/DBnVqet.jpg"
 
-    # Label to indicate if Log Scale is enabled
-    watermark = ""
+    # Check if LOG_SCALE is enabled (Optional Feature Flag)
+    log_scale = os.getenv("INPUT_LOG_SCALE", "false").lower() in ("true", "1", "t")
+    watermark = '<div class="watermark">Log Scale Enabled</div>' if log_scale else ""
 
-    # Calculate dynamic height based on the number of games
+    # Calculate dynamic height
     num_games = games_data["response"]["total_count"]
-    total_height = num_games * 70
+    min_canvas_height = num_games * 60 + 70
 
-    # Generate the progress bars with repeating styles
-    progress_bars = ""
-    for i, game in enumerate(games_data["response"]["games"]):
-        if "name" in game and "playtime_2weeks" in game:
-            name = game["name"]
-            playtime = game["playtime_2weeks"]
+    # Get max playtime for normalization
+    max_playtime = games_data["response"]["games"][0]["playtime_2weeks"]
 
-            img_icon_url = (
-                placeholder_image
-                if game["name"] == "Spacewar"
-                else "https://media.steampowered.com/steamcommunity/public/images/apps/"
-                + str(game["appid"])
-                + "/"
-                + game["img_icon_url"]
-                + ".jpg"
-            )
+    def format_playtime(playtime):
+        """Format playtime into human-readable format"""
+        if playtime < 60:
+            unit = " min" if playtime == 1 else " mins"
+            return str(playtime) + unit
 
-            if log_scale:
-                normalized_playtime = (
-                    math.log1p(playtime)
-                    / math.log1p(
-                        max(
-                            game["playtime_2weeks"]
-                            for game in games_data["response"]["games"]
-                        )
+        hours, minutes = divmod(playtime, 60)
+        if minutes == 0:
+            return str(hours) + " hrs"
+
+        unit = " min" if minutes == 1 else " mins"
+        return str(hours) + " hrs and " + str(minutes) + unit
+
+    def generate_progress_bar(game, index):
+        """Generate progress bar HTML for a single game"""
+        name = game["name"]
+        playtime = game["playtime_2weeks"]
+        img_icon_url = (
+            placeholder_image
+            if name == "Spacewar"
+            else "https://media.steampowered.com/steamcommunity/public/images/apps/"
+            + str(game["appid"])
+            + "/"
+            + game["img_icon_url"]
+            + ".jpg"
+        )
+        normalized_playtime = (
+            round(
+                math.log1p(playtime)
+                / math.log1p(
+                    max(
+                        game["playtime_2weeks"]
+                        for game in games_data["response"]["games"]
                     )
-                    * 100
                 )
-                watermark = """
-                    <div class="watermark">
-                        Log Scale Enabled
-                    </div>
-                """
-            else:
-                normalized_playtime = (playtime / max_playtime) * 100
-                watermark = ""
+                * 100
+            )
+            if log_scale
+            else round((playtime / max_playtime) * 100)
+        )
+        display_time = format_playtime(playtime)
 
-            normalized_playtime = round(normalized_playtime)
-            if playtime < 60:
-                if playtime == 1:
-                    display_time = str(playtime) + " min"
-                else:
-                    display_time = str(playtime) + " mins"
-            else:
-                hours = playtime // 60
-                minutes = playtime % 60
-                if minutes == 0:
-                    display_time = str(hours) + " hrs"
-                elif minutes == 1:
-                    display_time = str(hours) + " hrs and " + str(minutes) + " min"
-                else:
-                    display_time = str(hours) + " hrs and " + str(minutes) + " mins"
-
-            progress_bars += f"""
-            <div class="bar-container">
-                <img src="{img_icon_url}" alt="{name}" class="game-icon">
-                <progress class="progress-style-{(i % 6) + 1}" value="{normalized_playtime}"
-                max="100"></progress>
-                <div class="game-info">
-                    <span class="game-name">{name}</span><br>
-                    <span class="game-time">{display_time}</span>
-                </div>
-            </div>
+        return (
             """
+        <div class="bar-container">
+            <img src="{img}" alt="{name}" class="game-icon">
+            <progress class="progress-style-{style}" value="{value}" max="100"></progress>
+            <div class="game-info">
+                <span class="game-name">{name}</span><br>
+                <span class="game-time">{time}</span>
+            </div>
+        </div>
+        """.replace(
+                "{img}", img_icon_url
+            )
+            .replace("{name}", name)
+            .replace("{style}", str((index % 6) + 1))
+            .replace("{value}", str(normalized_playtime))
+            .replace("{time}", display_time)
+        )
 
-    html_content = f"""
+    # Generate progress bars for all games
+    progress_bars = "".join(
+        generate_progress_bar(game, i)
+        for i, game in enumerate(games_data["response"]["games"])
+        if "name" in game and "playtime_2weeks" in game
+    )
+
+    # Generate HTML content
+    html_content = (
+        """
     <!DOCTYPE html>
     <html lang="en">
     <head>
@@ -322,18 +336,21 @@ def generate_card_for_played_games(games_data):
         <link rel="stylesheet" href="style.css">
     </head>
     <body>
-        <div class="card" style="height: {total_height}px; position: relative;">
-            <div class="content" style="position: relative;">
+        <div class="card" style="height: {height}px; position: relative; ">
+            <div class="content" style="position: relative; text-align: center;">
                 <h2>Recently Played Games (Last 2 Weeks)</h2>
-                {progress_bars}
+                {bars}
             </div>
-            <div class="watermark">
-                {watermark}
-            </div>
+            {watermark}
         </div>
     </body>
     </html>
-    """
+    """.replace(
+            "{height}", str(min_canvas_height)
+        )
+        .replace("{bars}", progress_bars)
+        .replace("{watermark}", watermark)
+    )
 
     with open("assets/recently_played_games.html", "w", encoding="utf-8") as file:
         file.write(html_content)
@@ -357,78 +374,78 @@ def generate_card_for_played_games(games_data):
 def generate_card_for_steam_workshop(workshop_stats):
     """Generates HTML content for retrieved Workshop Data"""
     html_content = f"""
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Steam Workshop Stats</title>
-    <style>
-        body {{
-            font-family: Arial, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            background-color: #f0f0f0;
-            margin: 0;
-        }}
-        .card {{
-            width: 100%;
-            max-width: 400px;
-            margin: auto;
-            border: 2px solid #000;
-            padding: 20px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            border-radius: 10px;
-            background-color: #fff;
-        }}
-        table {{
-            width: 100%;
-            border-collapse: collapse;
-        }}
-        th, td {{
-            border: 1px solid #ddd;
-            padding: 8px;
-            text-align: center;
-        }}
-        th {{
-            background-color: #6495ED;
-            color: white;
-        }}
-        tr:nth-child(even) {{
-            background-color: #f2f2f2;
-        }}
-    </style>
-</head>
-<body>
-    <div class="card">
-        <h2>Steam Workshop Stats</h2>
-        <table>
-            <thead>
-                <tr>
-                    <th>Workshop Stats</th>
-                    <th>Total</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>Unique Visitors</td>
-                    <td>{workshop_stats["total_unique_visitors"]}</td>
-                </tr>
-                <tr>
-                    <td>Current Subscribers</td>
-                    <td>{workshop_stats["total_current_subscribers"]}</td>
-                </tr>
-                <tr>
-                    <td>Current Favorites</td>
-                    <td>{workshop_stats["total_current_favorites"]}</td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
-</body>
-</html>
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Steam Workshop Stats</title>
+        <style>
+            body {{
+                font-family: Arial, sans-serif;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                min-height: 100vh;
+                background-color: #f0f0f0;
+                margin: 0;
+            }}
+            .card {{
+                width: 100%;
+                max-width: 400px;
+                margin: auto;
+                border: 2px solid #000;
+                padding: 20px;
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+                border-radius: 10px;
+                background-color: #fff;
+            }}
+            table {{
+                width: 100%;
+                border-collapse: collapse;
+            }}
+            th, td {{
+                border: 1px solid #ddd;
+                padding: 8px;
+                text-align: center;
+            }}
+            th {{
+                background-color: #6495ED;
+                color: white;
+            }}
+            tr:nth-child(even) {{
+                background-color: #f2f2f2;
+            }}
+        </style>
+    </head>
+    <body>
+        <div class="card" style="text-align: center;">
+            <h2>Steam Workshop Stats</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Workshop Stats</th>
+                        <th>Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Unique Visitors</td>
+                        <td>{workshop_stats["total_unique_visitors"]}</td>
+                    </tr>
+                    <tr>
+                        <td>Current Subscribers</td>
+                        <td>{workshop_stats["total_current_subscribers"]}</td>
+                    </tr>
+                    <tr>
+                        <td>Current Favorites</td>
+                        <td>{workshop_stats["total_current_favorites"]}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </body>
+    </html>
     """
     with open("assets/steam_workshop_stats.html", "w", encoding="utf-8") as file:
         file.write(html_content)
