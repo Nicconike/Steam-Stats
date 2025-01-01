@@ -1,6 +1,60 @@
 # CHANGELOG
 
 
+## v1.2.1 (2025-01-01)
+
+### Bug Fixes
+
+- **api**: Patch the bug for incomplete card generation for recently played games
+  ([`1e306f8`](https://github.com/Nicconike/Steam-Stats/commit/1e306f8fc7e1e9f89076534202403913afde5870))
+
+### Build System
+
+- Update ENTRYPOINT
+  ([`13508da`](https://github.com/Nicconike/Steam-Stats/commit/13508dad973bb75a72890a2917cde3ad93aa6a98))
+
+### Chores
+
+- Update Pylint Badge
+  ([`7dbcb74`](https://github.com/Nicconike/Steam-Stats/commit/7dbcb744e5d64e55cae99ab1f72793be271c1b6e))
+
+- Update Steam Stats
+  ([`be45d6b`](https://github.com/Nicconike/Steam-Stats/commit/be45d6b1e19f39c144a5287091a6b73505a958d6))
+
+- Update Steam Stats
+  ([`80c5c63`](https://github.com/Nicconike/Steam-Stats/commit/80c5c632d2bfed7ecd8ac6d273567b4b8a964fb3))
+
+- Update Steam Stats
+  ([`666037e`](https://github.com/Nicconike/Steam-Stats/commit/666037e92073127fecabf5ced9d393ccffcaab9d))
+
+### Continuous Integration
+
+- Bump the github-actions group with 2 updates
+  ([#48](https://github.com/Nicconike/Steam-Stats/pull/48),
+  [`ed2359a`](https://github.com/Nicconike/Steam-Stats/commit/ed2359a7ec9176ca82ab38b8a5df2d7d8e5aacdb))
+
+Bumps the github-actions group with 2 updates:
+  [python-semantic-release/python-semantic-release](https://github.com/python-semantic-release/python-semantic-release)
+  and [docker/scout-action](https://github.com/docker/scout-action).
+
+- Updates `python-semantic-release/python-semantic-release` from 9.15.1 to 9.15.2 - Updates
+  `docker/scout-action` from 1.15.1 to 1.16.1
+
+- Fix docker workflow for signing published docker images
+  ([`fd1536b`](https://github.com/Nicconike/Steam-Stats/commit/fd1536bbc34dc99212e2f8548cb1ba926445e4a9))
+
+- Trigger docker workflow
+  ([`12ffc28`](https://github.com/Nicconike/Steam-Stats/commit/12ffc2858c5d4e0fc702be84338baef75e7e4ed1))
+
+- Update docker step for release
+  ([`4aaf432`](https://github.com/Nicconike/Steam-Stats/commit/4aaf43249572cb931d55b054e810cb42870692fa))
+
+### Documentation
+
+- Update readme
+  ([`a391a9a`](https://github.com/Nicconike/Steam-Stats/commit/a391a9aeffa7871880ca8826cbb998812241d55e))
+
+
 ## v1.2.0 (2024-12-16)
 
 ### Build System
