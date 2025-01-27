@@ -70,7 +70,7 @@ jobs:
 
           - name: Semantic Release
             id: semantic
-            uses: python-semantic-release/python-semantic-release@v9.16.1
+            uses: python-semantic-release/python-semantic-release@v9.17.0
             with:
                 github_token: ${{ steps.app-token.outputs.token }}
 
