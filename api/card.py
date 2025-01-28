@@ -5,6 +5,7 @@ import logging
 import math
 import os
 import asyncio
+from typing import Optional, TypedDict
 from playwright.async_api import async_playwright, Error as PlaywrightError
 
 # Configure logging
@@ -13,13 +14,25 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
+
 MARGIN = 10
+CARD_SELECTOR = ".card"
 
-# Get Github Repo's Details where the action is being ran
-repo_owner, repo_name = os.environ["GITHUB_REPOSITORY"].split("/")
-branch_name = os.environ["GITHUB_REF_NAME"]
 
-# Personastate mapping for Steam Profile Status
+class FloatRect(TypedDict):
+    """Define FloatRect type for compatibility with Playwright"""
+
+    x: float
+    y: float
+    width: float
+    height: float
+
+
+# Get GitHub Repo's Details where the action is being run
+repo_owner, repo_name = os.getenv("GITHUB_REPOSITORY", "owner/repo").split("/")
+branch_name = os.getenv("GITHUB_REF_NAME", "main")
+
+# Persona state mapping for Steam Profile Status
 personastate_map = {
     0: "Offline",
     1: "Online",
@@ -34,113 +47,144 @@ personastate_map = {
 def handle_exception(e):
     """Handle exceptions and log appropriate error messages"""
     if isinstance(e, FileNotFoundError):
-        logger.error("File Not Found Error: %s", str(e))
+        logger.error("File Not Found Error: %s", e)
     elif isinstance(e, PlaywrightError):
-        logger.error("Playwright Error: %s", str(e))
+        logger.error("Playwright Error: %s", e)
     elif isinstance(e, KeyError):
-        logger.error("Key Error: %s", str(e))
+        logger.error("Key Error: %s", e)
     elif isinstance(e, asyncio.TimeoutError):
-        logger.error("Timeout Error: %s", str(e))
+        logger.error("Timeout Error: %s", e)
     else:
-        logger.error("Unexpected Error: %s", str(e))
+        logger.error("Unexpected Error: %s", e)
 
 
-async def get_element_bounding_box(html_file, selector):
+async def get_element_bounding_box(
+    html_file: str, selector: str, margin: int = MARGIN
+) -> Optional[FloatRect]:
     """Get the bounding box of the specified element using Playwright"""
     browser = None
     try:
         # Check if the HTML file exists
         if not os.path.exists(html_file):
-            raise FileNotFoundError("HTML file not found:" + str(html_file))
+            raise FileNotFoundError("HTML file not found: " + html_file)
+
         async with async_playwright() as p:
             browser = await p.firefox.launch(headless=True)
             page = await browser.new_page()
-            await page.goto("file://" + os.path.abspath(html_file))
-            bounding_box = await page.evaluate(
-                "() => {"
-                ' var element = document.querySelector("' + selector + '");'
-                " if (!element) {"
-                ' throw new Error("Element not found: ' + selector + '");'
-                " }"
-                " var rect = element.getBoundingClientRect();"
-                " return {x: rect.x, y: rect.y, width: rect.width, height: rect.height};"
-                "}"
-            )
-            await page.close()
-        # Add margin to the bounding box
-        bounding_box["x"] = max(bounding_box["x"] - MARGIN, 0)
-        bounding_box["y"] = max(bounding_box["y"] - MARGIN, 0)
-        bounding_box["width"] += 2 * MARGIN
-        bounding_box["height"] += 2 * MARGIN
-        return bounding_box
-    except (FileNotFoundError, PlaywrightError, KeyError, asyncio.TimeoutError) as e:
+            try:
+                await page.goto("file://" + os.path.abspath(html_file))
+            except TimeoutError as e:
+                raise asyncio.TimeoutError("Timeout error while loading page") from e
+
+            # Find element and get its bounding box
+            element = await page.query_selector(selector)
+            if not element:
+                raise ValueError("Element not found for selector: " + selector)
+
+            try:
+                bounding_box = await element.bounding_box()
+            except KeyError as e:
+                raise KeyError("Key error while retrieving bounding box") from e
+
+            if not bounding_box:
+                raise ValueError(
+                    "Could not retrieve bounding box for selector: " + selector
+                )
+
+            # Add margin to the bounding box
+            bounding_box_with_margin: FloatRect = {
+                "x": max(bounding_box["x"] - margin, 0),
+                "y": max(bounding_box["y"] - margin, 0),
+                "width": bounding_box["width"] + 2 * margin,
+                "height": bounding_box["height"] + 2 * margin,
+            }
+
+            await browser.close()
+            return bounding_box_with_margin
+
+    except (
+        FileNotFoundError,
+        PlaywrightError,
+        ValueError,
+        KeyError,
+        asyncio.TimeoutError,
+    ) as e:
         handle_exception(e)
+        return None
     finally:
         if browser:
             await browser.close()
 
 
-async def html_to_png(html_file, output_file, selector):
-    """Convert HTML file to PNG using Playwright with clipping"""
+async def html_to_png(
+    html_file: str, output_file: str, selector: str, margin: int = MARGIN
+) -> bool:
+    """Convert an HTML file to a PNG using Playwright with clipping"""
+    bounding_box = await get_element_bounding_box(html_file, selector, margin)
+    if not bounding_box:
+        logger.error("Bounding box could not be determined")
+        return False
+
+    clip: FloatRect = {
+        "x": float(bounding_box["x"]),
+        "y": float(bounding_box["y"]),
+        "width": float(bounding_box["width"]),
+        "height": float(bounding_box["height"]),
+    }
+
     browser = None
     try:
-        bounding_box = await get_element_bounding_box(html_file, selector)
         async with async_playwright() as p:
             browser = await p.firefox.launch(headless=True)
             page = await browser.new_page()
             await page.goto("file://" + os.path.abspath(html_file))
-            await page.screenshot(path=output_file, clip=bounding_box)
-            await page.close()
-    except (FileNotFoundError, PlaywrightError, KeyError, asyncio.TimeoutError) as e:
+
+            # Take screenshot with clipping
+            await page.screenshot(path=output_file, clip=clip)
+            return True
+
+    except (PlaywrightError, asyncio.TimeoutError) as e:
         handle_exception(e)
+        return False
+
     finally:
         if browser:
             await browser.close()
 
 
 def convert_html_to_png(html_file, output_file, selector):
-    """Convert HTML file to PNG using Playwright with clipping"""
+    """Synchronous wrapper to convert HTML to PNG"""
     try:
-        loop = asyncio.new_event_loop()
-        asyncio.set_event_loop(loop)
-        loop.run_until_complete(html_to_png(html_file, output_file, selector))
+        return asyncio.run(html_to_png(html_file, output_file, selector))
     except (FileNotFoundError, PlaywrightError, KeyError, asyncio.TimeoutError) as e:
         handle_exception(e)
+        return False
 
 
 def format_unix_time(unix_time):
     """Convert Unix time to human-readable format with ordinal day"""
     dt = datetime.datetime.fromtimestamp(unix_time)
     day = dt.day
-
-    if 11 <= day <= 13:
-        suffix = "th"
-    else:
-        suffix = {1: "st", 2: "nd", 3: "rd"}.get(day % 10, "th")
-
-    return str(day) + suffix + " " + dt.strftime("%b %Y")
+    suffix = (
+        "th" if 11 <= day <= 13 else {1: "st", 2: "nd", 3: "rd"}.get(day % 10, "th")
+    )
+    return f"{day}{suffix} {dt.strftime('%b %Y')}"
 
 
 def generate_card_for_player_summary(player_data):
     """Generate HTML content based on Steam Player Summary Data"""
     if not player_data:
         return None
-    summary_data = player_data["response"]["players"][0]
-    personaname = summary_data["personaname"]
-    personastate = summary_data["personastate"]
-    avatarfull = summary_data["avatarfull"]
-    loccountrycode = summary_data.get("loccountrycode", "")
-    lastlogoff = summary_data["lastlogoff"]
-    timecreated = summary_data["timecreated"]
-    gameextrainfo = summary_data.get("gameextrainfo", None)
 
-    # Convert lastlogoff & timecreated from Unix time to human-readable format
-    lastlogoff_str = format_unix_time(lastlogoff)
-    timecreated_str = format_unix_time(timecreated)
+    summary = player_data["response"]["players"][0]
+    personaname = summary.get("personaname", "Unknown")
+    personastate = personastate_map.get(summary.get("personastate", 0), "Unknown")
+    avatarfull = summary.get("avatarfull", "")
+    loccountrycode = summary.get("loccountrycode", "")
+    lastlogoff = format_unix_time(summary.get("lastlogoff", 0))
+    timecreated = format_unix_time(summary.get("timecreated", 0))
+    gameextrainfo = summary.get("gameextrainfo")
 
-    personastate_value = personastate_map.get(personastate, "Unknown")
-
-    # Create country section only if loccountrycode exists
     country_section = ""
     if loccountrycode:
         country_section = f"""
@@ -149,6 +193,14 @@ def generate_card_for_player_summary(player_data):
                 src="https://flagcdn.com/w320/{loccountrycode.lower()}.png" alt="Flag">
             </p>
         """
+
+    game_section = (
+        f"""
+            <p id='game'>Currently Playing: <span id='game-info'>{gameextrainfo}</span></p>
+        """
+        if gameextrainfo
+        else ""
+    )
 
     html_content = f"""
     <!DOCTYPE html>
@@ -187,11 +239,8 @@ def generate_card_for_player_summary(player_data):
                 justify-content: space-between;
                 margin-top: 10px;
             }}
-            .info-left {{
-                width: 45%;
-            }}
-            .info-right {{
-                width: 55%;
+            .info-left, .info-right {{
+                width: 48%;
             }}
         </style>
     </head>
@@ -203,38 +252,29 @@ def generate_card_for_player_summary(player_data):
                 <h2 id="name">{personaname}</h2>
                 <div class="info-container">
                     <div class="info-left">
-                        <p id="status">Status: {personastate_value}</p>
+                        <p id="status">Status: {personastate}</p>
                         {country_section}
                     </div>
                     <div class="info-right">
-                        <p id="lastlogoff">Last Logoff: {lastlogoff_str}</p>
-                        <p id="timecreated">PC Gaming Since: {timecreated_str}</p>
+                        <p id="lastlogoff">Last Logoff: {lastlogoff}</p>
+                        <p id="timecreated">PC Gaming Since: {timecreated}</p>
                     </div>
                 </div>
-                {"<p id='game'>Currently Playing: <span id='game-info'>" +
-                gameextrainfo + "</span></p>" if gameextrainfo else ""}
+                {game_section}
             </div>
         </div>
     </body>
     </html>
     """
-    with open("assets/steam_summary.html", "w", encoding="utf-8") as file:
+
+    html_path = "assets/steam_summary.html"
+    png_path = "assets/steam_summary.png"
+    with open(html_path, "w", encoding="utf-8") as file:
         file.write(html_content)
 
-    convert_html_to_png(
-        "assets/steam_summary.html", "assets/steam_summary.png", ".card"
-    )
+    convert_html_to_png(html_path, png_path, CARD_SELECTOR)
 
-    return (
-        "![Steam Summary]"
-        "(https://github.com/"
-        + repo_owner
-        + "/"
-        + repo_name
-        + "/blob/"
-        + branch_name
-        + "/assets/steam_summary.png)\n"
-    )
+    return f"![Steam Summary](https://github.com/{repo_owner}/{repo_name}/blob/{branch_name}/{png_path})\n"
 
 
 def generate_card_for_played_games(games_data):
@@ -242,91 +282,62 @@ def generate_card_for_played_games(games_data):
     if not games_data:
         return None
 
-    # Placeholder image for Spacewar
     placeholder_image = "https://i.imgur.com/DBnVqet.jpg"
-
-    # Check if LOG_SCALE is enabled (Optional Feature Flag)
     log_scale = os.getenv("INPUT_LOG_SCALE", "false").lower() in ("true", "1", "t")
     watermark = '<div class="watermark">Log Scale Enabled</div>' if log_scale else ""
 
-    # Calculate dynamic height
-    num_games = games_data["response"]["total_count"]
+    num_games = len(games_data["response"]["games"])
     min_canvas_height = num_games * 60 + 70
-
-    # Get max playtime for normalization
-    max_playtime = games_data["response"]["games"][0]["playtime_2weeks"]
+    max_playtime = (
+        max(game["playtime_2weeks"] for game in games_data["response"]["games"]) or 1
+    )
 
     def format_playtime(playtime):
         """Format playtime into human-readable format"""
         if playtime < 60:
-            unit = " min" if playtime == 1 else " mins"
-            return str(playtime) + unit
-
+            unit = "min" if playtime == 1 else "mins"
+            return f"{playtime} {unit}"
         hours, minutes = divmod(playtime, 60)
         if minutes == 0:
-            return str(hours) + " hrs"
-
-        unit = " min" if minutes == 1 else " mins"
-        return str(hours) + " hrs and " + str(minutes) + unit
+            return f"{hours} hrs"
+        unit = "min" if minutes == 1 else "mins"
+        return f"{hours} hrs and {minutes} {unit}"
 
     def generate_progress_bar(game, index):
         """Generate progress bar HTML for a single game"""
-        name = game["name"]
-        playtime = game["playtime_2weeks"]
+        name = game.get("name", "Unknown Game")
+        playtime = game.get("playtime_2weeks", 0)
         img_icon_url = (
             placeholder_image
             if name == "Spacewar"
-            else "https://media.steampowered.com/steamcommunity/public/images/apps/"
-            + str(game["appid"])
-            + "/"
-            + game["img_icon_url"]
-            + ".jpg"
+            else f"https://media.steampowered.com/steamcommunity/public/images/apps/{game.get('appid')}/{game.get('img_icon_url')}.jpg"
         )
         normalized_playtime = (
-            round(
-                math.log1p(playtime)
-                / math.log1p(
-                    max(
-                        game["playtime_2weeks"]
-                        for game in games_data["response"]["games"]
-                    )
-                )
-                * 100
-            )
+            round(math.log1p(playtime) / math.log1p(max_playtime) * 100)
             if log_scale
             else round((playtime / max_playtime) * 100)
         )
         display_time = format_playtime(playtime)
+        style_class = f"progress-style-{(index % 6) + 1}"
 
-        return (
-            """
+        return f"""
         <div class="bar-container">
-            <img src="{img}" alt="{name}" class="game-icon">
-            <progress class="progress-style-{style}" value="{value}" max="100"></progress>
+            <img src="{img_icon_url}" alt="{name}" class="game-icon">
+            <progress class="{style_class}" value="{normalized_playtime}" max="100"></progress>
             <div class="game-info">
                 <span class="game-name">{name}</span><br>
-                <span class="game-time">{time}</span>
+                <span class="game-time">{display_time}</span>
             </div>
         </div>
-        """.replace(
-                "{img}", img_icon_url
-            )
-            .replace("{name}", name)
-            .replace("{style}", str((index % 6) + 1))
-            .replace("{value}", str(normalized_playtime))
-            .replace("{time}", display_time)
-        )
+        """
 
-    # Generate progress bars for all games
     progress_bars = "".join(
         generate_progress_bar(game, i)
         for i, game in enumerate(games_data["response"]["games"])
         if "name" in game and "playtime_2weeks" in game
     )
 
-    # Generate HTML content
-    html_content = (
-        """
+    html_content = f"""
     <!DOCTYPE html>
     <html lang="en">
     <head>
@@ -336,39 +347,25 @@ def generate_card_for_played_games(games_data):
         <link rel="stylesheet" href="style.css">
     </head>
     <body>
-        <div class="card" style="height: {height}px; position: relative; ">
+        <div class="card" style="height: {min_canvas_height}px; position: relative; ">
             <div class="content" style="position: relative; text-align: center;">
                 <h2>Recently Played Games (Last 2 Weeks)</h2>
-                {bars}
+                {progress_bars}
             </div>
             {watermark}
         </div>
     </body>
     </html>
-    """.replace(
-            "{height}", str(min_canvas_height)
-        )
-        .replace("{bars}", progress_bars)
-        .replace("{watermark}", watermark)
-    )
+    """
 
-    with open("assets/recently_played_games.html", "w", encoding="utf-8") as file:
+    html_path = "assets/recently_played_games.html"
+    png_path = "assets/recently_played_games.png"
+    with open(html_path, "w", encoding="utf-8") as file:
         file.write(html_content)
 
-    convert_html_to_png(
-        "assets/recently_played_games.html", "assets/recently_played_games.png", ".card"
-    )
+    convert_html_to_png(html_path, png_path, CARD_SELECTOR)
 
-    return (
-        "![Recently Played Games]"
-        "(https://github.com/"
-        + repo_owner
-        + "/"
-        + repo_name
-        + "/blob/"
-        + branch_name
-        + "/assets/recently_played_games.png)"
-    )
+    return f"![Recently Played Games](https://github.com/{repo_owner}/{repo_name}/blob/{branch_name}/{png_path})"
 
 
 def generate_card_for_steam_workshop(workshop_stats):
@@ -399,6 +396,7 @@ def generate_card_for_steam_workshop(workshop_stats):
                 box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
                 border-radius: 10px;
                 background-color: #fff;
+                text-align: center;
             }}
             table {{
                 width: 100%;
@@ -419,7 +417,7 @@ def generate_card_for_steam_workshop(workshop_stats):
         </style>
     </head>
     <body>
-        <div class="card" style="text-align: center;">
+        <div class="card">
             <h2>Steam Workshop Stats</h2>
             <table>
                 <thead>
@@ -431,15 +429,15 @@ def generate_card_for_steam_workshop(workshop_stats):
                 <tbody>
                     <tr>
                         <td>Unique Visitors</td>
-                        <td>{workshop_stats["total_unique_visitors"]}</td>
+                        <td>{workshop_stats.get("total_unique_visitors", 0)}</td>
                     </tr>
                     <tr>
                         <td>Current Subscribers</td>
-                        <td>{workshop_stats["total_current_subscribers"]}</td>
+                        <td>{workshop_stats.get("total_current_subscribers", 0)}</td>
                     </tr>
                     <tr>
                         <td>Current Favorites</td>
-                        <td>{workshop_stats["total_current_favorites"]}</td>
+                        <td>{workshop_stats.get("total_current_favorites", 0)}</td>
                     </tr>
                 </tbody>
             </table>
@@ -447,20 +445,12 @@ def generate_card_for_steam_workshop(workshop_stats):
     </body>
     </html>
     """
-    with open("assets/steam_workshop_stats.html", "w", encoding="utf-8") as file:
+
+    html_path = "assets/steam_workshop_stats.html"
+    png_path = "assets/steam_workshop_stats.png"
+    with open(html_path, "w", encoding="utf-8") as file:
         file.write(html_content)
 
-    convert_html_to_png(
-        "assets/steam_workshop_stats.html", "assets/steam_workshop_stats.png", ".card"
-    )
+    convert_html_to_png(html_path, png_path, CARD_SELECTOR)
 
-    return (
-        "![Steam Workshop Stats]"
-        "(https://github.com/"
-        + repo_owner
-        + "/"
-        + repo_name
-        + "/blob/"
-        + branch_name
-        + "/assets/steam_workshop_stats.png)"
-    )
+    return f"![Steam Workshop Stats](https://github.com/{repo_owner}/{repo_name}/blob/{branch_name}/{png_path})"

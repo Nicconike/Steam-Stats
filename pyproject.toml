@@ -1,23 +1,23 @@
 [build-system]
-requires = ["setuptools ~= 70"]
+requires = ["setuptools ~= 75.8"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "steam-stats"
+name = "Steam-Stats"
 authors = [
-    { name = "Nicco", email = "38905025+Nicconike@users.noreply.github.com" }
+    { name = "Nicco", email = "38905025+Nicconike@users.noreply.github.com" },
 ]
-dynamic = "version_variables"
+dynamic = ["version"]
 dependencies = [
     "bs4==0.0.2",
     "DateTime==5.5",
-    "playwright==1.48.0",
+    "playwright==1.49.1",
     "PyGithub==2.5.0",
-    "python-semantic-release==9.15.2"
+    "python-semantic-release==9.17.0",
 ]
 requires-python = ">= 3.8"
 readme = "README.md"
-license = {file = "LICENSE"}
+license = { file = "LICENSE" }
 
 [project.urls]
 changelog = "https://github.com/Nicconike/Steam-Stats/blob/master/CHANGELOG.md"
@@ -26,16 +26,12 @@ wiki = "https://github.com/Nicconike/Steam-Stats/wiki"
 
 [project.optional-dependencies]
 test = [
-    "pytest-asyncio==0.25.0",
+    "pytest-asyncio==0.25.3",
     "pytest-cov==6.0.0",
     "pytest-mock==3.14.0",
-    "requests-mock==1.12.1"
+    "requests-mock==1.12.1",
 ]
-dev = [
-    "bandit==1.8.0",
-    "pipdeptree==2.24.0",
-    "pylint==3.3.3"
-]
+dev = ["bandit==1.8.2", "pipdeptree==2.25.0", "pylint==3.3.4"]
 
 [tool.semantic_release]
 version_variables = ["api/main.py:__version__"]
@@ -47,7 +43,19 @@ tag_format = "v{version}"
 main = { match = "master", prerelease_token = "rc", prerelease = false }
 
 [tool.semantic_release.commit_parser_options]
-allowed_tags = ["build", "chore", "ci", "docs", "feat", "fix", "perf", "style", "refactor", "test", "revert"]
+allowed_tags = [
+    "build",
+    "chore",
+    "ci",
+    "docs",
+    "feat",
+    "fix",
+    "perf",
+    "style",
+    "refactor",
+    "test",
+    "revert",
+]
 minor_tags = ["feat"]
 patch_tags = ["fix", "perf"]
 default_bump_level = 0
@@ -58,9 +66,6 @@ token = { env = "GH_TOKEN" }
 
 [tool.semantic_release.publish]
 upload_to_vcs_release = true
-dist_glob_patterns = [
-    "dist/*"
-]
 
 [tool.semantic_release.changelog]
 changelog_file = "CHANGELOG.md"
@@ -70,26 +75,10 @@ exclude_commit_patterns = []
 trim_blocks = true
 
 [tool.semantic_release.plugins]
-verify_conditions = [
-    "@semantic-release/git",
-    "@semantic-release/github"
-]
-analyze_commits = [
-    "@semantic-release/commit-analyzer"
-]
-generate_notes = [
-    "@semantic-release/release-notes-generator"
-]
-prepare = [
-    "@semantic-release/changelog",
-    "@semantic-release/git"
-]
-publish = [
-    "@semantic-release/github"
-]
-success = [
-    "@semantic-release/github"
-]
-fail = [
-    "@semantic-release/github"
-]
+verify_conditions = ["@semantic-release/git", "@semantic-release/github"]
+analyze_commits = ["@semantic-release/commit-analyzer"]
+generate_notes = ["@semantic-release/release-notes-generator"]
+prepare = ["@semantic-release/changelog", "@semantic-release/git"]
+publish = ["@semantic-release/github"]
+success = ["@semantic-release/github"]
+fail = ["@semantic-release/github"]

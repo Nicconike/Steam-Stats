@@ -20,9 +20,9 @@ STEAM_API_KEY = os.environ["INPUT_STEAM_API_KEY"]
 REQUEST_TIMEOUT = (25, 30)
 
 # Steam Web API endpoints
-PLAYER_SUMMARIES = "http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/"
+PLAYER_SUMMARIES = "https://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/"
 RECENTLY_PLAYED_GAMES = (
-    "http://api.steampowered.com/IPlayerService/GetRecentlyPlayedGames/v0001/"
+    "https://api.steampowered.com/IPlayerService/GetRecentlyPlayedGames/v0001/"
 )
 
 

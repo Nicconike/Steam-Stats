@@ -158,3 +158,6 @@ cython_debug/
 # Vercel
 vercel.txt
 .vercel
+
+# pytest configuration
+pytest.ini

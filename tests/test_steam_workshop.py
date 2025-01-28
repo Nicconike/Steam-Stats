@@ -315,7 +315,7 @@ def test_fetch_individual_workshop_stats_success(mock_requests_get, mock_beautif
     )
     mock_beautifulsoup.return_value = mock_soup
 
-    result = fetch_individual_workshop_stats("http://example.com")
+    result = fetch_individual_workshop_stats("https://example.com")
 
     if result["unique_visitors"] != 100:
         raise AssertionError("Expected unique_visitors to be 100")
@@ -335,7 +335,7 @@ def test_fetch_individual_workshop_stats_no_table(
     mock_soup = BeautifulSoup("<div>No stats table</div>", "html.parser")
     mock_beautifulsoup.return_value = mock_soup
 
-    result = fetch_individual_workshop_stats("http://example.com")
+    result = fetch_individual_workshop_stats("https://example.com")
 
     if result["unique_visitors"]:
         raise AssertionError("Expected unique_visitors to be 0")
@@ -349,7 +349,7 @@ def test_fetch_individual_workshop_stats_request_exception(mock_requests_get):
     """Test request exception handling for individual workshop stats"""
     mock_requests_get.side_effect = requests.exceptions.RequestException
 
-    result = fetch_individual_workshop_stats("http://example.com")
+    result = fetch_individual_workshop_stats("https://example.com")
 
     if result:
         raise AssertionError("Expected result to be an empty dictionary")
@@ -382,7 +382,7 @@ def test_fetch_all_workshop_stats_success(mock_requests_get, mock_beautifulsoup)
     mock_beautifulsoup.side_effect = [mock_soup1, mock_soup2]
 
     result = fetch_all_workshop_stats(
-        ["http://example.com/item1", "http://example.com/item2"]
+        ["https://example.com/item1", "https://example.com/item2"]
     )
 
     if result["total_unique_visitors"] != 300:
@@ -410,7 +410,7 @@ def test_fetch_all_workshop_stats_request_exception(mock_requests_get):
     )
     with patch("api.steam_workshop.BeautifulSoup", return_value=mock_soup):
         result = fetch_all_workshop_stats(
-            ["http://example.com/item1", "http://example.com/item2"]
+            ["https://example.com/item1", "https://example.com/item2"]
         )
 
     if result["total_unique_visitors"] != 200:

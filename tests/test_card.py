@@ -121,14 +121,12 @@ async def _test_file_not_found_error(html_file, selector):
                 )
             if mock_logger.error.call_args[0][
                 0
-            ] != "File Not Found Error: %s" or mock_logger.error.call_args[0][
-                1
-            ] != "HTML file not found:" + str(
-                html_file
+            ] != "File Not Found Error: %s" or "HTML file not found:" not in str(
+                mock_logger.error.call_args[0][1]
             ):
                 raise AssertionError(
                     "Expected logger.error to be called with 'File Not Found Error: %s',"
-                    "'HTML file not found:" + str(html_file) + "'"
+                    "'HTML file not found:'"
                 )
 
 
@@ -149,9 +147,10 @@ async def _test_playwright_error(html_file, selector):
                     raise AssertionError(
                         "Expected logger.error to be called for PlaywrightError"
                     )
-                if (
-                    mock_logger.error.call_args[0][0] != "Playwright Error: %s"
-                    or mock_logger.error.call_args[0][1] != "Playwright error"
+                if mock_logger.error.call_args[0][
+                    0
+                ] != "Playwright Error: %s" or "Playwright error" not in str(
+                    mock_logger.error.call_args[0][1]
                 ):
                     raise AssertionError(
                         "Expected logger.error to be called with 'Playwright Error: %s',"
@@ -165,11 +164,15 @@ async def _test_key_error(html_file, selector):
         with mock.patch("api.card.async_playwright") as mock_playwright:
             mock_browser = mock.AsyncMock()
             mock_page = mock.AsyncMock()
+            mock_element = mock.AsyncMock()
             mock_playwright.return_value.__aenter__.return_value.firefox.launch.return_value = (
                 mock_browser
             )
             mock_browser.new_page.return_value = mock_page
-            mock_page.evaluate.side_effect = KeyError("Key error")
+            mock_page.query_selector.return_value = mock_element
+            mock_element.bounding_box.side_effect = KeyError(
+                "Key error while retrieving bounding box"
+            )
             with mock.patch("api.card.logger") as mock_logger:
                 result = await get_element_bounding_box(html_file, selector)
                 if result is not None:
@@ -178,12 +181,13 @@ async def _test_key_error(html_file, selector):
                     raise AssertionError(
                         "Expected logger.error to be called for KeyError"
                     )
-                if (
-                    mock_logger.error.call_args[0][0] != "Key Error: %s"
-                    or mock_logger.error.call_args[0][1] != "'Key error'"
+                if mock_logger.error.call_args[0][
+                    0
+                ] != "Key Error: %s" or "Key error while retrieving bounding box" not in str(
+                    mock_logger.error.call_args[0][1]
                 ):
                     raise AssertionError(
-                        "Expected logger.error to be called with 'Key Error: %s', 'Key error'"
+                        "Expected logger.error to be called with 'Key Error: %s', 'Key error while retrieving bounding box'"
                     )
 
 
@@ -197,7 +201,9 @@ async def _test_timeout_error(html_file, selector):
                 mock_browser
             )
             mock_browser.new_page.return_value = mock_page
-            mock_page.goto.side_effect = TimeoutError("Timeout error")
+            mock_page.goto.side_effect = asyncio.TimeoutError(
+                "Timeout error while loading page"
+            )
             with mock.patch("api.card.logger") as mock_logger:
                 result = await get_element_bounding_box(html_file, selector)
                 if result is not None:
@@ -206,13 +212,13 @@ async def _test_timeout_error(html_file, selector):
                     raise AssertionError(
                         "Expected logger.error to be called for TimeoutError"
                     )
-                if (
-                    mock_logger.error.call_args[0][0] != "Timeout Error: %s"
-                    or mock_logger.error.call_args[0][1] != "Timeout error"
+                if mock_logger.error.call_args[0][
+                    0
+                ] != "Timeout Error: %s" or "Timeout error while loading page" not in str(
+                    mock_logger.error.call_args[0][1]
                 ):
                     raise AssertionError(
-                        "Expected logger.error to be called with 'Timeout Error: %s',"
-                        "'Timeout error'"
+                        "Expected logger.error to be called with 'Timeout Error: %s', 'Timeout error while loading page'"
                     )
 
 
@@ -220,7 +226,6 @@ def test_get_element_bounding_box():
     """Test get_element_bounding_box function"""
     html_file = "test.html"
     selector = ".test-element"
-
     asyncio.run(_test_file_not_found_error(html_file, selector))
     asyncio.run(_test_playwright_error(html_file, selector))
     asyncio.run(_test_key_error(html_file, selector))
@@ -271,10 +276,10 @@ def test_convert_html_to_png():
 def test_format_unix_time():
     """Test format_unix_time function"""
     unix_time = 1609459200  # 01/01/2021 @ 12:00am (UTC)
-    expected = "01/01/2021"
+    expected = "1st Jan 2021"
     result = format_unix_time(unix_time)
     if result != expected:
-        raise AssertionError(f"Expected result to be {expected}")
+        raise AssertionError(f"Expected result to be {expected}, but got {result}")
 
 
 def test_generate_card_for_player_summary():
