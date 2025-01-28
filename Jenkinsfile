@@ -2,7 +2,7 @@ pipeline {
     agent any
     options {
         disableConcurrentBuilds()
-        timeout(time: 15, unit: 'MINUTES')
+        timeout(time: 5, unit: 'MINUTES')
     }
     environment {
         PYTHON = 'python3'
@@ -74,12 +74,6 @@ pipeline {
             script {
                 currentBuild.description = "Build #${currentBuild.number} - ${currentBuild.result}"
             }
-        }
-        success {
-            slackSend(color: 'good', message: "Build Successful: ${env.JOB_NAME} ${env.BUILD_NUMBER}")
-        }
-        failure {
-            slackSend(color: 'danger', message: "Build Failed: ${env.JOB_NAME} ${env.BUILD_NUMBER}")
         }
     }
 }
