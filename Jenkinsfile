@@ -1,5 +1,7 @@
 pipeline {
-    agent any
+    agent {
+        label 'windows-local'
+    }
     options {
         disableConcurrentBuilds()
         timeout(time: 5, unit: 'MINUTES')
