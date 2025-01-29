@@ -7,29 +7,14 @@ pipeline {
         timeout(time: 5, unit: 'MINUTES')
     }
     environment {
-        PYTHON = 'python3'
-        VENV_DIR = 'jenkins_venv'
+        VENV_DIR = 'F:\\CodeBase\\Steam-Stats\\venv'
     }
     stages {
-        stage('Checkout') {
-            steps {
-                checkout([
-                    $class: 'GitSCM',
-                    branches: [[name: '*/jenkins-experiment']],
-                    extensions: [],
-                    userRemoteConfigs: [[
-                        url: 'https://github.com/Nicconike/Steam-Stats.git',
-                        credentialsId: 'github-token'
-                    ]]
-                ])
-            }
-        }
-
         stage('Security Scans') {
             parallel {
                 stage('Bandit') {
                     steps {
-                        sh 'bandit -r . -f xml -o bandit-results.xml'
+                        bat 'python -m bandit -r . -f xml -o bandit-results.xml'
                     }
                     post {
                         always {
@@ -39,9 +24,9 @@ pipeline {
                 }
                 stage('CodeQL') {
                     steps {
-                        sh 'python -m venv $VENV_DIR'
-                        sh '. $VENV_DIR/bin/activate && pip install -r requirements.txt'
-                        sh 'codeql database create --language=python codeql-db'
+                        bat 'python -m venv %VENV_DIR%'
+                        bat 'call %VENV_DIR%\\Scripts\\activate && pip install -r requirements.txt'
+                        bat 'codeql database create --language=python codeql-db'
                     }
                 }
             }
@@ -49,16 +34,10 @@ pipeline {
 
         stage('Quality Checks') {
             steps {
-                sh 'pylint **/*.py --output-format=parseable > pylint-report.txt'
+                bat 'python -m pylint **/*.py --output-format=parseable > pylint-report.txt'
                 warnings(
                     canComputeNew: false,
                     canResolveRelativePaths: false,
-                    defaultEncoding: '',
-                    excludePattern: '',
-                    healthy: '',
-                    includePattern: '',
-                    messagesPattern: '',
-                    unHealthy: '',
                     tool: pyLint(id: 'pylint', name: 'Pylint', pattern: 'pylint-report.txt')
                 )
             }
@@ -66,7 +45,7 @@ pipeline {
 
         stage('Test & Coverage') {
             steps {
-                sh '$PYTHON -m pytest --cov=api --cov-report=xml:coverage.xml'
+                bat 'python -m pytest --cov=api --cov-report=xml:coverage.xml'
             }
         }
     }
