@@ -32,8 +32,9 @@ pipeline {
                         exit /b 0
                     )
                 """
-                warnings(
-                    tool: pyLint(id: 'pylint', name: 'Pylint', pattern: 'pylint-report.txt')
+                recordIssues(
+                    tool: pyLint(id: 'pylint', name: 'Pylint', pattern: 'pylint-report.txt'),
+                    enabledForFailure: true
                 )
             }
         }
