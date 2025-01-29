@@ -35,11 +35,11 @@ pipeline {
 
         stage('Quality Checks') {
             steps {
-                bat """
+                bat '''
                     call "%VENV_PATH%\\Scripts\\activate"
                     echo Running Pylint analysis
-                    pylint **/*.py --output-format=parseable > pylint-report.txt || python -m pylint_exit $?
-                """
+                    python -m pylint **/*.py --output-format=parseable > pylint-report.txt || python -m pylint_exit $?
+                '''
                 warnings(
                     tool: pyLint(id: 'pylint', name: 'Pylint', pattern: 'pylint-report.txt')
                 )
