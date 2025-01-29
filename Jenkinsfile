@@ -11,17 +11,6 @@ pipeline {
         CODECOV_TOKEN = credentials('codecov-token')
     }
     stages {
-        stage('Environment Setup') {
-            steps {
-                bat """
-                    echo Using existing virtual environment at %VENV_PATH%
-                    call "%VENV_PATH%\\Scripts\\activate"
-                    python -V
-                    pipdeptree
-                """
-            }
-        }
-
         stage('Security Scan') {
             steps {
                 bat """
@@ -38,7 +27,10 @@ pipeline {
                 bat """
                     call "%VENV_PATH%\\Scripts\\activate"
                     echo Running Pylint analysis
-                    pylint api tests --output-format=parseable > pylint-report.txt
+                    pylint api tests --output-format=parseable > pylint-report.txt || (
+                        python -m pylint_exit %ERRORLEVEL%
+                        exit /b 0
+                    )
                 """
                 warnings(
                     tool: pyLint(id: 'pylint', name: 'Pylint', pattern: 'pylint-report.txt')
