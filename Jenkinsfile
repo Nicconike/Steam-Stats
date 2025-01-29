@@ -17,7 +17,7 @@ pipeline {
                     echo Using existing virtual environment at %VENV_PATH%
                     call "%VENV_PATH%\\Scripts\\activate"
                     python -V
-                    pip list
+                    pipdeptree
                 """
             }
         }
@@ -38,7 +38,7 @@ pipeline {
                 bat """
                     call "%VENV_PATH%\\Scripts\\activate"
                     echo Running Pylint analysis
-                    pylint **/*.py --output-format=parseable > pylint-report.txt
+                    pylint **/*.py --output-format=parseable > pylint-report.txt || python -m pylint_exit $?
                 """
                 warnings(
                     tool: pyLint(id: 'pylint', name: 'Pylint', pattern: 'pylint-report.txt')
