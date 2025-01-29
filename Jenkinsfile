@@ -49,7 +49,6 @@ pipeline {
                     curl -Os https://uploader.codecov.io/latest/windows/codecov.exe
                     codecov.exe -f coverage.xml -t %CODECOV_TOKEN% -B %GIT_BRANCH% -C %GIT_COMMIT%
                 """
-                junit 'test-results.xml'
             }
         }
     }
