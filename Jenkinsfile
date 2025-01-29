@@ -7,37 +7,40 @@ pipeline {
         timeout(time: 5, unit: 'MINUTES')
     }
     environment {
-        VENV_DIR = 'F:\\CodeBase\\Steam-Stats\\venv'
+        VENV_PATH = 'F:\\CodeBase\\Steam-Stats\\venv'
+        CODECOV_TOKEN = credentials('codecov-token')
     }
     stages {
-        stage('Security Scans') {
-            parallel {
-                stage('Bandit') {
-                    steps {
-                        bat 'python -m bandit -r . -f xml -o bandit-results.xml'
-                    }
-                    post {
-                        always {
-                            archiveArtifacts 'bandit-results.xml'
-                        }
-                    }
-                }
-                stage('CodeQL') {
-                    steps {
-                        bat 'python -m venv %VENV_DIR%'
-                        bat 'call %VENV_DIR%\\Scripts\\activate && pip install -r requirements.txt'
-                        bat 'codeql database create --language=python codeql-db'
-                    }
-                }
+        stage('Environment Setup') {
+            steps {
+                bat """
+                    echo Using existing virtual environment at %VENV_PATH%
+                    call "%VENV_PATH%\\Scripts\\activate"
+                    python -V
+                    pip list
+                """
+            }
+        }
+
+        stage('Security Scan') {
+            steps {
+                bat """
+                    call "%VENV_PATH%\\Scripts\\activate"
+                    echo Running Bandit security scan
+                    bandit -r . -f json -o bandit-report.json
+                """
+                archiveArtifacts 'bandit-report.json'
             }
         }
 
         stage('Quality Checks') {
             steps {
-                bat 'python -m pylint **/*.py --output-format=parseable > pylint-report.txt'
+                bat """
+                    call "%VENV_PATH%\\Scripts\\activate"
+                    echo Running Pylint analysis
+                    pylint **/*.py --output-format=parseable > pylint-report.txt
+                """
                 warnings(
-                    canComputeNew: false,
-                    canResolveRelativePaths: false,
                     tool: pyLint(id: 'pylint', name: 'Pylint', pattern: 'pylint-report.txt')
                 )
             }
@@ -45,7 +48,16 @@ pipeline {
 
         stage('Test & Coverage') {
             steps {
-                bat 'python -m pytest --cov=api --cov-report=xml:coverage.xml'
+                bat """
+                    call "%VENV_PATH%\\Scripts\\activate"
+                    echo Running tests with coverage
+                    pytest --cov=api --cov-report=xml:coverage.xml --junitxml=test-results.xml
+
+                    echo Uploading to Codecov
+                    curl -Os https://uploader.codecov.io/latest/windows/codecov.exe
+                    codecov.exe -f coverage.xml -t %CODECOV_TOKEN% -B %GIT_BRANCH% -C %GIT_COMMIT%
+                """
+                junit 'test-results.xml'
             }
         }
     }
