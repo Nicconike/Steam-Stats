@@ -64,7 +64,7 @@ pipeline {
 
         stage('Test & Coverage') {
             steps {
-                sh '$PYTHON -m pytest --cov=./ --cov-report=xml:coverage.xml'
+                sh '$PYTHON -m pytest --cov=api --cov-report=xml:coverage.xml'
             }
         }
     }
