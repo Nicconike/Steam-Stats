@@ -38,7 +38,7 @@ pipeline {
                 bat '''
                     call "%VENV_PATH%\\Scripts\\activate"
                     echo Running Pylint analysis
-                    python -m pylint **/*.py --output-format=parseable > pylint-report.txt || python -m pylint_exit $?
+                    pylint api tests --output-format=parseable > pylint-report.txt
                 '''
                 warnings(
                     tool: pyLint(id: 'pylint', name: 'Pylint', pattern: 'pylint-report.txt')
