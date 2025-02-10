@@ -70,7 +70,7 @@ jobs:
 
           - name: Semantic Release
             id: semantic
-            uses: python-semantic-release/python-semantic-release@v9.17.0
+            uses: python-semantic-release/python-semantic-release@v9.19.0
             with:
                 github_token: ${{ steps.app-token.outputs.token }}
             env:
@@ -105,7 +105,7 @@ jobs:
 
           - name: Install CoSign
             if: github.event_name != 'pull_request'
-            uses: sigstore/cosign-installer@v3.7.0
+            uses: sigstore/cosign-installer@v3.8.0
             with:
                 cosign-release: 'v2.4.0'
 
