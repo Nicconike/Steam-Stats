@@ -11,9 +11,9 @@ dynamic = ["version"]
 dependencies = [
     "bs4==0.0.2",
     "DateTime==5.5",
-    "playwright==1.49.1",
-    "PyGithub==2.5.0",
-    "python-semantic-release==9.17.0",
+    "playwright==1.50.0",
+    "PyGithub==2.6.0",
+    "python-semantic-release==9.20.0",
 ]
 requires-python = ">= 3.8"
 readme = "README.md"
@@ -31,7 +31,7 @@ test = [
     "pytest-mock==3.14.0",
     "requests-mock==1.12.1",
 ]
-dev = ["bandit==1.8.2", "pipdeptree==2.25.0", "pylint==3.3.4"]
+dev = ["bandit==1.8.3", "pipdeptree==2.25.0", "pylint==3.3.4"]
 
 [tool.semantic_release]
 version_variables = ["api/main.py:__version__"]
