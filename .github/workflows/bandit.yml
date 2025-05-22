@@ -4,12 +4,12 @@ name: "Bandit"
 on:
     workflow_dispatch:
     push:
-        branches: master
+        branches: [master]
         paths:
             - ".github/workflows/bandit.yml"
             - "**/*.py"
     pull_request:
-        branches: master
+        branches: [master]
 
 jobs:
     sast-scan:

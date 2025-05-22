@@ -125,6 +125,24 @@ def fetch_workshop_item_links(steam_id, api_key):
     return item_links
 
 
+def parse_stats_table(stats_table):
+    """Parse the stats table and return a dictionary of stats"""
+    stats = {}
+    if not isinstance(stats_table, Tag):
+        return stats
+    for row in stats_table.find_all("tr"):
+        cells = row.find_all("td")
+        if len(cells) == 2:
+            key = cells[1].text.strip().lower().replace(" ", "_")
+            value = cells[0].text.strip().replace(",", "")
+            try:
+                stats[key] = int(value) if value else 0
+            except ValueError:
+                logger.error("Could not convert value to int: %s", str(value))
+                stats[key] = 0
+    return stats
+
+
 def fetch_individual_workshop_stats(item_url):
     """Fetch Author Stats from a Workshop Item"""
     stats = {}
@@ -136,16 +154,7 @@ def fetch_individual_workshop_stats(item_url):
         stats_table = soup.find("table", class_="stats_table")
 
         if isinstance(stats_table, Tag):
-            for row in stats_table.find_all("tr"):
-                cells = row.find_all("td")
-                if len(cells) == 2:
-                    key = cells[1].text.strip().lower().replace(" ", "_")
-                    value = cells[0].text.strip().replace(",", "")
-                    try:
-                        stats[key] = int(value) if value else 0
-                    except ValueError:
-                        logger.error("Could not convert value to int: %s", str(value))
-                        stats[key] = 0
+            stats = parse_stats_table(stats_table)
         else:
             logger.info("Could not find stats table at %s", str(item_url))
     except (requests.exceptions.RequestException, AttributeError) as e:

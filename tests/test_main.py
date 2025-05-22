@@ -6,6 +6,7 @@ import os
 from unittest import TestCase
 from unittest.mock import patch, MagicMock
 import time
+from pytest import approx
 import pytest
 from api.main import (
     update_readme,
@@ -92,6 +93,22 @@ def test_update_readme(mock_repo):
         b"<!--START-->\nNew Content\n<!--END-->"
     )
     result = update_readme(mock_repo, markdown_data, start_marker, end_marker)
+    TestCase().assertIsNone(result)
+
+
+def test_update_readme_no_change(mock_repo):
+    """Test update_readme returns None if content is already up to date"""
+    markdown_data = "Same Content"
+    start_marker = "<!--START-->"
+    end_marker = "<!--END-->"
+
+    existing_content = start_marker + "\n" + markdown_data + "\n" + end_marker
+    mock_repo.get_contents.return_value.decoded_content = existing_content.encode(
+        "utf-8"
+    )
+
+    result = update_readme(mock_repo, markdown_data, start_marker, end_marker)
+
     TestCase().assertIsNone(result)
 
 
@@ -365,13 +382,15 @@ def test_log_execution_time():
     with patch("api.main.logger") as mock_logger:
         log_execution_time(start_time)
         mock_logger.info.assert_any_call(
-            "Total Execution Time: %d minutes and %.3f seconds", 1, 5.0
+            "Total Execution Time: %d minutes and %.3f seconds", 1, approx(5.0, abs=0.1)
         )
 
     start_time = time.time() - 30
     with patch("api.main.logger") as mock_logger:
         log_execution_time(start_time)
-        mock_logger.info.assert_any_call("Total Execution Time: %.3f seconds", 30.0)
+        mock_logger.info.assert_any_call(
+            "Total Execution Time: %.3f seconds", approx(30.0, abs=0.1)
+        )
 
 
 def test_main_successful_commit(mock_dependencies):

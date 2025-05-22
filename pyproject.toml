@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools ~= 75.8"]
+requires = ["setuptools>=80.0,<90.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -7,17 +7,18 @@ name = "Steam-Stats"
 authors = [
     { name = "Nicco", email = "38905025+Nicconike@users.noreply.github.com" },
 ]
+description = "A python project to get the stats of your Steam account and display them in your GitHub profile."
 dynamic = ["version"]
-dependencies = [
-    "bs4==0.0.2",
-    "DateTime==5.5",
-    "playwright==1.49.1",
-    "PyGithub==2.5.0",
-    "python-semantic-release==9.17.0",
-]
 requires-python = ">= 3.8"
 readme = "README.md"
 license = { file = "LICENSE" }
+dependencies = [
+    "bs4==0.0.2",
+    "DateTime==5.5",
+    "playwright==1.52.0",
+    "PyGithub==2.6.1",
+    "python-semantic-release==9.21.1",
+]
 
 [project.urls]
 changelog = "https://github.com/Nicconike/Steam-Stats/blob/master/CHANGELOG.md"
@@ -26,12 +27,16 @@ wiki = "https://github.com/Nicconike/Steam-Stats/wiki"
 
 [project.optional-dependencies]
 test = [
-    "pytest-asyncio==0.25.3",
-    "pytest-cov==6.0.0",
+    "pytest-asyncio==0.26.0",
+    "pytest-cov==6.1.1",
     "pytest-mock==3.14.0",
     "requests-mock==1.12.1",
 ]
-dev = ["bandit==1.8.2", "pipdeptree==2.25.0", "pylint==3.3.4"]
+dev = ["bandit==1.8.3", "pipdeptree==2.26.1", "pylint==3.3.7"]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["api*"]
 
 [tool.semantic_release]
 version_variables = ["api/main.py:__version__"]
@@ -73,12 +78,3 @@ exclude_commit_patterns = []
 
 [tool.semantic_release.changelog.environment]
 trim_blocks = true
-
-[tool.semantic_release.plugins]
-verify_conditions = ["@semantic-release/git", "@semantic-release/github"]
-analyze_commits = ["@semantic-release/commit-analyzer"]
-generate_notes = ["@semantic-release/release-notes-generator"]
-prepare = ["@semantic-release/changelog", "@semantic-release/git"]
-publish = ["@semantic-release/github"]
-success = ["@semantic-release/github"]
-fail = ["@semantic-release/github"]

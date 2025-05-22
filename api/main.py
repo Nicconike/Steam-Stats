@@ -7,9 +7,9 @@ import logging
 import os
 import time
 from github import Github, InputGitTreeElement
-from .steam_stats import get_player_summaries, get_recently_played_games
-from .steam_workshop import fetch_workshop_item_links, fetch_all_workshop_stats
-from .card import (
+from api.steam_stats import get_player_summaries, get_recently_played_games
+from api.steam_workshop import fetch_workshop_item_links, fetch_all_workshop_stats
+from api.card import (
     generate_card_for_player_summary,
     generate_card_for_played_games,
     generate_card_for_steam_workshop,
@@ -36,11 +36,13 @@ WORKSHOP_STATS = os.getenv("INPUT_WORKSHOP_STATS", "false").lower() in (
 # Version Identifier for Changelog
 __version__ = "1.2.1"
 
+README = "README.md"
+
 
 def update_readme(repo, markdown_data, start_marker, end_marker):
     """Updates the README.md file with the provided Markdown content within specified markers"""
     try:
-        readme_file = repo.get_contents("README.md")
+        readme_file = repo.get_contents(README)
         readme_content = readme_file.decoded_content.decode("utf-8")
 
         start_index = readme_content.find(start_marker)
@@ -193,7 +195,7 @@ def initialize_github():
 
 def get_readme_content(repo):
     """Get current README content"""
-    readme_file = repo.get_contents("README.md")
+    readme_file = repo.get_contents(README)
     if isinstance(readme_file, list):
         readme_file = readme_file[0]
     return readme_file.decoded_content.decode("utf-8")
@@ -251,7 +253,7 @@ def collect_files_to_update(current_readme, original_readme):
     """Collect files that needs to be updated"""
     files_to_update = {}
     if current_readme != original_readme:
-        files_to_update["README.md"] = current_readme.encode("utf-8")
+        files_to_update[README] = current_readme.encode("utf-8")
 
     for png_file in [
         "steam_summary.png",

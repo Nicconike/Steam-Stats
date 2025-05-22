@@ -29,7 +29,6 @@ RECENTLY_PLAYED_GAMES = (
 def get_player_summaries():
     """Get Player Summaries from Steam
     Fetch basic profile information for a list of 64-bit Steam IDs"""
-    # Construct the URL with all parameters
     url = PLAYER_SUMMARIES + "?key=" + STEAM_API_KEY + "&steamids=" + STEAM_ID
     try:
         response = requests.get(url, timeout=REQUEST_TIMEOUT)

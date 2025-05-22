@@ -2,12 +2,12 @@ name: "CodeQL & Pylint"
 
 on:
     push:
-        branches: master
+        branches: [master]
         paths:
             - ".github/workflows/codeql.yml"
             - "**/*.py"
     pull_request:
-        branches: master
+        branches: [master]
 
 jobs:
     codeql:
@@ -30,23 +30,13 @@ jobs:
             uses: github/codeql-action/init@v3
             with:
                 languages: python
-                queries: +security-extended
+                packs: codeql/python-queries:security-extended
 
           - name: Autobuild
             uses: github/codeql-action/autobuild@v3
 
           - name: Perform CodeQL Analysis
             uses: github/codeql-action/analyze@v3
-            with:
-                category: "/language:python"
-                output: codeql-report.sarif
-
-          - name: Upload CodeQL Results
-            if: always()
-            uses: actions/upload-artifact@v4
-            with:
-                name: codeql-results
-                path: codeql-report.sarif
 
     pylint:
         name: Pylint

@@ -1,5 +1,6 @@
 # .dockerignore
 __pycache__
+__pycache__/
 *.pyc
 *.pyo
 *.pyd
@@ -14,10 +15,19 @@ __pycache__
 Thumbs.db
 build/
 dist/
-.git
+.git/
 .gitignore
-.vscode
+.github/
+.vscode/
 .vercel
 .env
+.env.example
+.venv
 venv/
 env/
+tests/
+LICENSE
+CHANGELOG.md
+README.md
+action.yml
+pytest.ini

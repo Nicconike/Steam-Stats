@@ -3,12 +3,12 @@ name: "Code Coverage"
 on:
     workflow_dispatch:
     push:
-        branches: master
+        branches: [master]
         paths:
             - ".github/workflows/coverage.yml"
             - "**/*.py"
     pull_request:
-        branches: master
+        branches: [master]
 
 jobs:
     code-coverage:

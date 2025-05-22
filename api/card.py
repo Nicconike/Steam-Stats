@@ -5,6 +5,7 @@ import logging
 import math
 import os
 import asyncio
+from pathlib import Path
 from typing import Optional, TypedDict
 from playwright.async_api import async_playwright, Error as PlaywrightError
 
@@ -32,6 +33,10 @@ class FloatRect(TypedDict):
 repo_owner, repo_name = os.getenv("GITHUB_REPOSITORY", "owner/repo").split("/")
 branch_name = os.getenv("GITHUB_REF_NAME", "main")
 
+# Define the path to the assets directory
+REPO_ROOT = Path(__file__).resolve().parent.parent
+ASSETS_DIR = REPO_ROOT / "assets"
+
 # Persona state mapping for Steam Profile Status
 personastate_map = {
     0: "Offline",
@@ -54,6 +59,8 @@ def handle_exception(e):
         logger.error("Key Error: %s", e)
     elif isinstance(e, asyncio.TimeoutError):
         logger.error("Timeout Error: %s", e)
+    elif isinstance(e, ValueError):
+        logger.error("Value Error: %s", e)
     else:
         logger.error("Unexpected Error: %s", e)
 
@@ -69,7 +76,7 @@ async def get_element_bounding_box(
             raise FileNotFoundError("HTML file not found: " + html_file)
 
         async with async_playwright() as p:
-            browser = await p.firefox.launch(headless=True)
+            browser = await p.chromium.launch(headless=True)
             page = await browser.new_page()
             try:
                 await page.goto("file://" + os.path.abspath(html_file))
@@ -135,7 +142,7 @@ async def html_to_png(
     browser = None
     try:
         async with async_playwright() as p:
-            browser = await p.firefox.launch(headless=True)
+            browser = await p.chromium.launch(headless=True)
             page = await browser.new_page()
             await page.goto("file://" + os.path.abspath(html_file))
 
@@ -267,14 +274,63 @@ def generate_card_for_player_summary(player_data):
     </html>
     """
 
-    html_path = "assets/steam_summary.html"
-    png_path = "assets/steam_summary.png"
+    html_path = ASSETS_DIR / "steam_summary.html"
+    png_path = ASSETS_DIR / "steam_summary.png"
+
+    ASSETS_DIR.mkdir(parents=True, exist_ok=True)
     with open(html_path, "w", encoding="utf-8") as file:
         file.write(html_content)
 
     convert_html_to_png(html_path, png_path, CARD_SELECTOR)
 
-    return f"![Steam Summary](https://github.com/{repo_owner}/{repo_name}/blob/{branch_name}/{png_path})\n"
+    return (
+        f"![Steam Summary](https://github.com/{repo_owner}/"
+        f"{repo_name}/blob/{branch_name}/{png_path})\n"
+    )
+
+
+def format_playtime(playtime):
+    """Format playtime into human-readable format"""
+    if playtime < 60:
+        unit = "min" if playtime == 1 else "mins"
+        return f"{playtime} {unit}"
+    hours, minutes = divmod(playtime, 60)
+    if minutes == 0:
+        return f"{hours} hrs"
+    unit = "min" if minutes == 1 else "mins"
+    return f"{hours} hrs and {minutes} {unit}"
+
+
+def generate_progress_bar(game, index, max_playtime, log_scale, placeholder_image):
+    """Generate progress bar HTML for a single game"""
+    name = game.get("name", "Unknown Game")
+    playtime = game.get("playtime_2weeks", 0)
+    img_icon_url = (
+        placeholder_image
+        if name == "Spacewar"
+        else (
+            f"https://media.steampowered.com/steamcommunity/public/images/apps/"
+            f"{game.get('appid')}/{game.get('img_icon_url')}.jpg"
+        )
+    )
+    normalized_playtime = (
+        round(math.log1p(playtime) / math.log1p(max_playtime) * 100)
+        if log_scale
+        else round((playtime / max_playtime) * 100)
+    )
+    display_time = format_playtime(playtime)
+    style_class = f"progress-style-{(index % 6) + 1}"
+
+    return f"""
+    <div class="bar-container">
+        <img src="{img_icon_url}" alt="{name}" class="game-icon">
+        <progress class="{style_class}" value="{normalized_playtime}" max="100"></progress>
+        <div class="game-info">
+            <span class="game-name">{name}</span><br>
+            <span class="game-time">{display_time}</span>
+        </div>
+    </div>
+    """
 
 
 def generate_card_for_played_games(games_data):
@@ -292,47 +348,8 @@ def generate_card_for_played_games(games_data):
         max(game["playtime_2weeks"] for game in games_data["response"]["games"]) or 1
     )
 
-    def format_playtime(playtime):
-        """Format playtime into human-readable format"""
-        if playtime < 60:
-            unit = "min" if playtime == 1 else "mins"
-            return f"{playtime} {unit}"
-        hours, minutes = divmod(playtime, 60)
-        if minutes == 0:
-            return f"{hours} hrs"
-        unit = "min" if minutes == 1 else "mins"
-        return f"{hours} hrs and {minutes} {unit}"
-
-    def generate_progress_bar(game, index):
-        """Generate progress bar HTML for a single game"""
-        name = game.get("name", "Unknown Game")
-        playtime = game.get("playtime_2weeks", 0)
-        img_icon_url = (
-            placeholder_image
-            if name == "Spacewar"
-            else f"https://media.steampowered.com/steamcommunity/public/images/apps/{game.get('appid')}/{game.get('img_icon_url')}.jpg"
-        )
-        normalized_playtime = (
-            round(math.log1p(playtime) / math.log1p(max_playtime) * 100)
-            if log_scale
-            else round((playtime / max_playtime) * 100)
-        )
-        display_time = format_playtime(playtime)
-        style_class = f"progress-style-{(index % 6) + 1}"
-
-        return f"""
-        <div class="bar-container">
-            <img src="{img_icon_url}" alt="{name}" class="game-icon">
-            <progress class="{style_class}" value="{normalized_playtime}" max="100"></progress>
-            <div class="game-info">
-                <span class="game-name">{name}</span><br>
-                <span class="game-time">{display_time}</span>
-            </div>
-        </div>
-        """
-
     progress_bars = "".join(
-        generate_progress_bar(game, i)
+        generate_progress_bar(game, i, max_playtime, log_scale, placeholder_image)
         for i, game in enumerate(games_data["response"]["games"])
         if "name" in game and "playtime_2weeks" in game
     )
@@ -358,14 +375,19 @@ def generate_card_for_played_games(games_data):
     </html>
     """
 
-    html_path = "assets/recently_played_games.html"
-    png_path = "assets/recently_played_games.png"
+    html_path = ASSETS_DIR / "recently_played_games.html"
+    png_path = ASSETS_DIR / "recently_played_games.png"
+
+    ASSETS_DIR.mkdir(parents=True, exist_ok=True)
     with open(html_path, "w", encoding="utf-8") as file:
         file.write(html_content)
 
     convert_html_to_png(html_path, png_path, CARD_SELECTOR)
 
-    return f"![Recently Played Games](https://github.com/{repo_owner}/{repo_name}/blob/{branch_name}/{png_path})"
+    return (
+        f"![Recently Played Games](https://github.com/{repo_owner}/"
+        f"{repo_name}/blob/{branch_name}/{png_path})"
+    )
 
 
 def generate_card_for_steam_workshop(workshop_stats):
@@ -446,11 +468,16 @@ def generate_card_for_steam_workshop(workshop_stats):
     </html>
     """
 
-    html_path = "assets/steam_workshop_stats.html"
-    png_path = "assets/steam_workshop_stats.png"
+    html_path = ASSETS_DIR / "steam_workshop_stats.html"
+    png_path = ASSETS_DIR / "steam_workshop_stats.png"
+
+    ASSETS_DIR.mkdir(parents=True, exist_ok=True)
     with open(html_path, "w", encoding="utf-8") as file:
         file.write(html_content)
 
     convert_html_to_png(html_path, png_path, CARD_SELECTOR)
 
-    return f"![Steam Workshop Stats](https://github.com/{repo_owner}/{repo_name}/blob/{branch_name}/{png_path})"
+    return (
+        f"![Steam Workshop Stats](https://github.com/{repo_owner}/"
+        f"{repo_name}/blob/{branch_name}/{png_path})"
+    )

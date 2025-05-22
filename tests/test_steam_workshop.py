@@ -12,6 +12,7 @@ from api.steam_workshop import (
     has_next_page,
     handle_request_exception,
     fetch_workshop_item_links,
+    parse_stats_table,
     fetch_individual_workshop_stats,
     fetch_all_workshop_stats,
     BeautifulSoup,
@@ -282,25 +283,78 @@ def test_fetch_workshop_item_links_multiple_pages(mock_dependencies, requests_mo
         pytest.fail("Result should be " + str(expected_result))
 
 
-# def test_fetch_workshop_item_links_request_exception(mock_dependencies, requests_mock, caplog):
-#     """Test fetching workshop item links with request exception"""
-#     mock_dependencies['is_server_online'].return_value = True
-#     mock_dependencies['extract_links'].return_value = [
-#         "https://steamcommunity.com/sharedfiles/filedetails/?id=2984474065"
-#     ]
-#     mock_dependencies['has_next_page'].return_value = True
-#     requests_mock.get('https://steamcommunity.com/id/dummy_custom_id/myworkshopfiles/?p=1',
-#                       exc=requests.exceptions.RequestException)
+def test_fetch_workshop_item_links_request_exception(mock_dependencies):
+    """Test fetch_workshop_item_links when a request exception occurs"""
+    mock_dependencies["is_server_online"].return_value = True
 
-#     with pytest.raises(ValueError, match="No items were found in your Steam Workshop"):
-#         fetch_workshop_item_links("dummy_custom_id", "dummy_api_key")
+    with patch(
+        "api.steam_workshop.requests.get",
+        side_effect=requests.exceptions.ConnectionError,
+    ):
+        with patch("api.steam_workshop.handle_request_exception") as mock_handle:
+            with pytest.raises(
+                ValueError, match="No items were found in your Steam Workshop"
+            ):
+                fetch_workshop_item_links("dummy_custom_id", "dummy_api_key")
+            mock_handle.assert_called_once()
 
-#     mock_dependencies['handle_request_exception'].assert_called_once()
 
-#     error_logs = [
-#         record for record in caplog.records if record.levelname == "ERROR"]
-#     if len(error_logs) != 1:
-#         pytest.fail("Expected one error log, found " + str(len(error_logs)))
+@pytest.mark.parametrize(
+    "html_input, is_tag, expected, should_log_error, error_value",
+    [
+        (
+            "<table>"
+            + "<tr><td>1,234</td><td>Subscribers</td></tr>"
+            + "<tr><td>56</td><td>Favorites</td></tr>"
+            + "</table>",
+            True,
+            {"subscribers": 1234, "favorites": 56},
+            False,
+            None,
+        ),
+        (
+            "not_a_tag",
+            False,
+            {},
+            False,
+            None,
+        ),
+        (
+            "<table></table>",
+            True,
+            {},
+            False,
+            None,
+        ),
+        (
+            "<table><tr><td>abc</td><td>Downloads</td></tr></table>",
+            True,
+            {"downloads": 0},
+            True,
+            "abc",
+        ),
+    ],
+)
+def test_parse_stats_table_combined(
+    html_input, is_tag, expected, should_log_error, error_value
+):
+    """Test parse_stats_table with various inputs"""
+    if is_tag:
+        soup = BeautifulSoup(html_input, "html.parser")
+        stats_table = soup.find("table")
+    else:
+        stats_table = html_input
+
+    if should_log_error:
+        with patch("api.steam_workshop.logger") as mock_logger:
+            result = parse_stats_table(stats_table)
+            assert result == expected
+            mock_logger.error.assert_called_with(
+                "Could not convert value to int: %s", error_value
+            )
+    else:
+        result = parse_stats_table(stats_table)
+        assert result == expected
 
 
 def test_fetch_individual_workshop_stats_success(mock_requests_get, mock_beautifulsoup):
@@ -355,67 +409,78 @@ def test_fetch_individual_workshop_stats_request_exception(mock_requests_get):
         raise AssertionError("Expected result to be an empty dictionary")
 
 
-def test_fetch_all_workshop_stats_success(mock_requests_get, mock_beautifulsoup):
-    """Test successful fetching of all workshop stats"""
-    mock_requests_get.side_effect = [
-        Mock(
-            status_code=200,
-            content=(
-                '<table class="stats_table"><tr><td>100</td><td>unique_visitors</td></tr></table>'
-            ),
-        ),
-        Mock(
-            status_code=200,
-            content=(
-                '<table class="stats_table"><tr><td>200</td><td>unique_visitors</td></tr></table>'
-            ),
-        ),
-    ]
-    mock_soup1 = BeautifulSoup(
-        '<table class="stats_table"><tr><td>100</td><td>unique_visitors</td></tr></table>',
-        "html.parser",
-    )
-    mock_soup2 = BeautifulSoup(
-        '<table class="stats_table"><tr><td>200</td><td>unique_visitors</td></tr></table>',
-        "html.parser",
-    )
-    mock_beautifulsoup.side_effect = [mock_soup1, mock_soup2]
+def test_fetch_all_workshop_stats_all_success():
+    """Test fetch_all_workshop_stats with all successful responses"""
+    mock_stats_1 = {
+        "unique_visitors": 100,
+        "current_subscribers": 50,
+        "current_favorites": 25,
+    }
+    mock_stats_2 = {
+        "unique_visitors": 200,
+        "current_subscribers": 75,
+        "current_favorites": 35,
+    }
 
-    result = fetch_all_workshop_stats(
-        ["https://example.com/item1", "https://example.com/item2"]
-    )
+    with patch("api.steam_workshop.fetch_individual_workshop_stats") as mock_fetch:
+        mock_fetch.side_effect = [mock_stats_1, mock_stats_2]
+        result = fetch_all_workshop_stats(
+            ["https://example.com/item1", "https://example.com/item2"]
+        )
 
     if result["total_unique_visitors"] != 300:
         raise AssertionError("Expected total_unique_visitors to be 300")
-    if result["total_current_subscribers"] != 0:
-        raise AssertionError("Expected total_current_subscribers to be 0")
-    if result["total_current_favorites"] != 0:
-        raise AssertionError("Expected total_current_favorites to be 0")
+    if result["total_current_subscribers"] != 125:
+        raise AssertionError("Expected total_current_subscribers to be 125")
+    if result["total_current_favorites"] != 60:
+        raise AssertionError("Expected total_current_favorites to be 60")
+    if len(result["individual_stats"]) != 2:
+        raise AssertionError("Expected two individual stat entries")
 
 
-def test_fetch_all_workshop_stats_request_exception(mock_requests_get):
-    """Test request exception handling for all workshop stats"""
-    mock_requests_get.side_effect = [
-        requests.exceptions.RequestException,
-        Mock(
-            status_code=200,
-            content=(
-                '<table class="stats_table"><tr><td>200</td><td>unique_visitors</td></tr></table>'
-            ),
-        ),
-    ]
-    mock_soup = BeautifulSoup(
-        '<table class="stats_table"><tr><td>200</td><td>unique_visitors</td></tr></table>',
-        "html.parser",
-    )
-    with patch("api.steam_workshop.BeautifulSoup", return_value=mock_soup):
+def test_fetch_all_workshop_stats_partial_failure():
+    """Test fetch_all_workshop_stats with one failure and one success"""
+    mock_stats = {
+        "unique_visitors": 200,
+        "current_subscribers": 75,
+        "current_favorites": 35,
+    }
+
+    with patch("api.steam_workshop.fetch_individual_workshop_stats") as mock_fetch:
+        mock_fetch.side_effect = [
+            requests.exceptions.RequestException("Network failed"),
+            mock_stats,
+        ]
         result = fetch_all_workshop_stats(
             ["https://example.com/item1", "https://example.com/item2"]
         )
 
     if result["total_unique_visitors"] != 200:
         raise AssertionError("Expected total_unique_visitors to be 200")
+    if result["total_current_subscribers"] != 75:
+        raise AssertionError("Expected total_current_subscribers to be 75")
+    if result["total_current_favorites"] != 35:
+        raise AssertionError("Expected total_current_favorites to be 35")
+    if len(result["individual_stats"]) != 1:
+        raise AssertionError("Expected one individual stat entry")
+
+
+def test_fetch_all_workshop_stats_all_failures():
+    """Test fetch_all_workshop_stats with all requests failing"""
+    with patch("api.steam_workshop.fetch_individual_workshop_stats") as mock_fetch:
+        mock_fetch.side_effect = [
+            requests.exceptions.RequestException("Boom"),
+            AttributeError("Missing attribute"),
+        ]
+        result = fetch_all_workshop_stats(
+            ["https://example.com/item1", "https://example.com/item2"]
+        )
+
+    if result["total_unique_visitors"] != 0:
+        raise AssertionError("Expected total_unique_visitors to be 0")
     if result["total_current_subscribers"] != 0:
         raise AssertionError("Expected total_current_subscribers to be 0")
     if result["total_current_favorites"] != 0:
         raise AssertionError("Expected total_current_favorites to be 0")
+    if len(result["individual_stats"]) != 0:
+        raise AssertionError("Expected no individual stat entries")
