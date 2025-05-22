@@ -34,7 +34,7 @@ WORKSHOP_STATS = os.getenv("INPUT_WORKSHOP_STATS", "false").lower() in (
 )
 
 # Version Identifier for Changelog
-__version__ = "1.2.1"
+__version__ = "1.3.0"
 
 README = "README.md"
 

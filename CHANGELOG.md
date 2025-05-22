@@ -1,6 +1,186 @@
 # CHANGELOG
 
 
+## v1.3.0 (2025-05-22)
+
+### Build System
+
+- Update API URLs to use HTTPS and modify configuration files
+  ([`39527ee`](https://github.com/Nicconike/Steam-Stats/commit/39527ee1b6ab6b30fe8967edf9274aa9ba8f9435))
+
+- **deps**: Update dependabot config
+  ([`19dd504`](https://github.com/Nicconike/Steam-Stats/commit/19dd50470f8a7e71b9e4500513d947fd7b61aac4))
+
+### Chores
+
+- Update Pylint Badge
+  ([`90608b8`](https://github.com/Nicconike/Steam-Stats/commit/90608b804e7cdd5e68a7c8ebf47544d0e16d226d))
+
+- Update Pylint Badge
+  ([`5f85685`](https://github.com/Nicconike/Steam-Stats/commit/5f856852db6758c7f2a1f180ff9de03806b1c2c9))
+
+- Update Pylint Badge
+  ([`470b845`](https://github.com/Nicconike/Steam-Stats/commit/470b845d9027acee503ba770ea60a0b9644305b1))
+
+- Update Pylint Badge
+  ([`4163886`](https://github.com/Nicconike/Steam-Stats/commit/4163886f3e03f7190651d28c977dbe52f57b3794))
+
+- Update Steam Stats
+  ([`e22f0fa`](https://github.com/Nicconike/Steam-Stats/commit/e22f0fa6733337dfac0b81b195ed752d3ace532f))
+
+- Update Steam Stats
+  ([`a1bd732`](https://github.com/Nicconike/Steam-Stats/commit/a1bd732b2bad64c907718173f61d5f3bea16f994))
+
+- Update Steam Stats
+  ([`a2669b3`](https://github.com/Nicconike/Steam-Stats/commit/a2669b3a5618e48b89de68263d54d425270048a9))
+
+- Update Steam Stats
+  ([`49b0274`](https://github.com/Nicconike/Steam-Stats/commit/49b02747c13bec2fe15ab383dc6225f6becbccbb))
+
+- Update Steam Stats
+  ([`d66f783`](https://github.com/Nicconike/Steam-Stats/commit/d66f783b887b265415bbffb7fe85b3e5b142a3ce))
+
+- Update Steam Stats
+  ([`2175e57`](https://github.com/Nicconike/Steam-Stats/commit/2175e57c1f9bc1a2c75c66e3c91ae1626f82517d))
+
+- Update Steam Stats
+  ([`75f640f`](https://github.com/Nicconike/Steam-Stats/commit/75f640fb827ef71dad821d1d1d25a35791eb4a12))
+
+- Update Steam Stats
+  ([`debba3f`](https://github.com/Nicconike/Steam-Stats/commit/debba3f280500918f4206220931692c65a9d9e83))
+
+- Update Steam Stats
+  ([`b15953a`](https://github.com/Nicconike/Steam-Stats/commit/b15953a2706587904a11efc09c0f0503a39245a0))
+
+- Update Steam Stats
+  ([`b1bbc75`](https://github.com/Nicconike/Steam-Stats/commit/b1bbc759b2835d81301e5e32fbd180badf4dd387))
+
+- Update Steam Stats
+  ([`33ed342`](https://github.com/Nicconike/Steam-Stats/commit/33ed342d4713462f00a0f96010fa63d5d022c109))
+
+- Update Steam Stats
+  ([`53a0805`](https://github.com/Nicconike/Steam-Stats/commit/53a08054e0a3bd901c1a068aeacecfee13adacf7))
+
+- Update Steam Stats
+  ([`739bba0`](https://github.com/Nicconike/Steam-Stats/commit/739bba015108664d1137b97ecd0fae94a3809ec7))
+
+- Update Steam Stats
+  ([`e44ae22`](https://github.com/Nicconike/Steam-Stats/commit/e44ae22f46a55a3ae34f1dedd11a406fad547121))
+
+- Update Steam Stats
+  ([`b0b4fc0`](https://github.com/Nicconike/Steam-Stats/commit/b0b4fc0eb39d2a018ab5c449b72fbc1cf0e2c5ad))
+
+- Update Steam Stats
+  ([`ebd3aca`](https://github.com/Nicconike/Steam-Stats/commit/ebd3acaada7fc8cd8c895ef3392618aca1136aef))
+
+- Update Steam Stats
+  ([`7878200`](https://github.com/Nicconike/Steam-Stats/commit/787820079b9a934e4e52fe14f84a957a09be448f))
+
+- Update Steam Stats
+  ([`1dd8b55`](https://github.com/Nicconike/Steam-Stats/commit/1dd8b55f3fe7468ad86279b58966a1409f567221))
+
+- Update Steam Stats
+  ([`1266863`](https://github.com/Nicconike/Steam-Stats/commit/1266863b0cfa7a5df3dcc1e46f6782ceb945d78f))
+
+- Update Steam Stats
+  ([`4f9398f`](https://github.com/Nicconike/Steam-Stats/commit/4f9398f7aa4b67e287c5d80dc66837ff48c55c1a))
+
+- Update Steam Stats
+  ([`54104ff`](https://github.com/Nicconike/Steam-Stats/commit/54104ff559fb2c343c1b20f49b7e9c4c15d3c0d0))
+
+### Continuous Integration
+
+- Bump python-semantic-release/python-semantic-release
+  ([#52](https://github.com/Nicconike/Steam-Stats/pull/52),
+  [`002cee5`](https://github.com/Nicconike/Steam-Stats/commit/002cee559910821d76c0b6a11efffcebc27dc2ff))
+
+Bumps the github-actions group with 1 update:
+  [python-semantic-release/python-semantic-release](https://github.com/python-semantic-release/python-semantic-release).
+
+Updates `python-semantic-release/python-semantic-release` from 9.15.2 to 9.16.1
+
+- Bump python-semantic-release/python-semantic-release
+  ([#53](https://github.com/Nicconike/Steam-Stats/pull/53),
+  [`8f7efb9`](https://github.com/Nicconike/Steam-Stats/commit/8f7efb9740e76b5f43b66ba7ccb0c02027b43510))
+
+Bumps the github-actions group with 1 update:
+  [python-semantic-release/python-semantic-release](https://github.com/python-semantic-release/python-semantic-release).
+
+Updates `python-semantic-release/python-semantic-release` from 9.16.1 to 9.17.0 - [Release
+  notes](https://github.com/python-semantic-release/python-semantic-release/releases) -
+  [Changelog](https://github.com/python-semantic-release/python-semantic-release/blob/master/CHANGELOG.rst)
+  -
+  [Commits](https://github.com/python-semantic-release/python-semantic-release/compare/v9.16.1...v9.17.0)
+
+- Bump the github-actions group across 1 directory with 3 updates
+  ([#60](https://github.com/Nicconike/Steam-Stats/pull/60),
+  [`e0f7aaf`](https://github.com/Nicconike/Steam-Stats/commit/e0f7aaf98084855597e75ea6ee13312d3143054c))
+
+Bumps the github-actions group with 3 updates in the / directory:
+  [python-semantic-release/python-semantic-release](https://github.com/python-semantic-release/python-semantic-release),
+  [sigstore/cosign-installer](https://github.com/sigstore/cosign-installer) and
+  [docker/scout-action](https://github.com/docker/scout-action).
+
+Updates `python-semantic-release/python-semantic-release` from 9.19.0 to 9.21.0 Updates
+  `sigstore/cosign-installer` from 3.8.0 to 3.8.1 Updates `docker/scout-action` from 1.16.1 to
+  1.16.3
+
+- Bump the github-actions group with 2 updates
+  ([#55](https://github.com/Nicconike/Steam-Stats/pull/55),
+  [`7886706`](https://github.com/Nicconike/Steam-Stats/commit/7886706a5b6005572519ff0b8a5d76509c49a147))
+
+Bumps the github-actions group with 2 updates:
+  [python-semantic-release/python-semantic-release](https://github.com/python-semantic-release/python-semantic-release)
+  and [sigstore/cosign-installer](https://github.com/sigstore/cosign-installer).
+
+Updates `python-semantic-release/python-semantic-release` from 9.17.0 to 9.19.0 Updates
+  `sigstore/cosign-installer` from 3.7.0 to 3.8.0
+
+- Update pylint workflow
+  ([`f55040f`](https://github.com/Nicconike/Steam-Stats/commit/f55040fdad59f2b002d256eb20c5fa130a188c65))
+
+### Documentation
+
+- Add openssf badge
+  ([`0c36f3b`](https://github.com/Nicconike/Steam-Stats/commit/0c36f3b23bfde59297022c85a1e906ce6d577f17))
+
+Signed-off-by: Nicco <38905025+Nicconike@users.noreply.github.com>
+
+### Features
+
+- **api**: Upgrade Playwright to v1.52.0 and refactor Dockerfile
+  ([`fa2afd7`](https://github.com/Nicconike/Steam-Stats/commit/fa2afd726b99526532718c65a3e6daa58dbaf870))
+
+- Updated Dockerfile to use Playwright v1.52.0 with pinned digest. - Refactored environment variable
+  settings and user creation in Dockerfile. - Simplified installation of Python dependencies and
+  removed unnecessary asset directory creation.
+
+fix: Update assets path to resolve a bug where it was unable to find the api module
+
+- Updated asset paths to reflect new directory structure. - Changed browser launch from Firefox to
+  Chromium for consistency. - Adjusted test cases to cover new error handling scenarios and ensure
+  robustness.
+
+refactor: Enhance card generation logic and error handling
+
+- Introduced `format_playtime` function to format playtime into a human-readable format. - Added
+  `generate_progress_bar` function to create HTML for game progress bars. - Improved error handling
+  in `get_element_bounding_box` and `html_to_png` functions. - Updated card generation functions to
+  utilize new asset directory structure.
+
+chore: Update dependencies and improve test coverage
+
+- Updated dependencies in pyproject.toml and requirements.txt for compatibility. - Enhanced test
+  coverage for card generation and workshop fetching functions. - Added new tests for error handling
+  and edge cases in workshop stats fetching. - Refactored tests to improve readability and
+  maintainability.
+
+### Refactoring
+
+- Resolve pylint warning and refactor unit tests code
+  ([`e626afb`](https://github.com/Nicconike/Steam-Stats/commit/e626afb6e76a704e794d5591833f353b841007bc))
+
+
 ## v1.2.1 (2025-01-01)
 
 ### Bug Fixes
@@ -79,8 +259,7 @@ Co-authored-by: dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.c
 Bumps playwright/python from v1.46.0-jammy to v1.47.0-jammy.
 
 --- updated-dependencies: - dependency-name: playwright/python dependency-type: direct:production
-
-...
+  ...
 
 Signed-off-by: dependabot[bot] <support@github.com>
 
@@ -189,9 +368,7 @@ Updates `pipdeptree` from 2.23.1 to 2.23.3 - [Release
 
 update-type: version-update:semver-patch
 
-dependency-group: python-packages
-
-...
+dependency-group: python-packages ...
 
 Signed-off-by: dependabot[bot] <support@github.com>
 
@@ -212,9 +389,7 @@ Updates `playwright` from 1.46.0 to 1.47.0 - [Release
 
 update-type: version-update:semver-minor
 
-dependency-group: python-packages
-
-...
+dependency-group: python-packages ...
 
 Signed-off-by: dependabot[bot] <support@github.com>
 
@@ -235,9 +410,7 @@ Updates `pytest-cov` from 5.0.0 to 6.0.0 -
 
 update-type: version-update:semver-major
 
-dependency-group: python-packages
-
-...
+dependency-group: python-packages ...
 
 Signed-off-by: dependabot[bot] <support@github.com>
 
@@ -269,7 +442,7 @@ dependency-group: python-packages
 
 - dependency-name: python-semantic-release dependency-type: direct:production
 
-...
+dependency-group: python-packages ...
 
 Signed-off-by: dependabot[bot] <support@github.com>
 
@@ -302,7 +475,7 @@ dependency-group: python-packages
 
 - dependency-name: pylint dependency-type: direct:production
 
-...
+dependency-group: python-packages ...
 
 Signed-off-by: dependabot[bot] <support@github.com>
 
@@ -333,7 +506,7 @@ dependency-group: python-packages
 
 update-type: version-update:semver-minor
 
-...
+dependency-group: python-packages ...
 
 Signed-off-by: dependabot[bot] <support@github.com>
 
@@ -368,7 +541,7 @@ dependency-group: python-packages
 
 update-type: version-update:semver-patch
 
-...
+dependency-group: python-packages ...
 
 Signed-off-by: dependabot[bot] <support@github.com>
 
@@ -391,9 +564,7 @@ Updates `docker/scout-action` from 1.13.0 to 1.14.0 - [Release
 
 update-type: version-update:semver-minor
 
-dependency-group: github-actions
-
-...
+dependency-group: github-actions ...
 
 Signed-off-by: dependabot[bot] <support@github.com>
 
@@ -417,9 +588,7 @@ Updates `python-semantic-release/python-semantic-release` from 9.8.7 to 9.8.8 - 
 
 update-type: version-update:semver-patch
 
-dependency-group: github-actions
-
-...
+dependency-group: github-actions ...
 
 Signed-off-by: dependabot[bot] <support@github.com>
 
@@ -443,9 +612,7 @@ Updates `python-semantic-release/python-semantic-release` from 9.8.8 to 9.9.0 - 
 
 update-type: version-update:semver-minor
 
-dependency-group: github-actions
-
-...
+dependency-group: github-actions ...
 
 Signed-off-by: dependabot[bot] <support@github.com>
 
@@ -469,9 +636,7 @@ Updates `python-semantic-release/python-semantic-release` from 9.9.0 to 9.10.0 -
 
 update-type: version-update:semver-minor
 
-dependency-group: github-actions
-
-...
+dependency-group: github-actions ...
 
 Signed-off-by: dependabot[bot] <support@github.com>
 
@@ -573,8 +738,7 @@ Co-authored-by: dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.c
 Bumps playwright/python from v1.44.0-jammy to v1.45.0-jammy.
 
 --- updated-dependencies: - dependency-name: playwright/python dependency-type: direct:production
-
-...
+  ...
 
 Signed-off-by: dependabot[bot] <support@github.com>
 
@@ -589,8 +753,7 @@ Co-authored-by: Nicco <38905025+Nicconike@users.noreply.github.com>
 Bumps playwright/python from v1.45.0-jammy to v1.45.1-jammy.
 
 --- updated-dependencies: - dependency-name: playwright/python dependency-type: direct:production
-
-...
+  ...
 
 Signed-off-by: dependabot[bot] <support@github.com>
 
@@ -603,8 +766,7 @@ Co-authored-by: dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.c
 Bumps playwright/python from v1.45.1-jammy to v1.46.0-jammy.
 
 --- updated-dependencies: - dependency-name: playwright/python dependency-type: direct:production
-
-...
+  ...
 
 Signed-off-by: dependabot[bot] <support@github.com>
 
@@ -710,9 +872,7 @@ Updates `pipdeptree` from 2.23.0 to 2.23.1 - [Release
 
 update-type: version-update:semver-patch
 
-dependency-group: python-packages
-
-...
+dependency-group: python-packages ...
 
 Signed-off-by: dependabot[bot] <support@github.com>
 
@@ -735,9 +895,7 @@ Updates `playwright` from 1.45.0 to 1.45.1 - [Release
 
 update-type: version-update:semver-patch
 
-dependency-group: python-packages
-
-...
+dependency-group: python-packages ...
 
 Signed-off-by: dependabot[bot] <support@github.com>
 
@@ -758,9 +916,7 @@ Updates `playwright` from 1.45.1 to 1.46.0 - [Release
 
 update-type: version-update:semver-minor
 
-dependency-group: python-packages
-
-...
+dependency-group: python-packages ...
 
 Signed-off-by: dependabot[bot] <support@github.com>
 
@@ -793,7 +949,7 @@ dependency-group: python-packages
 
 - dependency-name: pylint dependency-type: direct:production
 
-...
+dependency-group: python-packages ...
 
 Signed-off-by: dependabot[bot] <support@github.com>
 
@@ -834,7 +990,7 @@ update-type: version-update:semver-patch
 
 - dependency-name: pytest-asyncio dependency-type: direct:production
 
-...
+dependency-group: python-packages ...
 
 Signed-off-by: dependabot[bot] <support@github.com>
 
@@ -856,9 +1012,7 @@ Updates `docker/scout-action` from 1.11.0 to 1.13.0 - [Release
 
 update-type: version-update:semver-minor
 
-dependency-group: github-actions
-
-...
+dependency-group: github-actions ...
 
 Signed-off-by: dependabot[bot] <support@github.com>
 
@@ -882,9 +1036,7 @@ Updates `python-semantic-release/python-semantic-release` from 9.8.3 to 9.8.5 - 
 
 update-type: version-update:semver-patch
 
-dependency-group: github-actions
-
-...
+dependency-group: github-actions ...
 
 Signed-off-by: dependabot[bot] <support@github.com>
 
@@ -908,9 +1060,7 @@ Updates `python-semantic-release/python-semantic-release` from 9.8.6 to 9.8.7 - 
 
 update-type: version-update:semver-patch
 
-dependency-group: github-actions
-
-...
+dependency-group: github-actions ...
 
 Signed-off-by: dependabot[bot] <support@github.com>
 
@@ -945,7 +1095,7 @@ dependency-group: github-actions
 
 update-type: version-update:semver-minor
 
-...
+dependency-group: github-actions ...
 
 Signed-off-by: dependabot[bot] <support@github.com>
 
@@ -1054,7 +1204,7 @@ dependency-group: python-packages
 
 update-type: version-update:semver-patch
 
-...
+dependency-group: python-packages ...
 
 Signed-off-by: dependabot[bot] <support@github.com>
 
@@ -1117,9 +1267,7 @@ Updates `pylint` from 3.2.3 to 3.2.5 - [Release
 
 update-type: version-update:semver-patch
 
-dependency-group: python-packages
-
-...
+dependency-group: python-packages ...
 
 Signed-off-by: dependabot[bot] <support@github.com>
 
@@ -1203,7 +1351,7 @@ BREAKING CHANGE: Major Release 🚀
 - Update test_steam_workshop.py for 100% coverage
   ([`72c964f`](https://github.com/Nicconike/Steam-Stats/commit/72c964faa4e7b7ce8838899554105324dd308709))
 
-### BREAKING CHANGES
+### Breaking Changes
 
 - Major Release 🚀
 
@@ -1259,9 +1407,7 @@ Updates `docker/scout-action` from 1.9.3 to 1.10.0 - [Release
 
 update-type: version-update:semver-minor
 
-dependency-group: github-actions
-
-...
+dependency-group: github-actions ...
 
 Signed-off-by: dependabot[bot] <support@github.com>
 
