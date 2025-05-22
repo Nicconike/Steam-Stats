@@ -30,7 +30,8 @@ jobs:
             uses: github/codeql-action/init@v3
             with:
                 languages: python
-                packs: codeql/python-queries:security-extended
+                config-file: ./.github/workflows/codeql.yml
+                queries: +security-and-quality
 
           - name: Autobuild
             uses: github/codeql-action/autobuild@v3

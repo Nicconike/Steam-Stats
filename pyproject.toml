@@ -73,7 +73,10 @@ token = { env = "GH_TOKEN" }
 upload_to_vcs_release = true
 
 [tool.semantic_release.changelog]
-changelog_file = "CHANGELOG.md"
+default_templates.changelog_file = "CHANGELOG.md"
+changelog_insertion_flag = "{{ changelog_insertion_flag }}"
+changelog_mode = "prepend"
+template_dir = "templates"
 exclude_commit_patterns = []
 
 [tool.semantic_release.changelog.environment]

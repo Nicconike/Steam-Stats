@@ -348,13 +348,24 @@ def test_parse_stats_table_combined(
     if should_log_error:
         with patch("api.steam_workshop.logger") as mock_logger:
             result = parse_stats_table(stats_table)
-            assert result == expected
-            mock_logger.error.assert_called_with(
-                "Could not convert value to int: %s", error_value
-            )
+            if result != expected:
+                pytest.fail(f"Expected {expected}, got {result}")
+            if mock_logger.error.call_count != 1:
+                pytest.fail("Expected logger.error to be called once")
+            if (
+                mock_logger.error.call_args[0][0]
+                != "Could not convert value to int: %s"
+            ):
+                pytest.fail("Incorrect error message format")
+            if mock_logger.error.call_args[0][1] != error_value:
+                pytest.fail(
+                    f"Expected error value '{error_value}', got '{
+                        mock_logger.error.call_args[0][1]}'"
+                )
     else:
         result = parse_stats_table(stats_table)
-        assert result == expected
+        if result != expected:
+            pytest.fail(f"Expected {expected}, got {result}")
 
 
 def test_fetch_individual_workshop_stats_success(mock_requests_get, mock_beautifulsoup):

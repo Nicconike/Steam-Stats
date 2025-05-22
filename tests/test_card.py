@@ -262,7 +262,8 @@ async def _test_element_not_found(html_file, selector):
 
                 if expected_detail not in str(log_call_args[1]):
                     raise AssertionError(
-                        f"Expected exception message to contain '{expected_detail}', got '{log_call_args[1]}'"
+                        f"Expected exception message to contain '{expected_detail}', got '{
+                            log_call_args[1]}'"
                     )
 
 
@@ -359,10 +360,12 @@ async def test_html_to_png_bounding_box_none():
         "api.card.get_element_bounding_box", new_callable=AsyncMock, return_value=None
     ), patch("api.card.logger") as mock_logger:
         result = await html_to_png(html_file, output_file, selector)
-        assert result is False
-        mock_logger.error.assert_called_once_with(
-            "Bounding box could not be determined"
-        )
+        if result:
+            pytest.fail("Expected False when bounding box is None")
+        if mock_logger.error.call_count != 1:
+            pytest.fail("Expected logger.error to be called once")
+        if mock_logger.error.call_args[0][0] != "Bounding box could not be determined":
+            pytest.fail("Incorrect error message logged")
 
 
 @pytest.mark.asyncio
@@ -392,8 +395,12 @@ async def test_html_to_png_exceptions(exception):
         )
 
         result = await html_to_png(html_file, output_file, selector)
-        assert result is False
-        mock_handle.assert_called_once_with(exception)
+        if result:
+            pytest.fail(f"Expected False due to exception: {exception}")
+        if mock_handle.call_count != 1:
+            pytest.fail("handle_exception should be called once")
+        if mock_handle.call_args[0][0] != exception:
+            pytest.fail("handle_exception called with incorrect exception")
 
 
 def test_convert_html_to_png():
@@ -426,8 +433,12 @@ def test_convert_html_to_png_exceptions(raised_exception):
         "api.card.handle_exception"
     ) as mock_handle:
         result = convert_html_to_png(html_file, output_file, selector)
-        assert result is False
-        mock_handle.assert_called_once_with(raised_exception)
+        if result:
+            pytest.fail(f"Expected False for exception: {raised_exception}")
+        if mock_handle.call_count != 1:
+            pytest.fail("handle_exception should be called once")
+        if mock_handle.call_args[0][0] != raised_exception:
+            pytest.fail("handle_exception called with wrong exception")
 
 
 def test_format_unix_time():
@@ -484,7 +495,9 @@ def test_generate_card_for_player_summary():
 )
 def test_format_playtime(playtime, expected):
     """Test format_playtime function with various playtime inputs."""
-    assert format_playtime(playtime) == expected
+    actual = format_playtime(playtime)
+    if actual != expected:
+        pytest.fail(f"Expected '{expected}', got '{actual}' for playtime={playtime}")
 
 
 def test_generate_card_for_played_games():

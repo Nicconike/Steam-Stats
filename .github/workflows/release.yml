@@ -29,7 +29,8 @@ jobs:
             issues: write
             pull-requests: write
         outputs:
-            new_release_version: ${{ steps.semantic.outputs.new_release_version }}
+            released: ${{ steps.semantic.outputs.released }}
+            version: ${{ steps.semantic.outputs.version }}
         steps:
           - name: GitHub App Token
             uses: actions/create-github-app-token@v1
@@ -80,7 +81,7 @@ jobs:
         name: Docker
         runs-on: ubuntu-latest
         needs: release
-        if: needs.release.outputs.new_release_version != ''
+        if: needs.release.outputs.released == 'true'
         concurrency:
             group: ${{ github.workflow }}-${{ github.ref }}
             cancel-in-progress: ${{ github.ref != 'refs/heads/master' }}
@@ -127,9 +128,7 @@ jobs:
 
           - name: Get latest Release
             id: get_latest_release
-            run: |
-                latest_release=$(gh release list --limit 1 --json tagName --jq '.[0].tagName')
-                echo "LATEST_RELEASE=${latest_release}" >> $GITHUB_ENV
+            run: echo "LATEST_RELEASE=${{ needs.release.outputs.version }}" >> $GITHUB_ENV
             env:
                 GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -192,7 +191,11 @@ jobs:
     cleanup:
         runs-on: ubuntu-latest
         name: Cleanup
-        needs: docker
+        needs: release
+        if: needs.release.outputs.released == 'true'
+        concurrency:
+            group: ${{ github.workflow }}-${{ github.ref }}
+            cancel-in-progress: ${{ github.ref != 'refs/heads/master' }}
         permissions:
             contents: read
             packages: write
