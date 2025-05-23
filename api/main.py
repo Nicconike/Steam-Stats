@@ -2,17 +2,22 @@
 
 # Disable pylint warnings for false positives
 # pylint: disable=duplicate-code
-import base64
 import logging
 import os
 import time
-from github import Github, InputGitTreeElement
 from api.steam_stats import get_player_summaries, get_recently_played_games
 from api.steam_workshop import fetch_workshop_item_links, fetch_all_workshop_stats
 from api.card import (
     generate_card_for_player_summary,
     generate_card_for_played_games,
     generate_card_for_steam_workshop,
+)
+from api.utils import (
+    initialize_github,
+    create_tree_elements,
+    get_readme_content,
+    get_asset_paths,
+    README,
 )
 
 # Configure logging
@@ -35,8 +40,6 @@ WORKSHOP_STATS = os.getenv("INPUT_WORKSHOP_STATS", "false").lower() in (
 
 # Version Identifier for Changelog
 __version__ = "1.3.0"
-
-README = "README.md"
 
 
 def update_readme(repo, markdown_data, start_marker, end_marker):
@@ -115,47 +118,6 @@ def generate_workshop_stats():
     return workshop_markdown_content
 
 
-def get_github_token():
-    """Get GitHub token from environment variables"""
-    token = (
-        os.environ.get("GITHUB_TOKEN")
-        or os.environ.get("GH_TOKEN")
-        or os.environ.get("INPUT_GH_TOKEN")
-    )
-    if not token:
-        raise ValueError(
-            "No GitHub token found in env vars (GITHUB_TOKEN, GH_TOKEN or INPUT_GH_TOKEN"
-        )
-    return token
-
-
-def get_repo(g):
-    """Get Repo object"""
-    repo_name = os.environ.get("GITHUB_REPOSITORY")
-    if not repo_name:
-        raise ValueError("GITHUB_REPOSITORY environment variable not set")
-    return g.get_repo(repo_name)
-
-
-def create_tree_elements(repo, files_to_update):
-    """Create tree elements for GitHub commit"""
-    tree_elements = []
-    for file_path, file_content in files_to_update.items():
-        if isinstance(file_content, bytes):
-            content = base64.b64encode(file_content).decode("utf-8")
-            encoding = "base64"
-        else:
-            content = file_content
-            encoding = "utf-8"
-
-        blob = repo.create_git_blob(content, encoding)
-        element = InputGitTreeElement(
-            path=file_path, mode="100644", type="blob", sha=blob.sha
-        )
-        tree_elements.append(element)
-    return tree_elements
-
-
 def commit_to_github(repo, files_to_update):
     """Commit files to GitHub Repo"""
     if not files_to_update:
@@ -184,21 +146,6 @@ def commit_to_github(repo, files_to_update):
     except (ValueError, IOError) as e:
         logger.error("Error occurred while committing to GitHub: %s", str(e))
         return False
-
-
-def initialize_github():
-    """Initialize GitHub client and get repo"""
-    token = get_github_token()
-    g = Github(token)
-    return get_repo(g)
-
-
-def get_readme_content(repo):
-    """Get current README content"""
-    readme_file = repo.get_contents(README)
-    if isinstance(readme_file, list):
-        readme_file = readme_file[0]
-    return readme_file.decoded_content.decode("utf-8")
 
 
 def update_readme_sections(repo, current_content):
@@ -255,15 +202,15 @@ def collect_files_to_update(current_readme, original_readme):
     if current_readme != original_readme:
         files_to_update[README] = current_readme.encode("utf-8")
 
-    for png_file in [
-        "steam_summary.png",
-        "recently_played_games.png",
-        "steam_workshop_stats.png",
+    for name in [
+        "steam_summary",
+        "recently_played_games",
+        "steam_workshop_stats",
     ]:
-        png_path = "assets/" + png_file
-        if os.path.exists(png_path):
+        _, png_path, relative_png_path = get_asset_paths(name)
+        if png_path.exists():
             with open(png_path, "rb") as file:
-                files_to_update["assets/" + png_file] = file.read()
+                files_to_update[relative_png_path] = file.read()
 
     return files_to_update
 

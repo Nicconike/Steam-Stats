@@ -27,14 +27,7 @@ def mock_env_vars(monkeypatch):
     monkeypatch.setenv("GITHUB_REF_NAME", "main")
 
 
-@pytest.fixture
-def mock_logger():
-    """Mock logger"""
-    with patch("api.main.logger") as mock_logger:
-        yield mock_logger
-
-
-def test_handle_file_not_found_error(mock_logger, caplog):
+def test_handle_file_not_found_error(caplog):
     """Test handle_exception with FileNotFoundError"""
     exception = FileNotFoundError("Test File Not Found Error")
     handle_exception(exception)
@@ -49,7 +42,7 @@ def test_handle_file_not_found_error(mock_logger, caplog):
         )
 
 
-def test_handle_playwright_error(mock_logger, caplog):
+def test_handle_playwright_error(caplog):
     """Test handle_exception with PlaywrightError"""
     exception = PlaywrightError("Test Playwright Error")
     handle_exception(exception)
@@ -64,7 +57,7 @@ def test_handle_playwright_error(mock_logger, caplog):
         )
 
 
-def test_handle_key_error(mock_logger, caplog):
+def test_handle_key_error(caplog):
     """Test handle_exception with KeyError"""
     exception = KeyError("Test Key Error")
     handle_exception(exception)
@@ -79,7 +72,7 @@ def test_handle_key_error(mock_logger, caplog):
         )
 
 
-def test_handle_timeout_error(mock_logger, caplog):
+def test_handle_timeout_error(caplog):
     """Test handle_exception with asyncio.TimeoutError"""
     exception = asyncio.TimeoutError("Test Timeout Error")
     handle_exception(exception)
@@ -94,7 +87,7 @@ def test_handle_timeout_error(mock_logger, caplog):
         )
 
 
-def test_handle_unexpected_error(mock_logger, caplog):
+def test_handle_unexpected_error(caplog):
     """Test handle_exception with an unexpected error"""
     exception = Exception("Test Unexpected Error")
     handle_exception(exception)

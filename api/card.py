@@ -8,6 +8,7 @@ import asyncio
 from pathlib import Path
 from typing import Optional, TypedDict
 from playwright.async_api import async_playwright, Error as PlaywrightError
+from api.utils import get_asset_paths
 
 # Configure logging
 logging.basicConfig(
@@ -36,6 +37,7 @@ branch_name = os.getenv("GITHUB_REF_NAME", "main")
 # Define the path to the assets directory
 REPO_ROOT = Path(__file__).resolve().parent.parent
 ASSETS_DIR = REPO_ROOT / "assets"
+ASSETS_DIR.mkdir(parents=True, exist_ok=True)
 
 # Persona state mapping for Steam Profile Status
 personastate_map = {
@@ -274,18 +276,16 @@ def generate_card_for_player_summary(player_data):
     </html>
     """
 
-    html_path = ASSETS_DIR / "steam_summary.html"
-    png_path = ASSETS_DIR / "steam_summary.png"
-
-    ASSETS_DIR.mkdir(parents=True, exist_ok=True)
+    html_path, png_path, relative_png_path = get_asset_paths("steam_summary")
     with open(html_path, "w", encoding="utf-8") as file:
         file.write(html_content)
-
     convert_html_to_png(html_path, png_path, CARD_SELECTOR)
+    logger.info("Checking PNG created at: %s", png_path)
+    logger.info("File exists: %s", png_path.exists())
 
     return (
         f"![Steam Summary](https://github.com/{repo_owner}/"
-        f"{repo_name}/blob/{branch_name}/{png_path})\n"
+        f"{repo_name}/blob/{branch_name}/{relative_png_path})\n"
     )
 
 
@@ -375,18 +375,16 @@ def generate_card_for_played_games(games_data):
     </html>
     """
 
-    html_path = ASSETS_DIR / "recently_played_games.html"
-    png_path = ASSETS_DIR / "recently_played_games.png"
-
-    ASSETS_DIR.mkdir(parents=True, exist_ok=True)
+    html_path, png_path, relative_png_path = get_asset_paths("recently_played_games")
     with open(html_path, "w", encoding="utf-8") as file:
         file.write(html_content)
-
     convert_html_to_png(html_path, png_path, CARD_SELECTOR)
+    logger.info("Checking PNG created at: %s", png_path)
+    logger.info("File exists: %s", png_path.exists())
 
     return (
         f"![Recently Played Games](https://github.com/{repo_owner}/"
-        f"{repo_name}/blob/{branch_name}/{png_path})"
+        f"{repo_name}/blob/{branch_name}/{relative_png_path})"
     )
 
 
@@ -468,16 +466,14 @@ def generate_card_for_steam_workshop(workshop_stats):
     </html>
     """
 
-    html_path = ASSETS_DIR / "steam_workshop_stats.html"
-    png_path = ASSETS_DIR / "steam_workshop_stats.png"
-
-    ASSETS_DIR.mkdir(parents=True, exist_ok=True)
+    html_path, png_path, relative_png_path = get_asset_paths("steam_workshop_stats")
     with open(html_path, "w", encoding="utf-8") as file:
         file.write(html_content)
-
     convert_html_to_png(html_path, png_path, CARD_SELECTOR)
+    logger.info("Checking PNG created at: %s", png_path)
+    logger.info("File exists: %s", png_path.exists())
 
     return (
         f"![Steam Workshop Stats](https://github.com/{repo_owner}/"
-        f"{repo_name}/blob/{branch_name}/{png_path})"
+        f"{repo_name}/blob/{branch_name}/{relative_png_path})"
     )

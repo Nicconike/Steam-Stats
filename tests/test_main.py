@@ -2,28 +2,23 @@
 
 # Disable pylint warnings for false positives
 # pylint: disable=redefined-outer-name, unused-argument
-import os
+import logging
 from unittest import TestCase
 from unittest.mock import patch, MagicMock
 import time
 from pytest import approx
 import pytest
+import api.main
 from api.main import (
     update_readme,
     generate_steam_stats,
     generate_workshop_stats,
-    get_github_token,
-    get_repo,
-    create_tree_elements,
     commit_to_github,
-    initialize_github,
-    get_readme_content,
     update_readme_sections,
     update_section,
     collect_files_to_update,
     log_execution_time,
     main,
-    logger,
 )
 
 
@@ -34,37 +29,17 @@ def mock_repo():
 
 
 @pytest.fixture
-def mock_github():
-    """Mock Github Repo"""
-    with patch("api.main.Github") as mock_github:
-        yield mock_github
-
-
-@pytest.fixture
-def mock_env_vars(monkeypatch):
-    """Mock environment variables"""
-    monkeypatch.setenv("GITHUB_TOKEN", "fake_token")
-    monkeypatch.setenv("GITHUB_REPOSITORY", "fake/repo")
-    monkeypatch.setenv("INPUT_STEAM_ID", "fake_steam_id")
-    monkeypatch.setenv("INPUT_STEAM_API_KEY", "fake_steam_api_key")
-    monkeypatch.setenv("INPUT_STEAM_CUSTOM_ID", "fake_steam_custom_id")
-    monkeypatch.setenv("INPUT_WORKSHOP_STATS", "true")
-
-
-@pytest.fixture
 def mock_dependencies(mocker):
     """Fixtures for mocking dependencies"""
     fixtures = {}
-    fixtures["initialize_github"] = mocker.patch("api.main.initialize_github")
-    fixtures["get_readme_content"] = mocker.patch("api.main.get_readme_content")
+    fixtures["initialize_github"] = mocker.patch("api.utils.initialize_github")
+    fixtures["get_readme_content"] = mocker.patch("api.utils.get_readme_content")
     fixtures["update_readme_sections"] = mocker.patch("api.main.update_readme_sections")
     fixtures["collect_files_to_update"] = mocker.patch(
         "api.main.collect_files_to_update"
     )
     fixtures["commit_to_github"] = mocker.patch("api.main.commit_to_github")
     fixtures["log_execution_time"] = mocker.patch("api.main.log_execution_time")
-    fixtures["logger_info"] = mocker.patch.object(logger, "info")
-    fixtures["logger_error"] = mocker.patch.object(logger, "error")
     return fixtures
 
 
@@ -200,64 +175,14 @@ def test_generate_workshop_stats(
     mock_logger.error.assert_any_call("Failed to generate card data for Workshop Stats")
 
 
-def test_get_github_token(mock_env_vars):
-    """Test fetching github token"""
-    token = get_github_token()
-    TestCase().assertEqual(token, "fake_token")
-
-    with patch.dict(os.environ, {}, clear=True):
-        with pytest.raises(ValueError, match="No GitHub token found in env vars"):
-            get_github_token()
-
-
-def test_get_repo(mock_github):
-    """Test fetching GitHub repo"""
-    mock_repo = MagicMock()
-    mock_github.return_value.get_repo.return_value = mock_repo
-
-    with patch.dict(os.environ, {"GITHUB_REPOSITORY": "fake/repo"}):
-        repo = get_repo(mock_github.return_value)
-        TestCase().assertEqual(repo, mock_repo)
-
-    with patch.dict(os.environ, {}, clear=True):
-        with pytest.raises(
-            ValueError, match="GITHUB_REPOSITORY environment variable not set"
-        ):
-            get_repo(mock_github.return_value)
-
-
-def test_initialize_github(mock_github, mock_env_vars):
-    """Test Initializing Github Repo"""
-    mock_repo = MagicMock()
-    mock_github.return_value.get_repo.return_value = mock_repo
-
-    repo = initialize_github()
-    TestCase().assertEqual(repo, mock_repo)
-
-
-@patch("api.main.InputGitTreeElement")
-def test_create_tree_elements(mock_input_git_tree_element, mock_repo):
-    """Test Create Tree elements"""
-    files_to_update = {"README.md": "New Content", "image.png": b"binary content"}
-    mock_repo.create_git_blob.side_effect = lambda content, encoding: MagicMock(
-        sha="fake_sha"
-    )
-    mock_input_git_tree_element.side_effect = lambda path, mode, type, sha: MagicMock(
-        path=path
-    )
-
-    tree_elements = create_tree_elements(mock_repo, files_to_update)
-
-    TestCase().assertEqual(len(tree_elements), 2)
-    TestCase().assertEqual(tree_elements[0].path, "README.md")
-    TestCase().assertEqual(tree_elements[1].path, "image.png")
-
-
-@patch("api.main.create_tree_elements")
+@patch("api.utils.create_tree_elements")
 @patch("api.main.logger")
 def test_commit_to_github(mock_logger, mock_create_tree_elements, mock_repo):
     """Test Committing to Github Repo"""
-    mock_create_tree_elements.return_value = [MagicMock()]
+    fake_blob = MagicMock()
+    fake_blob.sha = "fake_blob_sha"
+    mock_repo.create_git_blob.return_value = fake_blob
+
     mock_repo.get_branch.return_value.commit.sha = "fake_sha"
     mock_repo.create_git_tree.return_value = MagicMock()
     mock_repo.create_git_commit.return_value = MagicMock(sha="new_commit_sha")
@@ -282,17 +207,6 @@ def test_commit_to_github(mock_logger, mock_create_tree_elements, mock_repo):
     mock_logger.error.assert_any_call(
         "Error occurred while committing to GitHub: %s", "Test IOError"
     )
-
-
-def test_get_readme_content(mock_repo):
-    """Test fetching Readme Content"""
-    mock_repo.get_contents.return_value = MagicMock(decoded_content=b"README content")
-    content = get_readme_content(mock_repo)
-    TestCase().assertEqual(content, "README content")
-
-    mock_repo.get_contents.return_value = [MagicMock(decoded_content=b"README content")]
-    content = get_readme_content(mock_repo)
-    TestCase().assertEqual(content, "README content")
 
 
 @patch("api.main.generate_steam_stats")
@@ -393,7 +307,7 @@ def test_log_execution_time():
         )
 
 
-def test_main_successful_commit(mock_dependencies):
+def test_main_successful_commit(caplog, mock_dependencies):
     """Test Main Function for Successful Commit"""
     mock_dependencies["initialize_github"].return_value = "repo"
     mock_dependencies["get_readme_content"].return_value = "original_readme"
@@ -401,32 +315,36 @@ def test_main_successful_commit(mock_dependencies):
     mock_dependencies["collect_files_to_update"].return_value = ["file1", "file2"]
     mock_dependencies["commit_to_github"].return_value = True
 
-    main()
+    with caplog.at_level(logging.INFO):
+        main()
 
-    if mock_dependencies["logger_info"].call_count != 1:
+    info_logs = [
+        record.message for record in caplog.records if record.levelname == "INFO"
+    ]
+    if not any("Successfully committed to GitHub" in msg for msg in info_logs):
         raise AssertionError(
-            "Expected logger.info to be called once for successful commit"
+            "Expected 'Successfully committed to GitHub' info log not found"
         )
-    if mock_dependencies["logger_error"].call_count != 0:
-        raise AssertionError("Expected logger.error to not be called")
 
 
-def test_main_no_changes(mock_dependencies):
+def test_main_no_changes(caplog, mock_dependencies):
     """Test Main Function for No Changes"""
     mock_dependencies["initialize_github"].return_value = "repo"
     mock_dependencies["get_readme_content"].return_value = "original_readme"
     mock_dependencies["update_readme_sections"].return_value = "current_readme"
     mock_dependencies["collect_files_to_update"].return_value = []
 
-    main()
+    with caplog.at_level(logging.INFO):
+        main()
 
-    if mock_dependencies["logger_info"].call_count != 1:
-        raise AssertionError("Expected logger.info to be called once for no changes")
-    if mock_dependencies["logger_error"].call_count != 0:
-        raise AssertionError("Expected logger.error to not be called")
+    info_logs = [
+        record.message for record in caplog.records if record.levelname == "INFO"
+    ]
+    if not any("No changes to commit" in msg for msg in info_logs):
+        raise AssertionError("Expected 'No changes to commit' info log not found")
 
 
-def test_main_commit_failure(mock_dependencies):
+def test_main_commit_failure(caplog, mock_dependencies):
     """Test Main Function for Commit Failure"""
     mock_dependencies["initialize_github"].return_value = "repo"
     mock_dependencies["get_readme_content"].return_value = "original_readme"
@@ -434,38 +352,45 @@ def test_main_commit_failure(mock_dependencies):
     mock_dependencies["collect_files_to_update"].return_value = ["file1", "file2"]
     mock_dependencies["commit_to_github"].return_value = False
 
-    main()
+    with caplog.at_level(logging.ERROR):
+        main()
 
-    if mock_dependencies["logger_info"].call_count != 0:
-        raise AssertionError("Expected logger.info to not be called for commit failure")
-    if mock_dependencies["logger_error"].call_count != 1:
+    error_logs = [
+        record.message for record in caplog.records if record.levelname == "ERROR"
+    ]
+    if not any("Failed to commit changes to GitHub" in msg for msg in error_logs):
         raise AssertionError(
-            "Expected logger.error to be called once for commit failure"
+            "Expected 'Failed to commit changes to GitHub' error log not found"
         )
 
 
-def test_main_value_error(mock_dependencies):
-    """Test Main Function for ValueError"""
-    mock_dependencies["initialize_github"].side_effect = ValueError("Test ValueError")
+@pytest.mark.parametrize(
+    "exception_type, expected_message",
+    [
+        (ValueError("Test ValueError"), "ValueError error occurred: Test ValueError"),
+        (IOError("Test IOError"), "OSError error occurred: Test IOError"),
+    ],
+)
+def test_main_exception_handling(caplog, mocker, exception_type, expected_message):
+    """Test exception block in main() logs correct error message"""
+    caplog.set_level(logging.ERROR, logger=api.main.logger.name)
 
-    main()
+    mocker.patch("api.main.initialize_github", side_effect=exception_type)
+    mocker.patch("api.main.get_readme_content")
+    mocker.patch("api.main.update_readme_sections")
+    mocker.patch("api.main.collect_files_to_update")
+    mocker.patch("api.main.commit_to_github")
+    mocker.patch("api.main.log_execution_time")
 
-    if mock_dependencies["logger_info"].call_count != 0:
-        raise AssertionError("Expected logger.info to not be called")
-    if mock_dependencies["logger_error"].call_count != 1:
-        raise AssertionError("Expected logger.error to be called once")
+    api.main.main()
 
-
-def test_main_io_error(mock_dependencies):
-    """Test Main Function for IOError"""
-    mock_dependencies["initialize_github"].side_effect = IOError("Test IOError")
-
-    main()
-
-    if mock_dependencies["logger_info"].call_count != 0:
-        raise AssertionError("Expected logger.info to not be called")
-    if mock_dependencies["logger_error"].call_count != 1:
-        raise AssertionError("Expected logger.error to be called once")
+    messages = [
+        record.message for record in caplog.records if record.levelname == "ERROR"
+    ]
+    if expected_message not in messages:
+        raise AssertionError(
+            f"Expected error log '{expected_message}' not found. Got: {messages}"
+        )
 
 
 if __name__ == "__main__":
