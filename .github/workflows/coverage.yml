@@ -36,7 +36,8 @@ jobs:
                 playwright install --with-deps chromium
 
           - name: Run tests with coverage
-            run: pytest --cov=api --cov-report=xml --cov-report=term-missing \
+            run: |
+                pytest --cov=api --cov-report=xml --cov-report=term-missing \
                     --junitxml=junit.xml -o junit_family=legacy
             env:
                 INPUT_STEAM_API_KEY: ${{ secrets.STEAM_API_KEY }}

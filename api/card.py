@@ -5,7 +5,6 @@ import logging
 import math
 import os
 import asyncio
-from pathlib import Path
 from typing import Optional, TypedDict
 from playwright.async_api import async_playwright, Error as PlaywrightError
 from api.utils import get_asset_paths
@@ -33,11 +32,6 @@ class FloatRect(TypedDict):
 # Get GitHub Repo's Details where the action is being run
 repo_owner, repo_name = os.getenv("GITHUB_REPOSITORY", "owner/repo").split("/")
 branch_name = os.getenv("GITHUB_REF_NAME", "main")
-
-# Define the path to the assets directory
-REPO_ROOT = Path(__file__).resolve().parent.parent
-ASSETS_DIR = REPO_ROOT / "assets"
-ASSETS_DIR.mkdir(parents=True, exist_ok=True)
 
 # Persona state mapping for Steam Profile Status
 personastate_map = {

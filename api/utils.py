@@ -6,10 +6,6 @@ import os
 from pathlib import Path
 from github import Github, InputGitTreeElement, Auth
 
-from dotenv import load_dotenv
-
-load_dotenv()
-
 REPO_ROOT = Path(__file__).resolve().parent.parent
 ASSETS_DIR = REPO_ROOT / "assets"
 README = "README.md"

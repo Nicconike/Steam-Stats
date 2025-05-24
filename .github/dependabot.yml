@@ -23,8 +23,6 @@ updates:
           python-packages:
               patterns:
                   - "*"
-      reviewers:
-          - "nicconike"
 
     - package-ecosystem: "github-actions"
       directory: "/"
@@ -38,8 +36,6 @@ updates:
           - github_actions
       rebase-strategy: auto
       open-pull-requests-limit: 10
-      reviewers:
-          - "nicconike"
       groups:
           github-actions:
               patterns:
@@ -66,5 +62,3 @@ updates:
           docker:
               patterns:
                   - "*"
-      reviewers:
-          - "nicconike"
