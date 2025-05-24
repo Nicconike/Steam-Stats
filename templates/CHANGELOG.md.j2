@@ -1,20 +1,11 @@
-# Changelog
+{% set changelog_parts = prev_changelog_contents.split(
+        ctx.changelog_insertion_flag, maxsplit=1
+    )
+%}
+{{ changelog_parts[0] }}{{ ctx.changelog_insertion_flag }}
 
-{{ changelog_insertion_flag }}
+{% if ctx.changelog_mode == "update" %}
+{%   include ".changelog_update.md.j2" %}
+{% endif %}
 
-{% for release in releases %}
-## {{ release.version }} - {{ release.date.strftime('%Y-%m-%d') }}
-
-{% set priority_order = ['feat', 'fix', 'build', 'ci', 'refactor', 'perf', 'chore', 'docs', 'style', 'test', 'revert'] %}
-
-{% for type in priority_order %}
-  {% for section in release.sections if section.type == type %}
-### {{ section.type | capitalize }}
-
-    {% for commit in section.commits %}
-- {{ commit.subject }}
-    {% endfor %}
-  {% endfor %}
-{% endfor %}
-
-{% endfor %}
+{{ changelog_parts[1] if changelog_parts | length > 1 else '' }}

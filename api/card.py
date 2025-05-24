@@ -186,28 +186,30 @@ def generate_card_for_player_summary(player_data):
         return None
 
     summary = player_data["response"]["players"][0]
-    personaname = summary.get("personaname", "Unknown")
-    personastate = personastate_map.get(summary.get("personastate", 0), "Unknown")
-    avatarfull = summary.get("avatarfull", "")
-    loccountrycode = summary.get("loccountrycode", "")
-    lastlogoff = format_unix_time(summary.get("lastlogoff", 0))
-    timecreated = format_unix_time(summary.get("timecreated", 0))
-    gameextrainfo = summary.get("gameextrainfo")
+    player = {
+        "name": summary.get("personaname", "Unknown"),
+        "status": personastate_map.get(summary.get("personastate", 0), "Unknown"),
+        "avatar": summary.get("avatarfull", ""),
+        "country": summary.get("loccountrycode", ""),
+        "lastlogoff": format_unix_time(summary.get("lastlogoff", 0)),
+        "timecreated": format_unix_time(summary.get("timecreated", 0)),
+        "game": summary.get("gameextrainfo"),
+    }
 
-    country_section = ""
-    if loccountrycode:
-        country_section = f"""
-            <p id="country">Country: <span id="country-code">{loccountrycode}</span>
-                <img id="flag" class="flag"
-                src="https://flagcdn.com/w320/{loccountrycode.lower()}.png" alt="Flag">
-            </p>
+    country_section = (
+        f"""
+        <p id="country">Country: <span id="country-code">{player['country']}</span>
+            <img id="flag" class="flag"
+            src="https://flagcdn.com/w320/{player['country'].lower()}.png" alt="Flag">
+        </p>
         """
+        if player["country"]
+        else ""
+    )
 
     game_section = (
-        f"""
-            <p id='game'>Currently Playing: <span id='game-info'>{gameextrainfo}</span></p>
-        """
-        if gameextrainfo
+        f"<p id='game'>Currently Playing: <span id='game-info'>{player['game']}</span></p>"
+        if player["game"]
         else ""
     )
 
@@ -257,16 +259,16 @@ def generate_card_for_player_summary(player_data):
         <div class="card">
             <div class="content">
                 <h2>Steam Profile Summary</h2>
-                <img id="avatar" class="avatar" src="{avatarfull}" alt="Avatar">
-                <h2 id="name">{personaname}</h2>
+                <img id="avatar" class="avatar" src="{player['avatar']}" alt="Avatar">
+                <h2 id="name">{player['name']}</h2>
                 <div class="info-container">
                     <div class="info-left">
-                        <p id="status">Status: {personastate}</p>
+                        <p id="status">Status: {player['status']}</p>
                         {country_section}
                     </div>
                     <div class="info-right">
-                        <p id="lastlogoff">Last Logoff: {lastlogoff}</p>
-                        <p id="timecreated">PC Gaming Since: {timecreated}</p>
+                        <p id="lastlogoff">Last Logoff: {player['lastlogoff']}</p>
+                        <p id="timecreated">PC Gaming Since: {player['timecreated']}</p>
                     </div>
                 </div>
                 {game_section}
@@ -280,8 +282,6 @@ def generate_card_for_player_summary(player_data):
     with open(html_path, "w", encoding="utf-8") as file:
         file.write(html_content)
     convert_html_to_png(html_path, png_path, CARD_SELECTOR)
-    logger.info("Checking PNG created at: %s", png_path)
-    logger.info("File exists: %s", png_path.exists())
 
     return (
         f"![Steam Summary](https://github.com/{repo_owner}/"
@@ -379,8 +379,6 @@ def generate_card_for_played_games(games_data):
     with open(html_path, "w", encoding="utf-8") as file:
         file.write(html_content)
     convert_html_to_png(html_path, png_path, CARD_SELECTOR)
-    logger.info("Checking PNG created at: %s", png_path)
-    logger.info("File exists: %s", png_path.exists())
 
     return (
         f"![Recently Played Games](https://github.com/{repo_owner}/"
@@ -470,8 +468,6 @@ def generate_card_for_steam_workshop(workshop_stats):
     with open(html_path, "w", encoding="utf-8") as file:
         file.write(html_content)
     convert_html_to_png(html_path, png_path, CARD_SELECTOR)
-    logger.info("Checking PNG created at: %s", png_path)
-    logger.info("File exists: %s", png_path.exists())
 
     return (
         f"![Steam Workshop Stats](https://github.com/{repo_owner}/"

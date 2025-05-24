@@ -1,6 +1,7 @@
 # https://docs.github.com/code-security/dependabot/dependabot-version-updates/configuration-options-for-the-dependabot.yml-file
 # pipdeptree | Select-String -Pattern '^\w' | ForEach-Object { $_.Line.Split('==')[0] } > requirements.txt
 # pipdeptree | Select-String -Pattern '^\w' | ForEach-Object { $_.Line } > requirements.txt
+# pip install --upgrade -r requirements.txt
 
 version: 2
 updates:

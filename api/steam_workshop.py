@@ -1,6 +1,5 @@
 """Scrape Steam Workshop Data"""
 
-import os
 import logging
 import requests
 from bs4 import BeautifulSoup, Tag
@@ -10,10 +9,6 @@ logging.basicConfig(
     level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
-
-# Required Secrets Configuration
-STEAM_API_KEY = os.environ["INPUT_STEAM_API_KEY"]
-STEAM_CUSTOM_ID = os.environ["INPUT_STEAM_CUSTOM_ID"]
 
 # A reasonable timeout for the request (connection and read timeout)
 REQUEST_TIMEOUT = (25, 30)

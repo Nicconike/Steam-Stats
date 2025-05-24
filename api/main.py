@@ -13,6 +13,7 @@ from api.card import (
     generate_card_for_steam_workshop,
 )
 from api.utils import (
+    get_steam_credentials,
     initialize_github,
     create_tree_elements,
     get_readme_content,
@@ -25,11 +26,6 @@ logging.basicConfig(
     level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
-
-# Required Secrets Configuration
-STEAM_ID = os.environ["INPUT_STEAM_ID"]
-STEAM_API_KEY = os.environ["INPUT_STEAM_API_KEY"]
-STEAM_CUSTOM_ID = os.environ["INPUT_STEAM_CUSTOM_ID"]
 
 # Optional Feature Flag
 WORKSHOP_STATS = os.getenv("INPUT_WORKSHOP_STATS", "false").lower() in (
@@ -102,8 +98,11 @@ def generate_steam_stats():
 
 def generate_workshop_stats():
     """Generate Workshop Stats and return markdown content"""
+    creds = get_steam_credentials()
+    custom_id = creds["custom_id"]
+    api_key = creds["api_key"]
     workshop_markdown_content = ""
-    links = fetch_workshop_item_links(STEAM_CUSTOM_ID, STEAM_API_KEY)
+    links = fetch_workshop_item_links(custom_id, api_key)
     if links:
         workshop_data = fetch_all_workshop_stats(links)
         workshop_content = generate_card_for_steam_workshop(workshop_data)

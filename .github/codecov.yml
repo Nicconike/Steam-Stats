@@ -35,3 +35,15 @@ parsers:
             loop: yes
             method: no
             macro: no
+
+component_management:
+    default_rules:
+        statuses:
+            - type: project
+              target: 80%
+              threshold: 5%
+              if_ci_failed: error
+    individual_components:
+        api:
+            paths:
+                - api/

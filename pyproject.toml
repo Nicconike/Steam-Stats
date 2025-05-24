@@ -11,7 +11,8 @@ description = "A python project to get the stats of your Steam account and displ
 dynamic = ["version"]
 requires-python = ">= 3.8"
 readme = "README.md"
-license = { file = "LICENSE" }
+license = "GPL-3.0"
+license-files = ["LICENSE"]
 dependencies = [
     "bs4==0.0.2",
     "DateTime==5.5",
@@ -19,11 +20,29 @@ dependencies = [
     "PyGithub==2.6.1",
     "python-semantic-release==9.21.1",
 ]
+classifiers = [
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
+    "Operating System :: OS Independent",
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Developers",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: Utilities",
+    "Topic :: Steam",
+]
 
 [project.urls]
 changelog = "https://github.com/Nicconike/Steam-Stats/blob/master/CHANGELOG.md"
 documentation = "https://github.com/Nicconike/Steam-Stats/blob/master/README.md"
 wiki = "https://github.com/Nicconike/Steam-Stats/wiki"
+issues = "https://github.com/Nicconike/Steam-Stats/issues"
 
 [project.optional-dependencies]
 test = [
@@ -40,12 +59,15 @@ include = ["api*"]
 
 [tool.semantic_release]
 version_variables = ["api/main.py:__version__"]
+version_source = "tag"
 branch = "master"
-commit_message = "chore: Version Release v{version}"
+commit_message = "chore(release): Version Release v{version}"
 tag_format = "v{version}"
 
-[tool.semantic_release.branches]
-main = { match = "master", prerelease_token = "rc", prerelease = false }
+[tool.semantic_release.branches.main]
+match = "master"
+prerelease_token = "rc"
+prerelease = false
 
 [tool.semantic_release.commit_parser_options]
 allowed_tags = [
@@ -69,15 +91,20 @@ default_bump_level = 0
 type = "github"
 token = { env = "GH_TOKEN" }
 
-[tool.semantic_release.publish]
-upload_to_vcs_release = true
-
 [tool.semantic_release.changelog]
 default_templates.changelog_file = "CHANGELOG.md"
-changelog_insertion_flag = "{{ changelog_insertion_flag }}"
-changelog_mode = "prepend"
+changelog_mode = "update"
+insertion_flag = "<!-- version list -->"
 template_dir = "templates"
-exclude_commit_patterns = []
+release_notes_template = "release_notes.md.j2"
+exclude_commit_patterns = ["^chore:", "^style:"]
 
 [tool.semantic_release.changelog.environment]
 trim_blocks = true
+autoescape = false
+ignore_token_for_push = false
+env = "GH_TOKEN"
+
+[tool.semantic_release.publish]
+upload_to_vcs_release = true
+upload_to_pypi = true

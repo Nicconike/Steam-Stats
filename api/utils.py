@@ -6,6 +6,10 @@ import os
 from pathlib import Path
 from github import Github, InputGitTreeElement, Auth
 
+from dotenv import load_dotenv
+
+load_dotenv()
+
 REPO_ROOT = Path(__file__).resolve().parent.parent
 ASSETS_DIR = REPO_ROOT / "assets"
 README = "README.md"
@@ -15,6 +19,15 @@ logging.basicConfig(
     level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
+
+
+def get_steam_credentials():
+    """Fetch Steam credentials using environment variables"""
+    return {
+        "steam_id": os.environ["INPUT_STEAM_ID"],
+        "api_key": os.environ["INPUT_STEAM_API_KEY"],
+        "custom_id": os.environ["INPUT_STEAM_CUSTOM_ID"],
+    }
 
 
 def get_github_token():

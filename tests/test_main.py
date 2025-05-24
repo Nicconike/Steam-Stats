@@ -8,7 +8,6 @@ from unittest.mock import patch, MagicMock
 import time
 from pytest import approx
 import pytest
-import api.main
 from api.main import (
     update_readme,
     generate_steam_stats,
@@ -19,6 +18,7 @@ from api.main import (
     collect_files_to_update,
     log_execution_time,
     main,
+    logger,
 )
 
 
@@ -373,7 +373,7 @@ def test_main_commit_failure(caplog, mock_dependencies):
 )
 def test_main_exception_handling(caplog, mocker, exception_type, expected_message):
     """Test exception block in main() logs correct error message"""
-    caplog.set_level(logging.ERROR, logger=api.main.logger.name)
+    caplog.set_level(logging.ERROR, logger=logger.name)
 
     mocker.patch("api.main.initialize_github", side_effect=exception_type)
     mocker.patch("api.main.get_readme_content")
@@ -382,7 +382,7 @@ def test_main_exception_handling(caplog, mocker, exception_type, expected_messag
     mocker.patch("api.main.commit_to_github")
     mocker.patch("api.main.log_execution_time")
 
-    api.main.main()
+    main()
 
     messages = [
         record.message for record in caplog.records if record.levelname == "ERROR"

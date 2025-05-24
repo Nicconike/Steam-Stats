@@ -77,6 +77,12 @@ jobs:
             env:
                 PYTHON_KEYRING_BACKEND: keyring.backends.null.Keyring
 
+          - name: Publish to PyPI
+            if: steps.semantic.outputs.released == 'true'
+            uses: pypa/gh-action-pypi-publish@v1.8.8
+            with:
+                skip_existing: true
+
     docker:
         name: Docker
         runs-on: ubuntu-latest
@@ -191,7 +197,7 @@ jobs:
     cleanup:
         runs-on: ubuntu-latest
         name: Cleanup
-        needs: release
+        needs: [release, docker]
         if: needs.release.outputs.released == 'true'
         concurrency:
             group: ${{ github.workflow }}-${{ github.ref }}
@@ -219,15 +225,22 @@ jobs:
           - name: Delete Old Docker Hub Tags
             run: |
                 echo "Fetching Docker Hub tags..."
-                tags=$(curl -s -H "Authorization: Bearer ${{ secrets.DOCKER_TOKEN }}" "https://hub.docker.com/v2/repositories/${{ vars.DOCKER_USERNAME }}/steam-stats/tags" | jq -r '.results[].name')
+                tags=$(curl -s -H "Authorization: Bearer ${{ secrets.DOCKER_TOKEN }}" \
+                "https://hub.docker.com/v2/repositories/${{ vars.DOCKER_USERNAME }}/steam-stats/tags?page_size=100" | \
+                jq -r '.results[].name')
+
                 echo "Tags found in Docker Hub:"
                 echo "$tags"
-                latest_tag=$(echo "$tags" | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' | sort -rV | head -n 1)
-                echo "Latest semantic version tag is $latest_tag"
+
+                # Find latest semver tag, supports with or without `v`
+                latest_tag=$(echo "$tags" | grep -E '^v?[0-9]+\.[0-9]+\.[0-9]+$' | sort -rV | head -n 1)
+                echo "Latest semantic version tag is: $latest_tag"
+
                 for tag in $tags; do
                     if [[ "$tag" != "master" && "$tag" != "$latest_tag" ]]; then
                         echo "Deleting tag $tag from Docker Hub"
-                        curl -X DELETE -H "Authorization: Bearer ${{ secrets.DOCKER_TOKEN }}" "https://hub.docker.com/v2/repositories/${{ vars.DOCKER_USERNAME }}/steam-stats/tags/$tag/"
+                        curl -s -X DELETE -H "Authorization: Bearer ${{ secrets.DOCKER_TOKEN }}" \
+                        "https://hub.docker.com/v2/repositories/${{ vars.DOCKER_USERNAME }}/steam-stats/tags/$tag/"
                     else
                         echo "Keeping tag $tag"
                     fi
@@ -241,29 +254,38 @@ jobs:
             run: |
                 echo "Fetching GHCR tags..."
                 page=1
-                all_tags=""
+                all_tags=()
+
                 while true; do
-                    tags=$(curl -s -H "Authorization: Bearer $GITHUB_TOKEN" \
-                        "https://api.github.com/user/packages/container/$PACKAGE_NAME/versions?per_page=100&page=$page" | jq -r '.[].metadata.container.tags[]')
-                    if [ -z "$tags" ]; then
+                    page_tags=$(curl -s -H "Authorization: Bearer $GITHUB_TOKEN" \
+                        "https://api.github.com/user/packages/container/$PACKAGE_NAME/versions?per_page=100&page=$page" | \
+                        jq -r '.[].metadata.container.tags[]')
+
+                    if [[ -z "$page_tags" ]]; then
                         break
                     fi
-                    all_tags="$all_tags $tags"
+
+                    all_tags+=($page_tags)
                     ((page++))
                 done
+
                 echo "Tags found in GHCR:"
-                echo "$all_tags"
-                latest_tag=$(echo "$all_tags" | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' | sort -rV | head -n 1)
-                echo "Latest semantic version tag is $latest_tag"
-                for tag in $all_tags; do
+                printf "%s\n" "${all_tags[@]}"
+
+                # Find latest semver tag
+                latest_tag=$(printf "%s\n" "${all_tags[@]}" | grep -E '^v?[0-9]+\.[0-9]+\.[0-9]+$' | sort -rV | head -n 1)
+                echo "Latest semantic version tag is: $latest_tag"
+
+                for tag in "${all_tags[@]}"; do
                     if [[ "$tag" != "master" && "$tag" != "$latest_tag" ]]; then
                         echo "Deleting tag $tag from GHCR"
                         version_id=$(curl -s -H "Authorization: Bearer $GITHUB_TOKEN" \
                         "https://api.github.com/user/packages/container/$PACKAGE_NAME/versions" | \
                         jq -r ".[] | select(.metadata.container.tags[] == \"$tag\") | .id")
-                        if [ -n "$version_id" ]; then
-                            curl -X DELETE -H "Authorization: Bearer $GITHUB_TOKEN" \
-                                "https://api.github.com/user/packages/container/$PACKAGE_NAME/versions/$version_id"
+
+                        if [[ -n "$version_id" ]]; then
+                        curl -s -X DELETE -H "Authorization: Bearer $GITHUB_TOKEN" \
+                            "https://api.github.com/user/packages/container/$PACKAGE_NAME/versions/$version_id"
                         else
                             echo "Warning: Could not find version ID for tag $tag"
                         fi
