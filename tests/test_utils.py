@@ -23,7 +23,7 @@ def mock_github():
         yield mock_github
 
 
-@pytest.fixture
+@pytest.fixture(autouse=True)
 def mock_env_vars(monkeypatch):
     """Mock environment variables"""
     monkeypatch.setenv("GITHUB_TOKEN", "fake_token")
