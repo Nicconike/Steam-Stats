@@ -28,12 +28,23 @@ def mock_repo():
     return MagicMock()
 
 
+@pytest.fixture(autouse=True)
+def mock_env_vars(monkeypatch):
+    """Mock environment variables"""
+    monkeypatch.setenv("GITHUB_TOKEN", "fake_token")
+    monkeypatch.setenv("GITHUB_REPOSITORY", "fake/repo")
+    monkeypatch.setenv("INPUT_STEAM_ID", "fake_steam_id")
+    monkeypatch.setenv("INPUT_STEAM_API_KEY", "fake_steam_api_key")
+    monkeypatch.setenv("INPUT_STEAM_CUSTOM_ID", "fake_steam_custom_id")
+    monkeypatch.setenv("INPUT_WORKSHOP_STATS", "true")
+
+
 @pytest.fixture
 def mock_dependencies(mocker):
     """Fixtures for mocking dependencies"""
     fixtures = {}
-    fixtures["initialize_github"] = mocker.patch("api.utils.initialize_github")
-    fixtures["get_readme_content"] = mocker.patch("api.utils.get_readme_content")
+    fixtures["initialize_github"] = mocker.patch("api.main.initialize_github")
+    fixtures["get_readme_content"] = mocker.patch("api.main.get_readme_content")
     fixtures["update_readme_sections"] = mocker.patch("api.main.update_readme_sections")
     fixtures["collect_files_to_update"] = mocker.patch(
         "api.main.collect_files_to_update"
@@ -309,7 +320,8 @@ def test_log_execution_time():
 
 def test_main_successful_commit(caplog, mock_dependencies):
     """Test Main Function for Successful Commit"""
-    mock_dependencies["initialize_github"].return_value = "repo"
+    mock_repo = MagicMock(name="MockGitHubRepo")
+    mock_dependencies["initialize_github"].return_value = mock_repo
     mock_dependencies["get_readme_content"].return_value = "original_readme"
     mock_dependencies["update_readme_sections"].return_value = "current_readme"
     mock_dependencies["collect_files_to_update"].return_value = ["file1", "file2"]
@@ -329,7 +341,8 @@ def test_main_successful_commit(caplog, mock_dependencies):
 
 def test_main_no_changes(caplog, mock_dependencies):
     """Test Main Function for No Changes"""
-    mock_dependencies["initialize_github"].return_value = "repo"
+    mock_repo = MagicMock(name="MockGitHubRepo")
+    mock_dependencies["initialize_github"].return_value = mock_repo
     mock_dependencies["get_readme_content"].return_value = "original_readme"
     mock_dependencies["update_readme_sections"].return_value = "current_readme"
     mock_dependencies["collect_files_to_update"].return_value = []
@@ -346,7 +359,8 @@ def test_main_no_changes(caplog, mock_dependencies):
 
 def test_main_commit_failure(caplog, mock_dependencies):
     """Test Main Function for Commit Failure"""
-    mock_dependencies["initialize_github"].return_value = "repo"
+    mock_repo = MagicMock(name="MockGitHubRepo")
+    mock_dependencies["initialize_github"].return_value = mock_repo
     mock_dependencies["get_readme_content"].return_value = "original_readme"
     mock_dependencies["update_readme_sections"].return_value = "current_readme"
     mock_dependencies["collect_files_to_update"].return_value = ["file1", "file2"]
@@ -376,7 +390,7 @@ def test_main_exception_handling(caplog, mocker, exception_type, expected_messag
     caplog.set_level(logging.ERROR, logger=logger.name)
 
     mocker.patch("api.main.initialize_github", side_effect=exception_type)
-    mocker.patch("api.main.get_readme_content")
+    mocker.patch("api.utils.get_readme_content")
     mocker.patch("api.main.update_readme_sections")
     mocker.patch("api.main.collect_files_to_update")
     mocker.patch("api.main.commit_to_github")
