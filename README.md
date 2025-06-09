@@ -38,7 +38,6 @@ schedule:
 ## Samples (From my [Steam Account](https://steamcommunity.com/id/nicconike/))
 **Example for Steam User Stats**
 <!-- Steam-Stats start -->
-![Steam Summary](https://github.com/Nicconike/Steam-Stats/blob/master/assets/steam_summary.png)
 ![Recently Played Games](https://github.com/Nicconike/Steam-Stats/blob/master/assets/recently_played_games.png)
 <!-- Steam-Stats end -->
 
