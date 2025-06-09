@@ -18,7 +18,7 @@ dependencies = [
     "DateTime==5.5",
     "playwright==1.52.0",
     "PyGithub==2.6.1",
-    "python-semantic-release==9.21.1",
+    "python-semantic-release==10.0.2",
 ]
 classifiers = [
     "Programming Language :: Python",
@@ -29,13 +29,15 @@ classifiers = [
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
-    "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
     "Operating System :: OS Independent",
     "Development Status :: 5 - Production/Stable",
+    "Framework :: Pytest",
     "Intended Audience :: Developers",
     "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: Software Development :: Version Control :: Git",
+    "Topic :: System :: Monitoring",
+    "Topic :: Games/Entertainment",
     "Topic :: Utilities",
-    "Topic :: Steam",
 ]
 
 [project.urls]
@@ -46,12 +48,12 @@ issues = "https://github.com/Nicconike/Steam-Stats/issues"
 
 [project.optional-dependencies]
 test = [
-    "pytest-asyncio==0.26.0",
+    "pytest-asyncio==1.0.0",
     "pytest-cov==6.1.1",
-    "pytest-mock==3.14.0",
+    "pytest-mock==3.14.1",
     "requests-mock==1.12.1",
 ]
-dev = ["bandit==1.8.3", "pipdeptree==2.26.1", "pylint==3.3.7"]
+dev = ["bandit==1.8.3", "pipdeptree==2.26.1", "pylint==3.3.7", "twine==6.1.0"]
 
 [tool.setuptools.packages.find]
 where = ["."]

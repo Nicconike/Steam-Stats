@@ -74,7 +74,6 @@ def create_tree_elements(repo, files_to_update):
             content = file_content
             encoding = "utf-8"
 
-        logger.info("Committing file: %s", file_path)
         blob = repo.create_git_blob(content, encoding)
         element = InputGitTreeElement(
             path=file_path, mode="100644", type="blob", sha=blob.sha

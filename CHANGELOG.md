@@ -7,7 +7,97 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <!-- version list -->
 
+## v1.3.1 (2025-05-23)
+
+### Bug Fixes
+
+- Squashed a bug where the asset path was getting created incorrectly which broke the markdown embed ([`ae4e33c`](https://github.com/Nicconike/Steam-Stats/commit/ae4e33c984e08902ae42bac4a600b56a820cc300))
+
+refactor: Implement utility functions for GitHub interactions and asset path management
+
+test: Add unit test functions for utils helper functions
+
+### Refactoring
+
+- Update changelog configuration and templates ([`01dd95c`](https://github.com/Nicconike/Steam-Stats/commit/01dd95c920b1e6c3764d5252274ddbf19094fe3b))
+- Modified the changelog settings in `pyproject.toml` to include new options for templates and insertion flags.
+- Enhanced test cases in `test_card.py` and `test_steam_workshop.py` to improve error handling and logging assertions.
+- Added a new changelog template in `templates/CHANGELOG.md.j2` to standardize the format of release notes.
+
+### Chores
+
+- Update Pylint Badge ([`c827595`](https://github.com/Nicconike/Steam-Stats/commit/c82759562764affbcf0803100e286952d898a427))
+- Update Steam Stats ([`a18d0a6`](https://github.com/Nicconike/Steam-Stats/commit/a18d0a6406a25bff4af0dae24bcb44f92464b325))
+- Update Steam Stats ([`900825a`](https://github.com/Nicconike/Steam-Stats/commit/900825af8c368588ea8f4733b3bd48b17c68a5f6))
+
 ## v1.3.0 (2025-05-22)
+
+### Features
+
+- **api**: Upgrade Playwright to v1.52.0 and refactor Dockerfile
+  ([`fa2afd7`](https://github.com/Nicconike/Steam-Stats/commit/fa2afd726b99526532718c65a3e6daa58dbaf870))
+
+- Updated Dockerfile to use Playwright v1.52.0 with pinned digest. - Refactored environment variable
+  settings and user creation in Dockerfile. - Simplified installation of Python dependencies and
+  removed unnecessary asset directory creation.
+
+fix: Update assets path to resolve a bug where it was unable to find the api module
+
+- Updated asset paths to reflect new directory structure. - Changed browser launch from Firefox to
+  Chromium for consistency. - Adjusted test cases to cover new error handling scenarios and ensure
+  robustness.
+
+refactor: Enhance card generation logic and error handling
+
+- Introduced `format_playtime` function to format playtime into a human-readable format. - Added
+  `generate_progress_bar` function to create HTML for game progress bars. - Improved error handling
+  in `get_element_bounding_box` and `html_to_png` functions. - Updated card generation functions to
+  utilize new asset directory structure.
+
+chore: Update dependencies and improve test coverage
+
+- Updated dependencies in pyproject.toml and requirements.txt for compatibility. - Enhanced test
+  coverage for card generation and workshop fetching functions. - Added new tests for error handling
+  and edge cases in workshop stats fetching. - Refactored tests to improve readability and
+  maintainability.
+
+### Continuous Integration
+
+- Bump python-semantic-release/python-semantic-release
+  ([#52](https://github.com/Nicconike/Steam-Stats/pull/52),
+  [`002cee5`](https://github.com/Nicconike/Steam-Stats/commit/002cee559910821d76c0b6a11efffcebc27dc2ff))
+
+Bumps the github-actions group with 1 update:
+  [python-semantic-release/python-semantic-release](https://github.com/python-semantic-release/python-semantic-release).
+
+Updates `python-semantic-release/python-semantic-release` from 9.15.2 to 9.16.1
+
+- Bump python-semantic-release/python-semantic-release
+  ([#53](https://github.com/Nicconike/Steam-Stats/pull/53),
+  [`8f7efb9`](https://github.com/Nicconike/Steam-Stats/commit/8f7efb9740e76b5f43b66ba7ccb0c02027b43510))
+
+Bumps the github-actions group with 1 update:
+Updates `python-semantic-release/python-semantic-release` from 9.16.1 to 9.17.0
+
+- Bump the github-actions group across 1 directory with 3 updates
+  ([#60](https://github.com/Nicconike/Steam-Stats/pull/60),
+  [`e0f7aaf`](https://github.com/Nicconike/Steam-Stats/commit/e0f7aaf98084855597e75ea6ee13312d3143054c))
+
+Bumps the github-actions group with 3 updates in the / directory:
+Updates `python-semantic-release/python-semantic-release` from 9.19.0 to 9.21.0
+Updates `sigstore/cosign-installer` from 3.8.0 to 3.8.1
+Updates `docker/scout-action` from 1.16.1 to 1.16.3
+
+- Bump the github-actions group with 2 updates
+  ([#55](https://github.com/Nicconike/Steam-Stats/pull/55),
+  [`7886706`](https://github.com/Nicconike/Steam-Stats/commit/7886706a5b6005572519ff0b8a5d76509c49a147))
+
+Bumps the github-actions group with 2 updates:
+Updates `python-semantic-release/python-semantic-release` from 9.17.0 to 9.19.0
+Updates `sigstore/cosign-installer` from 3.7.0 to 3.8.0
+
+- Update pylint workflow
+  ([`f55040f`](https://github.com/Nicconike/Steam-Stats/commit/f55040fdad59f2b002d256eb20c5fa130a188c65))
 
 ### Build System
 
@@ -94,43 +184,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Update Steam Stats
   ([`54104ff`](https://github.com/Nicconike/Steam-Stats/commit/54104ff559fb2c343c1b20f49b7e9c4c15d3c0d0))
 
-### Continuous Integration
-
-- Bump python-semantic-release/python-semantic-release
-  ([#52](https://github.com/Nicconike/Steam-Stats/pull/52),
-  [`002cee5`](https://github.com/Nicconike/Steam-Stats/commit/002cee559910821d76c0b6a11efffcebc27dc2ff))
-
-Bumps the github-actions group with 1 update:
-  [python-semantic-release/python-semantic-release](https://github.com/python-semantic-release/python-semantic-release).
-
-Updates `python-semantic-release/python-semantic-release` from 9.15.2 to 9.16.1
-
-- Bump python-semantic-release/python-semantic-release
-  ([#53](https://github.com/Nicconike/Steam-Stats/pull/53),
-  [`8f7efb9`](https://github.com/Nicconike/Steam-Stats/commit/8f7efb9740e76b5f43b66ba7ccb0c02027b43510))
-
-Bumps the github-actions group with 1 update:
-Updates `python-semantic-release/python-semantic-release` from 9.16.1 to 9.17.0
-
-- Bump the github-actions group across 1 directory with 3 updates
-  ([#60](https://github.com/Nicconike/Steam-Stats/pull/60),
-  [`e0f7aaf`](https://github.com/Nicconike/Steam-Stats/commit/e0f7aaf98084855597e75ea6ee13312d3143054c))
-
-Bumps the github-actions group with 3 updates in the / directory:
-Updates `python-semantic-release/python-semantic-release` from 9.19.0 to 9.21.0
-Updates `sigstore/cosign-installer` from 3.8.0 to 3.8.1
-Updates `docker/scout-action` from 1.16.1 to 1.16.3
-
-- Bump the github-actions group with 2 updates
-  ([#55](https://github.com/Nicconike/Steam-Stats/pull/55),
-  [`7886706`](https://github.com/Nicconike/Steam-Stats/commit/7886706a5b6005572519ff0b8a5d76509c49a147))
-
-Bumps the github-actions group with 2 updates:
-Updates `python-semantic-release/python-semantic-release` from 9.17.0 to 9.19.0
-Updates `sigstore/cosign-installer` from 3.7.0 to 3.8.0
-
-- Update pylint workflow
-  ([`f55040f`](https://github.com/Nicconike/Steam-Stats/commit/f55040fdad59f2b002d256eb20c5fa130a188c65))
 
 ### Documentation
 
@@ -139,34 +192,6 @@ Updates `sigstore/cosign-installer` from 3.7.0 to 3.8.0
 
 Signed-off-by: Nicco <38905025+Nicconike@users.noreply.github.com>
 
-### Features
-
-- **api**: Upgrade Playwright to v1.52.0 and refactor Dockerfile
-  ([`fa2afd7`](https://github.com/Nicconike/Steam-Stats/commit/fa2afd726b99526532718c65a3e6daa58dbaf870))
-
-- Updated Dockerfile to use Playwright v1.52.0 with pinned digest. - Refactored environment variable
-  settings and user creation in Dockerfile. - Simplified installation of Python dependencies and
-  removed unnecessary asset directory creation.
-
-fix: Update assets path to resolve a bug where it was unable to find the api module
-
-- Updated asset paths to reflect new directory structure. - Changed browser launch from Firefox to
-  Chromium for consistency. - Adjusted test cases to cover new error handling scenarios and ensure
-  robustness.
-
-refactor: Enhance card generation logic and error handling
-
-- Introduced `format_playtime` function to format playtime into a human-readable format. - Added
-  `generate_progress_bar` function to create HTML for game progress bars. - Improved error handling
-  in `get_element_bounding_box` and `html_to_png` functions. - Updated card generation functions to
-  utilize new asset directory structure.
-
-chore: Update dependencies and improve test coverage
-
-- Updated dependencies in pyproject.toml and requirements.txt for compatibility. - Enhanced test
-  coverage for card generation and workshop fetching functions. - Added new tests for error handling
-  and edge cases in workshop stats fetching. - Refactored tests to improve readability and
-  maintainability.
 
 ### Refactoring
 
