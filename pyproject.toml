@@ -18,7 +18,7 @@ dependencies = [
     "DateTime==5.5",
     "playwright==1.52.0",
     "PyGithub==2.6.1",
-    "python-semantic-release==10.0.2",
+    "python-semantic-release==10.1.0",
 ]
 classifiers = [
     "Programming Language :: Python",
@@ -49,7 +49,7 @@ issues = "https://github.com/Nicconike/Steam-Stats/issues"
 [project.optional-dependencies]
 test = [
     "pytest-asyncio==1.0.0",
-    "pytest-cov==6.1.1",
+    "pytest-cov==6.2.1",
     "pytest-mock==3.14.1",
     "requests-mock==1.12.1",
 ]
