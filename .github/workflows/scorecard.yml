@@ -10,7 +10,7 @@ on:
     push:
         branches: [ "master" ]
         paths:
-            - ".github/workflows/scoredcard.yml"
+            - ".github/workflows/scorecard.yml"
             - "api/*.py"
     pull_request:
         branches: [ "master" ]
