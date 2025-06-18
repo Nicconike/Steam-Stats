@@ -3,6 +3,7 @@
 [![Release](https://github.com/Nicconike/Steam-Stats/actions/workflows/release.yml/badge.svg)](https://github.com/Nicconike/Steam-Stats/actions/workflows/release.yml)
 [![CodeQL & Pylint](https://github.com/Nicconike/Steam-Stats/actions/workflows/codeql.yml/badge.svg)](https://github.com/Nicconike/Steam-Stats/actions/workflows/codeql.yml)
 [![Bandit](https://github.com/Nicconike/Steam-Stats/actions/workflows/bandit.yml/badge.svg)](https://github.com/Nicconike/Steam-Stats/actions/workflows/bandit.yml)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=Nicconike_Steam-Stats&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=Nicconike_Steam-Stats)
 ![Pylint](https://img.shields.io/badge/Pylint-9.99-greenyellow?logo=python)
 [![codecov](https://codecov.io/gh/Nicconike/Steam-Stats/graph/badge.svg?token=SC5P7CS1BW)](https://codecov.io/gh/Nicconike/Steam-Stats)
 ![Docker Image Size](https://img.shields.io/docker/image-size/nicconike/steam-stats?logo=docker&label=Docker%20Image&link=https%3A%2F%2Fhub.docker.com%2Fr%2Fnicconike%2Fsteam-stats)
@@ -11,9 +12,10 @@
 ![Python Version from PEP 621 TOML](https://img.shields.io/python/required-version-toml?tomlFilePath=https%3A%2F%2Fgithub.com%2FNicconike%2FSteam-Stats%2Fblob%2Fmaster%2Fpyproject.toml%3Fraw%3Dtrue)
 ![PyPI - Version](https://img.shields.io/pypi/v/steam-stats)
 ![GitHub License](https://img.shields.io/github/license/nicconike/Steam-Stats)
-[![Visitor Badge](https://badges.pufler.dev/visits/nicconike/steam-stats)](https://badges.pufler.dev)
+[![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/Nicconike/Steam-Stats/badge)](https://scorecard.dev/viewer/?uri=github.com/Nicconike/Steam-Stats)
 [![OpenSSF Best Practices](https://www.bestpractices.dev/projects/9965/badge)](https://www.bestpractices.dev/projects/9965)
 [![wakatime](https://wakatime.com/badge/user/018e538b-3f55-4e8e-95fa-6c3225418eed/project/018e62a4-056d-49fd-babd-b079ee94859f.svg)](https://wakatime.com/badge/user/018e538b-3f55-4e8e-95fa-6c3225418eed/project/018e62a4-056d-49fd-babd-b079ee94859f)
+[![Visitor Badge](https://badges.pufler.dev/visits/nicconike/steam-stats)](https://badges.pufler.dev)
 
 > ### From one Passionate Gamer and Developer to Another 🍻
 ***

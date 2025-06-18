@@ -1,0 +1,60 @@
+name: Scorecard supply-chain security
+on:
+    workflow_call:
+        secrets:
+            APP_ID:
+                required: true
+            APP_PRIVATE_KEY:
+                required: true
+    push:
+        branches: [ "master" ]
+        paths:
+            - ".github/workflows/scoredcard.yml"
+            - "api/*.py"
+    pull_request:
+        branches: [ "master" ]
+
+jobs:
+    analysis:
+        name: Scorecard analysis
+        runs-on: ubuntu-latest
+        if: |
+            github.actor != 'dependabot[bot]' &&
+            github.actor != 'github-actions[bot]' &&
+            github.actor != 'protected-auto-commits[bot]'
+            github.ref == 'refs/heads/${{ inputs.branch }}'
+        permissions:
+            security-events: write
+            id-token: write
+        steps:
+          - name: GitHub App Token
+            id: app-token
+            uses: actions/create-github-app-token@v2
+            with:
+              app-id: ${{ secrets.APP_ID }}
+              private-key: ${{ secrets.APP_PRIVATE_KEY }}
+
+          - name: "Checkout code"
+            uses: actions/checkout@v4
+            with:
+                token: ${{ steps.app-token.outputs.token }}
+                persist-credentials: false
+                ref: ${{ inputs.branch }}
+
+          - name: "Run analysis"
+            uses: ossf/scorecard-action@v2
+            with:
+                results_file: results.sarif
+                results_format: sarif
+                publish_results: true
+
+          - name: "Upload artifact"
+            uses: actions/upload-artifact@v4
+            with:
+                name: SARIF file
+                path: results.sarif
+
+          - name: "Upload to code-scanning"
+            uses: github/codeql-action/upload-sarif@v3
+            with:
+                sarif_file: results.sarif

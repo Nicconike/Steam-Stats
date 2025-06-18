@@ -4,9 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "Steam-Stats"
-authors = [
-    { name = "Nicco", email = "38905025+Nicconike@users.noreply.github.com" },
-]
+authors = [{ name = "Nicco", email = "github.giving328@passmail.com" }]
 description = "A python project to get the stats of your Steam account and display them in your GitHub profile."
 dynamic = ["version"]
 requires-python = ">= 3.8"
@@ -18,7 +16,7 @@ dependencies = [
     "DateTime==5.5",
     "playwright==1.52.0",
     "PyGithub==2.6.1",
-    "python-semantic-release==10.0.2",
+    "python-semantic-release==10.1.0",
 ]
 classifiers = [
     "Programming Language :: Python",
@@ -41,19 +39,20 @@ classifiers = [
 ]
 
 [project.urls]
-changelog = "https://github.com/Nicconike/Steam-Stats/blob/master/CHANGELOG.md"
-documentation = "https://github.com/Nicconike/Steam-Stats/blob/master/README.md"
-wiki = "https://github.com/Nicconike/Steam-Stats/wiki"
-issues = "https://github.com/Nicconike/Steam-Stats/issues"
+Homepage = "https://github.com/Nicconike/Steam-Stats"
+Changelog = "https://github.com/Nicconike/Steam-Stats/blob/master/CHANGELOG.md"
+Documentation = "https://github.com/Nicconike/Steam-Stats/blob/master/README.md"
+Wiki = "https://github.com/Nicconike/Steam-Stats/wiki"
+Issues = "https://github.com/Nicconike/Steam-Stats/issues"
 
 [project.optional-dependencies]
 test = [
     "pytest-asyncio==1.0.0",
-    "pytest-cov==6.1.1",
+    "pytest-cov==6.2.1",
     "pytest-mock==3.14.1",
     "requests-mock==1.12.1",
 ]
-dev = ["bandit==1.8.3", "pipdeptree==2.26.1", "pylint==3.3.7", "twine==6.1.0"]
+dev = ["bandit==1.8.5", "pipdeptree==2.26.1", "pylint==3.3.7", "twine==6.1.0"]
 
 [tool.setuptools.packages.find]
 where = ["."]
@@ -65,11 +64,6 @@ version_source = "tag"
 branch = "master"
 commit_message = "chore(release): Version Release v{version}"
 tag_format = "v{version}"
-
-[tool.semantic_release.branches.main]
-match = "master"
-prerelease_token = "rc"
-prerelease = false
 
 [tool.semantic_release.commit_parser_options]
 allowed_tags = [
@@ -105,7 +99,6 @@ exclude_commit_patterns = ["^chore:", "^style:"]
 trim_blocks = true
 autoescape = false
 ignore_token_for_push = false
-env = "GH_TOKEN"
 
 [tool.semantic_release.publish]
 upload_to_vcs_release = true

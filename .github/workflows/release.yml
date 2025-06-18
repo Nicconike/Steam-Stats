@@ -1,10 +1,27 @@
 name: Release
 
 on:
+    workflow_call:
+        inputs:
+            package_name:
+                required: true
+                type: string
+            docker_image:
+                required: true
+                type: string
+        secrets:
+            APP_ID:
+                required: true
+            APP_PRIVATE_KEY:
+                required: true
+            DOCKER_TOKEN:
+                required: true
+            GITHUB_TOKEN:
+                required: true
     push:
         branches: [master]
         tags:
-            - '*'
+            - 'v*'
         paths:
             - '.github/workflows/release.yml'
             - 'api/*.py'
@@ -48,7 +65,7 @@ jobs:
           - name: Setup Python
             uses: actions/setup-python@v5
             with:
-                python-version: '3.12'
+                python-version: '3.x'
                 cache: "pip"
 
           - name: Cache Dependencies
@@ -71,7 +88,7 @@ jobs:
 
           - name: Semantic Release
             id: semantic
-            uses: python-semantic-release/python-semantic-release@v10.0.2
+            uses: python-semantic-release/python-semantic-release@v10.1.0
             with:
                 github_token: ${{ steps.app-token.outputs.token }}
             env:
@@ -112,9 +129,9 @@ jobs:
 
           - name: Install CoSign
             if: github.event_name != 'pull_request'
-            uses: sigstore/cosign-installer@v3.8.2
+            uses: sigstore/cosign-installer@v3
             with:
-                cosign-release: 'v2.4.0'
+                cosign-release: 'v2.5.0'
 
           - name: Setup Docker Buildx
             uses: docker/setup-buildx-action@v3
@@ -143,8 +160,8 @@ jobs:
             uses: docker/metadata-action@v5
             with:
                 images: |
-                    ${{ vars.DOCKER_USERNAME }}/steam-stats
-                    ghcr.io/${{ github.repository_owner }}/steam-stats
+                    ${{ vars.DOCKER_USERNAME }}/${{ github.event.repository.name }}
+                    ghcr.io/${{ github.repository_owner }}/${{ github.event.repository.name }}
                 tags: |
                     type=raw,value=master
                     type=raw,value=${{ env.LATEST_RELEASE }}
@@ -174,7 +191,7 @@ jobs:
           - name: Generate Artifact Attestation
             uses: actions/attest-build-provenance@v2
             with:
-                subject-name: ghcr.io/${{ github.repository_owner }}/steam-stats
+                subject-name: ghcr.io/${{ github.repository_owner }}/${{ github.event.repository.name }}
                 subject-digest: ${{ steps.push.outputs.digest }}
                 push-to-registry: true
 
@@ -182,7 +199,7 @@ jobs:
             uses: docker/scout-action@v1.18.1
             with:
                 command: quickview, cves
-                image: ${{ vars.DOCKER_USERNAME }}/steam-stats:master
+                image: ${{ vars.DOCKER_USERNAME }}/${{ github.event.repository.name }}:master
                 write-comment: true
                 github-token: ${{ secrets.GITHUB_TOKEN }}
                 sarif-file: docker-scout-results.sarif
@@ -223,16 +240,17 @@ jobs:
                 password: ${{ secrets.GITHUB_TOKEN }}
 
           - name: Delete Old Docker Hub Tags
+            env:
+                REPO_NAME: ${{ github.event.repository.name }}
             run: |
-                echo "Fetching Docker Hub tags..."
+                echo "Fetching Docker Hub tags for $REPO_NAME..."
                 tags=$(curl -s -H "Authorization: Bearer ${{ secrets.DOCKER_TOKEN }}" \
-                "https://hub.docker.com/v2/repositories/${{ vars.DOCKER_USERNAME }}/steam-stats/tags?page_size=100" | \
+                "https://hub.docker.com/v2/repositories/${{ vars.DOCKER_USERNAME }}/$REPO_NAME/tags?page_size=100" | \
                 jq -r '.results[].name')
 
                 echo "Tags found in Docker Hub:"
                 echo "$tags"
 
-                # Find latest semver tag, supports with or without `v`
                 latest_tag=$(echo "$tags" | grep -E '^v?[0-9]+\.[0-9]+\.[0-9]+$' | sort -rV | head -n 1)
                 echo "Latest semantic version tag is: $latest_tag"
 
@@ -240,7 +258,7 @@ jobs:
                     if [[ "$tag" != "master" && "$tag" != "$latest_tag" ]]; then
                         echo "Deleting tag $tag from Docker Hub"
                         curl -s -X DELETE -H "Authorization: Bearer ${{ secrets.DOCKER_TOKEN }}" \
-                        "https://hub.docker.com/v2/repositories/${{ vars.DOCKER_USERNAME }}/steam-stats/tags/$tag/"
+                        "https://hub.docker.com/v2/repositories/${{ vars.DOCKER_USERNAME }}/$REPO_NAME/tags/$tag/"
                     else
                         echo "Keeping tag $tag"
                     fi
@@ -249,16 +267,15 @@ jobs:
           - name: Delete Old GHCR Tags
             env:
                 GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-                REPO_OWNER: ${{ github.repository_owner }}
-                PACKAGE_NAME: "steam-stats"
+                REPO_NAME: ${{ github.event.repository.name }}
             run: |
-                echo "Fetching GHCR tags..."
+                echo "Fetching GHCR tags for $REPO_NAME..."
                 page=1
                 all_tags=()
 
                 while true; do
                     page_tags=$(curl -s -H "Authorization: Bearer $GITHUB_TOKEN" \
-                        "https://api.github.com/user/packages/container/$PACKAGE_NAME/versions?per_page=100&page=$page" | \
+                        "https://api.github.com/user/packages/container/$REPO_NAME/versions?per_page=100&page=$page" | \
                         jq -r '.[].metadata.container.tags[]')
 
                     if [[ -z "$page_tags" ]]; then
@@ -272,7 +289,6 @@ jobs:
                 echo "Tags found in GHCR:"
                 printf "%s\n" "${all_tags[@]}"
 
-                # Find latest semver tag
                 latest_tag=$(printf "%s\n" "${all_tags[@]}" | grep -E '^v?[0-9]+\.[0-9]+\.[0-9]+$' | sort -rV | head -n 1)
                 echo "Latest semantic version tag is: $latest_tag"
 
@@ -280,12 +296,12 @@ jobs:
                     if [[ "$tag" != "master" && "$tag" != "$latest_tag" ]]; then
                         echo "Deleting tag $tag from GHCR"
                         version_id=$(curl -s -H "Authorization: Bearer $GITHUB_TOKEN" \
-                        "https://api.github.com/user/packages/container/$PACKAGE_NAME/versions" | \
+                        "https://api.github.com/user/packages/container/$REPO_NAME/versions" | \
                         jq -r ".[] | select(.metadata.container.tags[] == \"$tag\") | .id")
 
                         if [[ -n "$version_id" ]]; then
                         curl -s -X DELETE -H "Authorization: Bearer $GITHUB_TOKEN" \
-                            "https://api.github.com/user/packages/container/$PACKAGE_NAME/versions/$version_id"
+                            "https://api.github.com/user/packages/container/$REPO_NAME/versions/$version_id"
                         else
                             echo "Warning: Could not find version ID for tag $tag"
                         fi
