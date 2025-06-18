@@ -2,11 +2,11 @@ coverage:
     status:
         project:
             default:
-                target: 80%
+                target: 90%
                 threshold: 5%
         patch:
             default:
-                target: 80%
+                target: 90%
                 threshold: 5%
 
 comment:
@@ -40,7 +40,7 @@ component_management:
     default_rules:
         statuses:
             - type: project
-              target: 80%
+              target: 90%
               threshold: 5%
               if_ci_failed: error
     individual_components:

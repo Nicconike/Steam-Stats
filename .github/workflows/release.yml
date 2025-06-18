@@ -3,7 +3,7 @@ name: Release
 on:
     workflow_call:
         inputs:
-            package_name:
+            repo_name:
                 required: true
                 type: string
             docker_image:
@@ -28,7 +28,7 @@ on:
             - 'requirements.txt'
 
 permissions:
-  contents: read
+    contents: read
 
 jobs:
     release:
@@ -50,10 +50,10 @@ jobs:
             released: ${{ steps.semantic.outputs.released }}
             version: ${{ steps.semantic.outputs.version }}
         steps:
-          - name: Harden the runner (Audit all outbound calls)
+          - name: Harden the runner
             uses: step-security/harden-runner@002fdce3c6a235733a90a27c80493a3241e56863 # v2.12.1
             with:
-              egress-policy: audit
+                egress-policy: audit
 
           - name: GitHub App Token
             uses: actions/create-github-app-token@df432ceedc7162793a195dd1713ff69aefc7379e # v2.0.6
@@ -120,10 +120,10 @@ jobs:
             id-token: write
             packages: write
         steps:
-          - name: Harden the runner (Audit all outbound calls)
+          - name: Harden the runner
             uses: step-security/harden-runner@002fdce3c6a235733a90a27c80493a3241e56863 # v2.12.1
             with:
-              egress-policy: audit
+                egress-policy: audit
 
           - name: GitHub App Token
             uses: actions/create-github-app-token@df432ceedc7162793a195dd1713ff69aefc7379e # v2.0.6
@@ -234,10 +234,10 @@ jobs:
             contents: read
             packages: write
         steps:
-          - name: Harden the runner (Audit all outbound calls)
+          - name: Harden the runner
             uses: step-security/harden-runner@002fdce3c6a235733a90a27c80493a3241e56863 # v2.12.1
             with:
-              egress-policy: audit
+                egress-policy: audit
 
           - name: Checkout Repo
             uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
@@ -285,6 +285,7 @@ jobs:
                 GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
                 REPO_NAME: ${{ github.event.repository.name }}
             run: |
+                REPO_NAME="${{ inputs.repo_name }}"
                 echo "Fetching GHCR tags for $REPO_NAME..."
                 page=1
                 all_tags=()
