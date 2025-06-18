@@ -16,8 +16,6 @@ on:
                 required: true
             DOCKER_TOKEN:
                 required: true
-            GITHUB_TOKEN:
-                required: true
     push:
         branches: [master]
         tags:
