@@ -23,24 +23,14 @@ jobs:
             github.actor != 'dependabot[bot]' &&
             github.actor != 'github-actions[bot]' &&
             github.actor != 'protected-auto-commits[bot]'
-            github.ref == 'refs/heads/${{ inputs.branch }}'
         permissions:
             security-events: write
             id-token: write
         steps:
-          - name: GitHub App Token
-            id: app-token
-            uses: actions/create-github-app-token@v2
-            with:
-              app-id: ${{ secrets.APP_ID }}
-              private-key: ${{ secrets.APP_PRIVATE_KEY }}
-
           - name: "Checkout code"
             uses: actions/checkout@v4
             with:
-                token: ${{ steps.app-token.outputs.token }}
                 persist-credentials: false
-                ref: ${{ inputs.branch }}
 
           - name: "Run analysis"
             uses: ossf/scorecard-action@v2.4.2
