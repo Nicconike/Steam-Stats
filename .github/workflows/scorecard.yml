@@ -1,5 +1,6 @@
 name: Scorecard supply-chain security
 on:
+    workflow_dispatch:
     workflow_call:
         secrets:
             APP_ID:
