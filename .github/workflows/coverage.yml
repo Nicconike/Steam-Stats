@@ -2,6 +2,10 @@ name: Codecov
 
 on:
     workflow_call:
+        inputs:
+            use_playwright:
+                required: false
+                type: boolean
         secrets:
             CODECOV_TOKEN:
                 required: true
@@ -33,7 +37,7 @@ jobs:
         runs-on: ubuntu-latest
         concurrency: code-coverage
         steps:
-          - name: Harden the runner (Audit all outbound calls)
+          - name: Harden the runner
             uses: step-security/harden-runner@002fdce3c6a235733a90a27c80493a3241e56863 # v2.12.1
             with:
                 egress-policy: audit
