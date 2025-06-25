@@ -1,6 +1,10 @@
 {% set releases = context.history.released.values() | list %}
 {% for release in releases %}
-## {{ release.version }} ({{ release.date.strftime('%Y-%m-%d') }})
+## {{ release.version }} - {{
+    release.date.strftime('%Y-%m-%d')
+    if release.date and release.date.strftime
+    else "Unknown Date"
+}}
 
 {% include "components/changes.md.j2" %}
 
