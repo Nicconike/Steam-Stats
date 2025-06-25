@@ -4,9 +4,9 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "Steam-Stats"
+version = "1.3.1"
 authors = [{ name = "Nicco", email = "github.giving328@passmail.com" }]
 description = "A python project to get the stats of your Steam account and display them in your GitHub profile."
-dynamic = ["version"]
 requires-python = ">= 3.8"
 readme = "README.md"
 license = "GPL-3.0"
@@ -14,7 +14,7 @@ license-files = ["LICENSE"]
 dependencies = [
     "bs4==0.0.2",
     "DateTime==5.5",
-    "playwright==1.52.0",
+    "playwright==1.53.0",
     "PyGithub==2.6.1",
     "python-semantic-release==10.1.0",
 ]
@@ -55,33 +55,18 @@ test = [
 dev = ["bandit==1.8.5", "pipdeptree==2.26.1", "pylint==3.3.7", "twine==6.1.0"]
 
 [tool.setuptools.packages.find]
-where = ["."]
-include = ["api*"]
+where = ["api"]
 
 [tool.semantic_release]
 version_variables = ["api/main.py:__version__"]
+version_toml = ["pyproject.toml:project.version"]
 version_source = "tag"
 branch = "master"
 commit_message = "chore(release): Version Release v{version}"
 tag_format = "v{version}"
-
-[tool.semantic_release.commit_parser_options]
-allowed_tags = [
-    "build",
-    "chore",
-    "ci",
-    "docs",
-    "feat",
-    "fix",
-    "perf",
-    "style",
-    "refactor",
-    "test",
-    "revert",
-]
-minor_tags = ["feat"]
-patch_tags = ["fix", "perf"]
-default_bump_level = 0
+logging_use_named_masks = true
+commit_parser = "conventional"
+commit_parser_options = { parse_squash_commits = true, ignore_merge_commits = true }
 
 [tool.semantic_release.remote]
 type = "github"
@@ -89,11 +74,20 @@ token = { env = "GH_TOKEN" }
 
 [tool.semantic_release.changelog]
 default_templates.changelog_file = "CHANGELOG.md"
-changelog_mode = "update"
-insertion_flag = "<!-- version list -->"
+exclude_commit_patterns = [
+    '''chore(?:\([^)]*?\))?: .+''',
+    '''ci(?:\([^)]*?\))?: .+''',
+    '''refactor(?:\([^)]*?\))?: .+''',
+    '''style(?:\([^)]*?\))?: .+''',
+    '''test(?:\([^)]*?\))?: .+''',
+    '''build\((?!deps\): .+)''',
+    '''Merged? .*''',
+    '''Initial Commit.*''',
+]
+mode = "update"
+insertion_flag = "<!-- CHANGELOG -->"
 template_dir = "templates"
 release_notes_template = "release_notes.md.j2"
-exclude_commit_patterns = ["^chore:", "^style:"]
 
 [tool.semantic_release.changelog.environment]
 trim_blocks = true

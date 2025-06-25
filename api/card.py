@@ -5,7 +5,7 @@ import logging
 import math
 import os
 import asyncio
-from typing import Optional, TypedDict
+from typing import TypedDict
 from playwright.async_api import async_playwright, Error as PlaywrightError
 from api.utils import get_asset_paths
 
@@ -14,10 +14,7 @@ logging.basicConfig(
     level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
-
-
-MARGIN = 10
-CARD_SELECTOR = ".card"
+CARD_SELECTOR = ".outer-card"
 
 
 class FloatRect(TypedDict):
@@ -61,80 +58,8 @@ def handle_exception(e):
         logger.error("Unexpected Error: %s", e)
 
 
-async def get_element_bounding_box(
-    html_file: str, selector: str, margin: int = MARGIN
-) -> Optional[FloatRect]:
-    """Get the bounding box of the specified element using Playwright"""
-    browser = None
-    try:
-        # Check if the HTML file exists
-        if not os.path.exists(html_file):
-            raise FileNotFoundError("HTML file not found: " + html_file)
-
-        async with async_playwright() as p:
-            browser = await p.chromium.launch(headless=True)
-            page = await browser.new_page()
-            try:
-                await page.goto("file://" + os.path.abspath(html_file))
-            except TimeoutError as e:
-                raise asyncio.TimeoutError("Timeout error while loading page") from e
-
-            # Find element and get its bounding box
-            element = await page.query_selector(selector)
-            if not element:
-                raise ValueError("Element not found for selector: " + selector)
-
-            try:
-                bounding_box = await element.bounding_box()
-            except KeyError as e:
-                raise KeyError("Key error while retrieving bounding box") from e
-
-            if not bounding_box:
-                raise ValueError(
-                    "Could not retrieve bounding box for selector: " + selector
-                )
-
-            # Add margin to the bounding box
-            bounding_box_with_margin: FloatRect = {
-                "x": max(bounding_box["x"] - margin, 0),
-                "y": max(bounding_box["y"] - margin, 0),
-                "width": bounding_box["width"] + 2 * margin,
-                "height": bounding_box["height"] + 2 * margin,
-            }
-
-            await browser.close()
-            return bounding_box_with_margin
-
-    except (
-        FileNotFoundError,
-        PlaywrightError,
-        ValueError,
-        KeyError,
-        asyncio.TimeoutError,
-    ) as e:
-        handle_exception(e)
-        return None
-    finally:
-        if browser:
-            await browser.close()
-
-
-async def html_to_png(
-    html_file: str, output_file: str, selector: str, margin: int = MARGIN
-) -> bool:
-    """Convert an HTML file to a PNG using Playwright with clipping"""
-    bounding_box = await get_element_bounding_box(html_file, selector, margin)
-    if not bounding_box:
-        logger.error("Bounding box could not be determined")
-        return False
-
-    clip: FloatRect = {
-        "x": float(bounding_box["x"]),
-        "y": float(bounding_box["y"]),
-        "width": float(bounding_box["width"]),
-        "height": float(bounding_box["height"]),
-    }
-
+async def html_to_png(html_file: str, output_file: str, selector: str) -> bool:
+    """Convert an HTML file to a PNG using Playwright"""
     browser = None
     try:
         async with async_playwright() as p:
@@ -142,8 +67,11 @@ async def html_to_png(
             page = await browser.new_page()
             await page.goto("file://" + os.path.abspath(html_file))
 
-            # Take screenshot with clipping
-            await page.screenshot(path=output_file, clip=clip)
+            element = await page.query_selector(selector)
+            if not element:
+                logger.error("Element not found for selector: %s", selector)
+                return False
+            await element.screenshot(path=output_file)
             return True
 
     except (PlaywrightError, asyncio.TimeoutError) as e:
@@ -215,6 +143,14 @@ def generate_card_for_player_summary(player_data):
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Steam Profile Summary</title>
         <style>
+            .outer-card {{
+                width: 460px;
+                margin: auto;
+                padding: 10px;
+                background-color: #f8f8f8;
+                box-sizing: border-box;
+                border-radius: 12px;
+            }}
             .card {{
                 width: 100%;
                 max-width: 400px;
@@ -250,22 +186,24 @@ def generate_card_for_player_summary(player_data):
         </style>
     </head>
     <body>
-        <div class="card">
-            <div class="content">
-                <h2>Steam Profile Summary</h2>
-                <img id="avatar" class="avatar" src="{player['avatar']}" alt="Avatar">
-                <h2 id="name">{player['name']}</h2>
-                <div class="info-container">
-                    <div class="info-left">
-                        <p id="status">Status: {player['status']}</p>
-                        {country_section}
+        <div class="outer-card">
+            <div class="card">
+                <div class="content">
+                    <h2>Steam Profile Summary</h2>
+                    <img id="avatar" class="avatar" src="{player['avatar']}" alt="Avatar">
+                    <h2 id="name">{player['name']}</h2>
+                    <div class="info-container">
+                        <div class="info-left">
+                            <p id="status">Status: {player['status']}</p>
+                            {country_section}
+                        </div>
+                        <div class="info-right">
+                            <p id="lastlogoff">Last Logoff: {player['lastlogoff']}</p>
+                            <p id="timecreated">PC Gaming Since: {player['timecreated']}</p>
+                        </div>
                     </div>
-                    <div class="info-right">
-                        <p id="lastlogoff">Last Logoff: {player['lastlogoff']}</p>
-                        <p id="timecreated">PC Gaming Since: {player['timecreated']}</p>
-                    </div>
+                    {game_section}
                 </div>
-                {game_section}
             </div>
         </div>
     </body>
@@ -289,10 +227,11 @@ def format_playtime(playtime):
         unit = "min" if playtime == 1 else "mins"
         return f"{playtime} {unit}"
     hours, minutes = divmod(playtime, 60)
+    hr_unit = "hr" if hours == 1 else "hrs"
     if minutes == 0:
-        return f"{hours} hrs"
-    unit = "min" if minutes == 1 else "mins"
-    return f"{hours} hrs and {minutes} {unit}"
+        return f"{hours} {hr_unit}"
+    min_unit = "min" if minutes == 1 else "mins"
+    return f"{hours} {hr_unit} and {minutes} {min_unit}"
 
 
 def generate_progress_bar(game, index, max_playtime, log_scale, placeholder_image):
@@ -320,7 +259,7 @@ def generate_progress_bar(game, index, max_playtime, log_scale, placeholder_imag
         <img src="{img_icon_url}" alt="{name}" class="game-icon">
         <progress class="{style_class}" value="{normalized_playtime}" max="100"></progress>
         <div class="game-info">
-            <span class="game-name">{name}</span><br>
+            <span class="game-name">{name}</span>
             <span class="game-time">{display_time}</span>
         </div>
     </div>
@@ -336,8 +275,6 @@ def generate_card_for_played_games(games_data):
     log_scale = os.getenv("INPUT_LOG_SCALE", "false").lower() in ("true", "1", "t")
     watermark = '<div class="watermark">Log Scale Enabled</div>' if log_scale else ""
 
-    num_games = len(games_data["response"]["games"])
-    min_canvas_height = num_games * 60 + 70
     max_playtime = (
         max(game["playtime_2weeks"] for game in games_data["response"]["games"]) or 1
     )
@@ -358,12 +295,14 @@ def generate_card_for_played_games(games_data):
         <link rel="stylesheet" href="style.css">
     </head>
     <body>
-        <div class="card" style="height: {min_canvas_height}px; position: relative; ">
-            <div class="content" style="position: relative; text-align: center;">
-                <h2>Recently Played Games (Last 2 Weeks)</h2>
-                {progress_bars}
+        <div class="outer-card">
+            <div class="card">
+                <div class="content" style="position: relative; text-align: center;">
+                    <h2>Recently Played Games (Last 2 Weeks)</h2>
+                    {progress_bars}
+                </div>
+                {watermark}
             </div>
-            {watermark}
         </div>
     </body>
     </html>
@@ -399,6 +338,14 @@ def generate_card_for_steam_workshop(workshop_stats):
                 background-color: #f0f0f0;
                 margin: 0;
             }}
+            .outer-card {{
+                width: 460px;
+                margin: auto;
+                padding: 10px;
+                background-color: #f8f8f8;
+                box-sizing: border-box;
+                border-radius: 12px;
+            }}
             .card {{
                 width: 100%;
                 max-width: 400px;
@@ -429,30 +376,32 @@ def generate_card_for_steam_workshop(workshop_stats):
         </style>
     </head>
     <body>
-        <div class="card">
-            <h2>Steam Workshop Stats</h2>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Workshop Stats</th>
-                        <th>Total</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>Unique Visitors</td>
-                        <td>{workshop_stats.get("total_unique_visitors", 0)}</td>
-                    </tr>
-                    <tr>
-                        <td>Current Subscribers</td>
-                        <td>{workshop_stats.get("total_current_subscribers", 0)}</td>
-                    </tr>
-                    <tr>
-                        <td>Current Favorites</td>
-                        <td>{workshop_stats.get("total_current_favorites", 0)}</td>
-                    </tr>
-                </tbody>
-            </table>
+        <div class="outer-card">
+            <div class="card">
+                <h2>Steam Workshop Stats</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Workshop Stats</th>
+                            <th>Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Unique Visitors</td>
+                            <td>{workshop_stats.get("total_unique_visitors", 0)}</td>
+                        </tr>
+                        <tr>
+                            <td>Current Subscribers</td>
+                            <td>{workshop_stats.get("total_current_subscribers", 0)}</td>
+                        </tr>
+                        <tr>
+                            <td>Current Favorites</td>
+                            <td>{workshop_stats.get("total_current_favorites", 0)}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </body>
     </html>

@@ -88,6 +88,11 @@ progress::-moz-progress-bar {
         linear-gradient(#f3c402, #ed7401);
 }
 
+.outer-card {
+    padding: 15px;
+    background-color: #fff;
+}
+
 .card {
     border: 2px solid #000;
     border-radius: 10px;

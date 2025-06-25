@@ -1,11 +1,15 @@
-{% set changelog_parts = prev_changelog_contents.split(
-        ctx.changelog_insertion_flag, maxsplit=1
-    )
-%}
-{{ changelog_parts[0] }}{{ ctx.changelog_insertion_flag }}
+{#
+    This changelog template controls changelog generation based on the mode:
+    - init: creates full changelog from scratch
+    - update: inserts new version info at a placeholder
+#}
+{% set this_file = "CHANGELOG.md" %}
+{% set insertion_flag = ctx.changelog_insertion_flag %}
+{% set unreleased_commits = ctx.history.unreleased %}
+{% set releases = ctx.history.released.values() | list %}
 
-{% if ctx.changelog_mode == "update" %}
-{%   include ".changelog_update.md.j2" %}
+{% if ctx.changelog_mode == "init" %}
+    {% include "changelog_init.md.j2" %}
+{% elif ctx.changelog_mode == "update" %}
+    {% include "changelog_update.md.j2" %}
 {% endif %}
-
-{{ changelog_parts[1] if changelog_parts | length > 1 else '' }}

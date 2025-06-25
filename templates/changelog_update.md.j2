@@ -1,0 +1,9 @@
+## {{ ctx.version }} - {{ ctx.version_date.strftime('%Y-%m-%d') }}
+{% for group in ctx.commit_groups %}
+### {{ group.title }}
+{% for commit in group.commits %}
+- {{ commit.subject }}
+{% endfor %}
+{% endfor %}
+
+{{ insertion_flag }}

@@ -11,6 +11,9 @@ on:
             - '.github/workflows/steam-stats.yml'
             - 'api/*.py'
 
+permissions:
+    contents: read
+
 jobs:
     steam-stats:
         if: |

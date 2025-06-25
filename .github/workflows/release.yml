@@ -43,7 +43,7 @@ jobs:
             cancel-in-progress: ${{ github.ref != 'refs/heads/master' }}
         permissions:
             id-token: write
-            contents: write
+            contents: read
             issues: write
             pull-requests: write
         outputs:

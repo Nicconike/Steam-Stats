@@ -158,9 +158,9 @@ def update_readme_sections(repo, current_content):
             "<!-- Steam-Stats start -->",
             "<!-- Steam-Stats end -->",
         )
-        logger.info("Steam stats updated")
+        logger.info("Steam Stats updated")
     else:
-        logger.info("No Steam stats content generated")
+        logger.info("No Steam Stats content generated")
 
     if WORKSHOP_STATS:
         workshop_content = generate_workshop_stats()
@@ -172,9 +172,9 @@ def update_readme_sections(repo, current_content):
                 "<!-- Steam-Workshop start -->",
                 "<!-- Steam-Workshop end -->",
             )
-            logger.info("Workshop stats updated")
+            logger.info("Workshop Stats updated")
         else:
-            logger.info("No Workshop stats content generated")
+            logger.info("No Workshop Stats content generated")
 
     return updated_content
 

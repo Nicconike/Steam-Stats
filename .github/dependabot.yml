@@ -1,5 +1,4 @@
 # https://docs.github.com/code-security/dependabot/dependabot-version-updates/configuration-options-for-the-dependabot.yml-file
-# pipdeptree | Select-String -Pattern '^\w' | ForEach-Object { $_.Line.Split('==')[0] } > requirements.txt
 # pipdeptree | Select-String -Pattern '^\w' | ForEach-Object { $_.Line } > requirements.txt
 # pip install --upgrade -r requirements.txt
 
@@ -18,9 +17,9 @@ updates:
           - python
       rebase-strategy: auto
       versioning-strategy: "increase-if-necessary"
-      open-pull-requests-limit: 10
+      open-pull-requests-limit: 3
       groups:
-          python-packages:
+          python-deps:
               patterns:
                   - "*"
 
@@ -30,12 +29,13 @@ updates:
           interval: "weekly"
       commit-message:
           prefix: "ci"
+          include: "scope"
       labels:
           - dependencies
           - dependabot
           - github_actions
       rebase-strategy: auto
-      open-pull-requests-limit: 10
+      open-pull-requests-limit: 3
       groups:
           github-actions:
               patterns:
@@ -53,11 +53,7 @@ updates:
           - dependabot
           - docker
       rebase-strategy: auto
-      ignore:
-          - dependency-name: "playwright/python"
-            versions:
-                - "1.49.1"
-      open-pull-requests-limit: 10
+      open-pull-requests-limit: 4
       groups:
           docker:
               patterns:
