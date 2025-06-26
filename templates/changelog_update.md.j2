@@ -1,4 +1,4 @@
-## {{ ctx.version }} - {{ ctx.version_date.strftime('%Y-%m-%d') }}
+## {{ ctx.version }}{% if ctx.date %} - {{ ctx.date.strftime('%Y-%m-%d') }}{% endif %}
 {% for group in ctx.commit_groups %}
 ### {{ group.title }}
 {% for commit in group.commits %}

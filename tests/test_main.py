@@ -28,20 +28,9 @@ def mock_repo():
     return MagicMock()
 
 
-@pytest.fixture(autouse=True)
-def mock_env_vars(monkeypatch):
-    """Mock environment variables"""
-    monkeypatch.setenv("GITHUB_TOKEN", "fake_token")
-    monkeypatch.setenv("GITHUB_REPOSITORY", "fake/repo")
-    monkeypatch.setenv("INPUT_STEAM_ID", "fake_steam_id")
-    monkeypatch.setenv("INPUT_STEAM_API_KEY", "fake_steam_api_key")
-    monkeypatch.setenv("INPUT_STEAM_CUSTOM_ID", "fake_steam_custom_id")
-    monkeypatch.setenv("INPUT_WORKSHOP_STATS", "true")
-
-
 @pytest.fixture
 def mock_dependencies(mocker):
-    """Fixtures for mocking dependencies"""
+    """Fixtures for Mocking Deps"""
     fixtures = {}
     fixtures["initialize_github"] = mocker.patch("api.main.initialize_github")
     fixtures["get_readme_content"] = mocker.patch("api.main.get_readme_content")
@@ -253,7 +242,7 @@ def test_update_readme_sections(
     mock_generate_steam.return_value = None
     updated_content = update_readme_sections(mock_repo, "Original Content")
     TestCase().assertIn("Original Content", updated_content)
-    mock_logger.info.assert_any_call("No Steam stats content generated")
+    mock_logger.info.assert_any_call("No Steam Stats content generated")
 
     mock_generate_steam.return_value = "Steam Stats Content"
     mock_generate_workshop.return_value = None
@@ -263,7 +252,7 @@ def test_update_readme_sections(
         "<!-- Steam-Stats start -->Steam Stats Content<!-- Steam-Stats end -->",
         updated_content,
     )
-    mock_logger.info.assert_any_call("No Workshop stats content generated")
+    mock_logger.info.assert_any_call("No Workshop Stats content generated")
 
 
 @patch("api.main.update_readme")

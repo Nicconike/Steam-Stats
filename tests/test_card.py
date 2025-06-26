@@ -3,13 +3,11 @@
 # Disable pylint warnings for false positives
 # pylint: disable=duplicate-code,redefined-outer-name,unused-argument,unused-variable
 import asyncio
-from unittest import mock
 from unittest.mock import patch, MagicMock, AsyncMock
 from playwright.async_api import Error as PlaywrightError
 import pytest
 from api.card import (
     handle_exception,
-    get_element_bounding_box,
     html_to_png,
     convert_html_to_png,
     format_unix_time,
@@ -87,6 +85,21 @@ def test_handle_timeout_error(caplog):
         )
 
 
+def test_handle_value_error(caplog):
+    """Test handle_exception with ValueError"""
+    exception = ValueError("Test Value Error")
+    handle_exception(exception)
+    if len(caplog.records) != 1:
+        pytest.fail("Expected one log record, found " + str(len(caplog.records)))
+    if caplog.records[0].levelname != "ERROR":
+        pytest.fail("Expected log level ERROR, found " + caplog.records[0].levelname)
+    if caplog.records[0].message != "Value Error: Test Value Error":
+        pytest.fail(
+            "Expected log message 'Value Error: Test Value Error', found "
+            + caplog.records[0].message
+        )
+
+
 def test_handle_unexpected_error(caplog):
     """Test handle_exception with an unexpected error"""
     exception = Exception("Test Unexpected Error")
@@ -102,279 +115,81 @@ def test_handle_unexpected_error(caplog):
         )
 
 
-async def _test_file_not_found_error(html_file, selector):
-    """Helper function to test FileNotFoundError"""
-    with mock.patch("os.path.exists", return_value=False):
-        with mock.patch("api.card.logger") as mock_logger:
-            result = await get_element_bounding_box(html_file, selector)
-            if result is not None:
-                raise AssertionError("Expected result to be None for FileNotFoundError")
-            if not mock_logger.error.called:
-                raise AssertionError(
-                    "Expected logger.error to be called for FileNotFoundError"
-                )
-            if mock_logger.error.call_args[0][
-                0
-            ] != "File Not Found Error: %s" or "HTML file not found:" not in str(
-                mock_logger.error.call_args[0][1]
-            ):
-                raise AssertionError(
-                    "Expected logger.error to be called with 'File Not Found Error: %s',"
-                    "'HTML file not found:'"
-                )
-
-
-async def _test_playwright_error(html_file, selector):
-    """Helper function to test PlaywrightError"""
-    with mock.patch("os.path.exists", return_value=True):
-        with mock.patch("api.card.async_playwright") as mock_playwright:
-            mock_playwright.return_value.__aenter__.side_effect = PlaywrightError(
-                "Playwright error"
-            )
-            with mock.patch("api.card.logger") as mock_logger:
-                result = await get_element_bounding_box(html_file, selector)
-                if result is not None:
-                    raise AssertionError(
-                        "Expected result to be None for PlaywrightError"
-                    )
-                if not mock_logger.error.called:
-                    raise AssertionError(
-                        "Expected logger.error to be called for PlaywrightError"
-                    )
-                if mock_logger.error.call_args[0][
-                    0
-                ] != "Playwright Error: %s" or "Playwright error" not in str(
-                    mock_logger.error.call_args[0][1]
-                ):
-                    raise AssertionError(
-                        "Expected logger.error to be called with 'Playwright Error: %s',"
-                        "'Playwright error'"
-                    )
-
-
-async def _test_key_error(html_file, selector):
-    """Helper function to test KeyError"""
-    with mock.patch("os.path.exists", return_value=True):
-        with mock.patch("api.card.async_playwright") as mock_playwright:
-            mock_browser = mock.AsyncMock()
-            mock_page = mock.AsyncMock()
-            mock_element = mock.AsyncMock()
-            mock_playwright.return_value.__aenter__.return_value.chromium.launch.return_value = (
-                mock_browser
-            )
-            mock_browser.new_page.return_value = mock_page
-            mock_page.query_selector.return_value = mock_element
-            mock_element.bounding_box.side_effect = KeyError(
-                "Key error while retrieving bounding box"
-            )
-            with mock.patch("api.card.logger") as mock_logger:
-                result = await get_element_bounding_box(html_file, selector)
-                if result is not None:
-                    raise AssertionError("Expected result to be None for KeyError")
-                if not mock_logger.error.called:
-                    raise AssertionError(
-                        "Expected logger.error to be called for KeyError"
-                    )
-                if mock_logger.error.call_args[0][
-                    0
-                ] != "Key Error: %s" or "Key error while retrieving bounding box" not in str(
-                    mock_logger.error.call_args[0][1]
-                ):
-                    raise AssertionError(
-                        "Expected logger.error to be called with "
-                        "'Key Error: %s', 'Key error while retrieving bounding box'"
-                    )
-
-
-async def _test_timeout_error(html_file, selector):
-    """Helper function to test asyncio.TimeoutError"""
-    with mock.patch("os.path.exists", return_value=True):
-        with mock.patch("api.card.async_playwright") as mock_playwright:
-            mock_browser = mock.AsyncMock()
-            mock_page = mock.AsyncMock()
-            mock_playwright.return_value.__aenter__.return_value.chromium.launch.return_value = (
-                mock_browser
-            )
-            mock_browser.new_page.return_value = mock_page
-            mock_page.goto.side_effect = asyncio.TimeoutError(
-                "Timeout error while loading page"
-            )
-            with mock.patch("api.card.logger") as mock_logger:
-                result = await get_element_bounding_box(html_file, selector)
-                if result is not None:
-                    raise AssertionError("Expected result to be None for TimeoutError")
-                if not mock_logger.error.called:
-                    raise AssertionError(
-                        "Expected logger.error to be called for TimeoutError"
-                    )
-                if mock_logger.error.call_args[0][
-                    0
-                ] != "Timeout Error: %s" or "Timeout error while loading page" not in str(
-                    mock_logger.error.call_args[0][1]
-                ):
-                    raise AssertionError(
-                        "Expected logger.error to be called with "
-                        "'Timeout Error: %s', 'Timeout error while loading page'"
-                    )
-
-
-async def _test_element_not_found(html_file, selector):
-    """Helper function to test ValueError when element is not found"""
-    with mock.patch("os.path.exists", return_value=True):
-        with mock.patch("api.card.async_playwright") as mock_playwright:
-            mock_browser = mock.AsyncMock()
-            mock_page = mock.AsyncMock()
-            mock_page.query_selector.return_value = None  # Element not found
-            mock_browser.new_page.return_value = mock_page
-            mock_playwright.return_value.__aenter__.return_value.chromium.launch.return_value = (
-                mock_browser
-            )
-
-            with mock.patch("api.card.logger") as mock_logger:
-                result = await get_element_bounding_box(html_file, selector)
-
-                if result is not None:
-                    raise AssertionError(
-                        "Expected result to be None for ValueError when element not found"
-                    )
-
-                if not mock_logger.error.called:
-                    raise AssertionError(
-                        "Expected logger.error to be called for ValueError (element not found)"
-                    )
-
-                log_call_args = mock_logger.error.call_args[0]
-
-                expected_msg = "Value Error: %s"
-                expected_detail = f"Element not found for selector: {selector}"
-
-                if log_call_args[0] != expected_msg:
-                    raise AssertionError(
-                        f"Expected logger format '{expected_msg}', got '{log_call_args[0]}'"
-                    )
-
-                if expected_detail not in str(log_call_args[1]):
-                    raise AssertionError(
-                        f"Expected exception message to contain '{expected_detail}', got '{
-                            log_call_args[1]}'"
-                    )
-
-
-async def _test_bounding_box_none_error(html_file, selector):
-    """Helper function to test ValueError when bounding box is None"""
-    with mock.patch("os.path.exists", return_value=True):
-        with mock.patch("api.card.async_playwright") as mock_playwright:
-            mock_browser = mock.AsyncMock()
-            mock_page = mock.AsyncMock()
-            mock_element = mock.AsyncMock()
-
-            mock_playwright.return_value.__aenter__.return_value.chromium.launch.return_value = (
-                mock_browser
-            )
-            mock_browser.new_page.return_value = mock_page
-            mock_page.query_selector.return_value = mock_element
-
-            # Simulate bounding_box returning None
-            mock_element.bounding_box.return_value = None
-
-            with mock.patch("api.card.logger") as mock_logger:
-                result = await get_element_bounding_box(html_file, selector)
-
-                if result is not None:
-                    raise AssertionError(
-                        "Expected result to be None when bounding box is None"
-                    )
-
-                if not mock_logger.error.called:
-                    raise AssertionError(
-                        "Expected logger.error to be called when bounding box is None"
-                    )
-
-                if mock_logger.error.call_args[0][0] != "Value Error: %s" or (
-                    "Could not retrieve bounding box for selector"
-                    not in str(mock_logger.error.call_args[0][1])
-                ):
-                    raise AssertionError(
-                        "Expected logger.error to be called with "
-                        "'Value Error: %s', 'Could not retrieve bounding box for selector...'"
-                    )
-
-
-def test_get_element_bounding_box():
-    """Test get_element_bounding_box function"""
-    html_file = "test.html"
-    selector = ".test-element"
-    asyncio.run(_test_file_not_found_error(html_file, selector))
-    asyncio.run(_test_playwright_error(html_file, selector))
-    asyncio.run(_test_key_error(html_file, selector))
-    asyncio.run(_test_timeout_error(html_file, selector))
-    asyncio.run(_test_element_not_found(html_file, selector))
-    asyncio.run(_test_bounding_box_none_error(html_file, selector))
-
-
 @pytest.mark.asyncio
-async def test_html_to_png():
-    """Test html_to_png function"""
+async def test_html_to_png_success():
+    """Test html_to_png when element is found and screenshot succeeds"""
     html_file = "test.html"
     output_file = "output.png"
     selector = ".test-element"
-    bounding_box = {"x": 10, "y": 20, "width": 100, "height": 200}
 
-    with patch("os.path.exists", return_value=True), patch(
-        "api.card.get_element_bounding_box",
-        new_callable=AsyncMock,
-        return_value=bounding_box,
-    ), patch("api.card.async_playwright") as mock_playwright:
+    mock_element = MagicMock()
+    mock_element.screenshot = AsyncMock()
+
+    with patch("api.card.async_playwright") as mock_playwright:
         mock_browser = MagicMock()
         mock_page = MagicMock()
         mock_page.goto = AsyncMock()
-        mock_page.screenshot = AsyncMock()
-        mock_page.close = AsyncMock()
+        mock_page.query_selector = AsyncMock(return_value=mock_element)
         mock_browser.new_page = AsyncMock(return_value=mock_page)
         mock_browser.close = AsyncMock()
         mock_playwright.return_value.__aenter__.return_value.chromium.launch = (
             AsyncMock(return_value=mock_browser)
         )
 
-        await html_to_png(html_file, output_file, selector)
-        mock_page.screenshot.assert_called_once_with(
-            path=output_file, clip=bounding_box
-        )
+        result = await html_to_png(html_file, output_file, selector)
+
+        if not result:
+            pytest.fail("Expected True when element is found and screenshot succeeds")
+
+        if not mock_page.goto.await_count:
+            pytest.fail("Expected page.goto to be awaited")
+        if not mock_page.query_selector.await_count:
+            pytest.fail("Expected query_selector to be awaited")
+        if not mock_element.screenshot.await_count:
+            pytest.fail("Expected screenshot to be awaited")
 
 
 @pytest.mark.asyncio
-async def test_html_to_png_bounding_box_none():
-    """Test html_to_png when get_element_bounding_box returns None"""
+async def test_html_to_png_element_not_found():
+    """Test html_to_png when query_selector returns None"""
     html_file = "test.html"
     output_file = "output.png"
     selector = ".invalid-element"
 
-    with patch(
-        "api.card.get_element_bounding_box", new_callable=AsyncMock, return_value=None
-    ), patch("api.card.logger") as mock_logger:
+    with patch("api.card.async_playwright") as mock_playwright, patch(
+        "api.card.logger"
+    ) as mock_logger:
+        mock_browser = MagicMock()
+        mock_page = MagicMock()
+        mock_page.goto = AsyncMock()
+        mock_page.query_selector = AsyncMock(return_value=None)
+        mock_browser.new_page = AsyncMock(return_value=mock_page)
+        mock_browser.close = AsyncMock()
+        mock_playwright.return_value.__aenter__.return_value.chromium.launch = (
+            AsyncMock(return_value=mock_browser)
+        )
+
         result = await html_to_png(html_file, output_file, selector)
+
         if result:
-            pytest.fail("Expected False when bounding box is None")
+            pytest.fail("Expected False when query_selector returns None")
         if mock_logger.error.call_count != 1:
             pytest.fail("Expected logger.error to be called once")
-        if mock_logger.error.call_args[0][0] != "Bounding box could not be determined":
-            pytest.fail("Incorrect error message logged")
+        if mock_logger.error.call_args[0][0] != "Element not found for selector: %s":
+            pytest.fail("Unexpected logger message content")
 
 
 @pytest.mark.asyncio
 @pytest.mark.parametrize(
-    "exception", [PlaywrightError("Failed to launch"), asyncio.TimeoutError()]
+    "exception", [PlaywrightError("Launch failed"), asyncio.TimeoutError()]
 )
-async def test_html_to_png_exceptions(exception):
-    """Test html_to_png when PlaywrightError or TimeoutError is raised"""
+async def test_html_to_png_exception_handling(exception):
+    """Test html_to_png handles exceptions properly"""
     html_file = "test.html"
     output_file = "output.png"
     selector = ".test-element"
-    bbox = {"x": 0, "y": 0, "width": 100, "height": 100}
 
-    with patch(
-        "api.card.get_element_bounding_box", new_callable=AsyncMock, return_value=bbox
-    ), patch("api.card.async_playwright") as mock_playwright, patch(
+    with patch("api.card.async_playwright") as mock_playwright, patch(
         "api.card.handle_exception"
     ) as mock_handle:
 
@@ -388,6 +203,7 @@ async def test_html_to_png_exceptions(exception):
         )
 
         result = await html_to_png(html_file, output_file, selector)
+
         if result:
             pytest.fail(f"Expected False due to exception: {exception}")
         if mock_handle.call_count != 1:
@@ -480,14 +296,14 @@ def test_generate_card_for_player_summary():
     [
         (1, "1 min"),  # less than 60 mins, singular
         (45, "45 mins"),  # less than 60 mins, plural
-        (60, "1 hrs"),  # exactly 60 mins, no leftover minutes
+        (60, "1 hr"),  # exactly 60 mins, no leftover minutes
         (120, "2 hrs"),  # multiple hours, no leftover minutes
         (121, "2 hrs and 1 min"),  # multiple hours, singular leftover minute
         (135, "2 hrs and 15 mins"),  # multiple hours, plural leftover minutes
     ],
 )
 def test_format_playtime(playtime, expected):
-    """Test format_playtime function with various playtime inputs."""
+    """Test format_playtime function with various playtime inputs"""
     actual = format_playtime(playtime)
     if actual != expected:
         pytest.fail(f"Expected '{expected}', got '{actual}' for playtime={playtime}")
