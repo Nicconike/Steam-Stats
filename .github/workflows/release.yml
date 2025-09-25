@@ -101,7 +101,7 @@ jobs:
                   PYTHON_KEYRING_BACKEND: keyring.backends.null.Keyring
 
             - name: Publish to GitHub Release Assets
-              uses: python-semantic-release/publish-action@4d4cb0ab842247caea1963132c242c62aab1e4d5 # v10.4.1
+              uses: python-semantic-release/publish-action@v10.4.1
               if: steps.release.outputs.released == 'true'
               with:
                   github_token: ${{ steps.app-token.outputs.token }}
