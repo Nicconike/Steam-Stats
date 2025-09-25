@@ -108,7 +108,7 @@ def test_get_recently_played_games_success(requests_mock):
     result = get_recently_played_games()
     if result is None:
         raise AssertionError("Expected result to be not None")
-    if result is None or "response" not in result:
+    if "response" not in result:
         raise AssertionError("Expected 'response' to be in result")
     if "games" not in result["response"]:
         raise AssertionError("Expected 'games' to be in result['response']")

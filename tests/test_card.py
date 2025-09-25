@@ -13,7 +13,7 @@ from api.card import (
     format_unix_time,
     generate_card_for_player_summary,
     format_playtime,
-    generate_card_for_played_games,
+    generate_card_for_recent_games,
     generate_card_for_steam_workshop,
 )
 
@@ -310,7 +310,7 @@ def test_format_playtime(playtime, expected):
 
 
 def test_generate_card_for_played_games():
-    """Test generate_card_for_played_games function"""
+    """Test generate_card_for_recent_games function"""
     games_data = {
         "response": {
             "games": [
@@ -323,17 +323,17 @@ def test_generate_card_for_played_games():
             ]
         }
     }
-    result = generate_card_for_played_games(games_data)
+    result = generate_card_for_recent_games(games_data)
     if result is None:
         raise AssertionError("Result should not be None")
     if "![Recently Played Games]" not in result:
         raise AssertionError("Result should contain '![Recently Played Games]'")
 
-    result_none = generate_card_for_played_games(None)
+    result_none = generate_card_for_recent_games(None)
     if result_none is not None:
         raise AssertionError("Result should be None when games_data is None")
 
-    result_empty = generate_card_for_played_games({})
+    result_empty = generate_card_for_recent_games({})
     if result_empty is not None:
         raise AssertionError("Result should be None when games_data is empty")
 

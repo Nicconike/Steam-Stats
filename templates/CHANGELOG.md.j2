@@ -7,9 +7,10 @@
 {% set insertion_flag = ctx.changelog_insertion_flag %}
 {% set unreleased_commits = ctx.history.unreleased %}
 {% set releases = ctx.history.released.values() | list %}
-
 {% if ctx.changelog_mode == "init" %}
-    {% include "changelog_init.md.j2" %}
+    {% include "components/changelog_header.md.j2" %}
+    {% include "components/changelog_init.md.j2" %}
 {% elif ctx.changelog_mode == "update" %}
-    {% include "changelog_update.md.j2" %}
+    {% include "components/changelog_header.md.j2" %}
+    {% include "components/changelog_update.md.j2" %}
 {% endif %}

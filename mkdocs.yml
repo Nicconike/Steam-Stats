@@ -1,0 +1,170 @@
+site_name: Steam Stats
+site_author: Nicconike
+site_description: Showcase your Steam Gaming Stats in your GitHub Profile with automated cards
+site_url: https://nicconike.github.io/Steam-Stats
+repo_name: Nicconike/Steam-Stats
+repo_url: https://github.com/Nicconike/Steam-Stats
+edit_uri: edit/main/docs/
+
+theme:
+    name: material
+    logo: assets/steam-stats-logo.png
+    favicon: assets/steam-stats-logo.png
+    icon:
+        previous: fontawesome/solid/angle-left
+        next: fontawesome/solid/angle-right
+    features:
+        # Content Features
+        - content.action.edit
+        - content.action.view
+        - content.code.annotate
+        - content.code.copy
+        - content.code.select
+        - content.footnote.tooltips
+        - content.tabs.link
+        - content.tooltips
+        # Navigation Features
+        - navigation.indexes
+        - navigation.instant
+        - navigation.instant.prefetch
+        - navigation.instant.progress
+        - navigation.tracking
+        - navigation.tabs
+        - navigation.tabs.sticky
+        - navigation.top
+        - navigation.footer
+        # Search Features
+        - search.highlight
+        - search.share
+        - search.suggest
+        # Header Features
+        - header.autohide
+        - announce.dismiss
+        - toc.follow
+    palette:
+        # Palette toggle for automatic mode
+        - media: "(prefers-color-scheme)"
+          toggle:
+              icon: material/brightness-auto
+              name: Switch to Light Mode
+        # Palette toggle for light mode
+        - media: "(prefers-color-scheme: light)"
+          scheme: default
+          primary: blue gray
+          accent: blue
+          toggle:
+              icon: material/brightness-7
+              name: Switch to Dark Mode
+        # Palette toggle for dark mode
+        - media: "(prefers-color-scheme: dark)"
+          scheme: slate
+          primary: black
+          accent: indigo
+          toggle:
+              icon: material/brightness-4
+              name: Switch to System Preference
+
+nav:
+    - Home:
+          - index.md
+          - Installation: setup.md
+          - Changelog: changelog.md
+          - License: license.md
+
+    - Getting started:
+          - getting-started/index.md
+          - Prerequisites: getting-started/prerequisites.md
+          - Steam Web API Setup: getting-started/steam-web-api.md
+          - Steam IDs: getting-started/steam-id.md
+          - GitHub Action Setup: getting-started/github-action.md
+          - Readme Integration: getting-started/readme-integration.md
+          - Verification: getting-started/verification.md
+
+    - User Guide:
+          - user-guide/index.md
+          - Cards Overview: user-guide/cards-overview.md
+          - Workflow Configuration: user-guide/config.md
+          - Scheduling Updates: user-guide/scheduling.md
+          - Troubleshooting: user-guide/troubleshooting.md
+
+    - Examples:
+          - examples/index.md
+          - Contribute Examples: examples/contribute-examples.md
+
+    - Reference:
+          - API Reference: reference/index.md
+          - Main: reference/main.md
+          - Steam Stats: reference/steam-stats.md
+          - Steam Workshop: reference/steam-workshop.md
+          - Card: reference/card.md
+          - Utilities: reference/utils.md
+
+    - Developer Guide:
+          - developer-guide/index.md
+          - Project Layout: developer-guide/project-layout.md
+          - Local Development: developer-guide/local-development.md
+          - Contributing: developer-guide/contributing.md
+          - Testing: developer-guide/testing.md
+
+plugins:
+    - search:
+          separator: '[\s\u200b\-_,:!=\[\]()"`/]+|\.(?!\d)|&[lg]t;|(?!\b)(?=[A-Z][a-z])'
+    - minify:
+          minify_html: true
+    - mkdocstrings:
+          default_handler: python
+    - autorefs
+    - mermaid2
+
+markdown_extensions:
+    # Basic Extensions
+    - admonition
+    - attr_list
+    - footnotes
+    - md_in_html
+    - toc:
+          permalink: true
+    # PyMdown Extensions
+    - pymdownx.superfences:
+          custom_fences:
+              - name: mermaid
+                class: mermaid
+                format: !!python/name:mermaid2.fence_mermaid_custom
+    - pymdownx.tabbed:
+          alternate_style: true
+    - pymdownx.tasklist:
+          custom_checkbox: true
+          clickable_checkbox: true
+    - pymdownx.highlight:
+          anchor_linenums: true
+    - pymdownx.emoji:
+          emoji_index: !!python/name:material.extensions.emoji.twemoji
+          emoji_generator: !!python/name:material.extensions.emoji.to_svg
+    - pymdownx.inlinehilite
+    - pymdownx.details
+    - pymdownx.keys
+    - pymdownx.mark
+    - pymdownx.critic
+    - pymdownx.caret
+    - pymdownx.tilde
+    - pymdownx.smartsymbols
+
+extra:
+    generator: false
+    copyright: Copyright &copy; 2024 - 2025 Nicconike
+    social:
+        - icon: fontawesome/brands/github
+          link: https://github.com/Nicconike
+        - icon: fontawesome/brands/docker
+          link: https://hub.docker.com/r/nicconike/steam-stats
+        - icon: fontawesome/brands/python
+          link: https://pypi.org/project/steam-stats
+        - icon: fontawesome/brands/steam
+          link: https://steamcommunity.com/id/nicconike
+        - icon: fontawesome/brands/discord
+          link: https://discord.gg/UbetHfu
+        - icon: fontawesome/brands/x-twitter
+          link: https://x.com/nicco_nike
+    analytics:
+        provider: google
+        property: !ENV GOOGLE_ANALYTICS_ID

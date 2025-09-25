@@ -14,9 +14,9 @@
 {% for title in ORDER %}
     {% set group = ctx.commit_groups | selectattr("title", "equalto", title) | list | first %}
     {% if group %}
-### {{ EMOJI_MAP.get(title, "") }} {{ title }}
-{%   for commit in group.commits %}
--   {{ commit.subject }}
-{%   endfor %}
+### {{ EMOJI_MAP[title] }} {{ title }}
+{% for commit in group.commits %}
+    - {{ commit.subject }}
+{% endfor %}
     {% endif %}
 {% endfor %}

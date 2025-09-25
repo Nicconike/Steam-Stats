@@ -23,8 +23,7 @@ RECENTLY_PLAYED_GAMES = (
 
 
 def get_player_summaries():
-    """Get Player Summaries from Steam
-    Fetch basic profile information for a list of 64-bit Steam IDs"""
+    """Get Player Summaries from Steam for basic profile info for a list of 64-bit Steam IDs"""
     creds = get_steam_credentials()
     steam_id = creds["steam_id"]
     api_key = creds["api_key"]
@@ -46,7 +45,7 @@ def get_player_summaries():
         except requests.exceptions.RequestException as err:
             logger.error("Request error: %s", err)
             return None
-    logger.error("Max retries reached. Failed to fetch player summaries.")
+    logger.error("Max retries reached. Failed to fetch player summaries")
     return None
 
 

@@ -7,7 +7,7 @@ from api.steam_stats import get_player_summaries, get_recently_played_games
 from api.steam_workshop import fetch_workshop_item_links, fetch_all_workshop_stats
 from api.card import (
     generate_card_for_player_summary,
-    generate_card_for_played_games,
+    generate_card_for_recent_games,
     generate_card_for_steam_workshop,
 )
 from api.utils import (
@@ -82,7 +82,7 @@ def generate_steam_stats():
     recently_played_games = get_recently_played_games()
     if recently_played_games:
         logger.info("Retrieved Recently Played Games Data")
-        recent_games = generate_card_for_played_games(recently_played_games)
+        recent_games = generate_card_for_recent_games(recently_played_games)
         if recent_games:
             user_markdown_content += recent_games
             logger.info("Generated Card for Recently Played Games")

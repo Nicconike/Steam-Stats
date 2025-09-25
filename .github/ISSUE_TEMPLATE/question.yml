@@ -2,7 +2,8 @@ name: Question
 description: Ask a question about this project
 title: "Ques:"
 labels: ["question"]
-assignees: "nicconike"
+assignees:
+    - nicconike
 body:
     - type: markdown
       attributes:

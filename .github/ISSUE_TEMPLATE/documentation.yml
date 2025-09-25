@@ -2,7 +2,8 @@ name: Documentation
 description: Suggest improvements or report issues with the documentation
 title: "Docs:"
 labels: ["documentation"]
-assignees: "nicconike"
+assignees:
+    - nicconike
 body:
     - type: markdown
       attributes:

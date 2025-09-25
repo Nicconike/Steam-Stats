@@ -28,7 +28,7 @@ class FloatRect(TypedDict):
 
 # Get GitHub Repo's Details where the action is being run
 repo_owner, repo_name = os.getenv("GITHUB_REPOSITORY", "owner/repo").split("/")
-branch_name = os.getenv("GITHUB_REF_NAME", "main")
+branch_name = os.getenv("GITHUB_REF_NAME", "master")
 
 # Persona state mapping for Steam Profile Status
 personastate_map = {
@@ -266,7 +266,7 @@ def generate_progress_bar(game, index, max_playtime, log_scale, placeholder_imag
     """
 
 
-def generate_card_for_played_games(games_data):
+def generate_card_for_recent_games(games_data):
     """Generate HTML Card for recently played games in last 2 weeks"""
     if not games_data:
         return None
@@ -300,8 +300,8 @@ def generate_card_for_played_games(games_data):
                 <div class="content" style="position: relative; text-align: center;">
                     <h2>Recently Played Games (Last 2 Weeks)</h2>
                     {progress_bars}
+                    {watermark}
                 </div>
-                {watermark}
             </div>
         </div>
     </body>
@@ -342,7 +342,7 @@ def generate_card_for_steam_workshop(workshop_stats):
                 width: 460px;
                 margin: auto;
                 padding: 10px;
-                background-color: #f8f8f8;
+                background-color: #ffffff;
                 box-sizing: border-box;
                 border-radius: 12px;
             }}
@@ -351,7 +351,7 @@ def generate_card_for_steam_workshop(workshop_stats):
                 max-width: 400px;
                 margin: auto;
                 border: 2px solid #000;
-                padding: 20px;
+                padding: 15px;
                 box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
                 border-radius: 10px;
                 background-color: #fff;

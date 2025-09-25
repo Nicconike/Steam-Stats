@@ -90,7 +90,7 @@ def test_update_readme_no_change(mock_repo):
 @patch("api.main.get_player_summaries")
 @patch("api.main.generate_card_for_player_summary")
 @patch("api.main.get_recently_played_games")
-@patch("api.main.generate_card_for_played_games")
+@patch("api.main.generate_card_for_recent_games")
 @patch("api.main.logger")
 def test_generate_steam_stats(
     mock_logger,

@@ -14,9 +14,9 @@ license-files = ["LICENSE"]
 dependencies = [
     "bs4==0.0.2",
     "DateTime==5.5",
-    "playwright==1.53.0",
-    "PyGithub==2.6.1",
-    "python-semantic-release==10.1.0",
+    "playwright==1.55.0",
+    "PyGithub==2.8.1",
+    "python-semantic-release==10.4.1",
 ]
 classifiers = [
     "Programming Language :: Python",
@@ -47,12 +47,25 @@ Issues = "https://github.com/Nicconike/Steam-Stats/issues"
 
 [project.optional-dependencies]
 test = [
-    "pytest-asyncio==1.0.0",
-    "pytest-cov==6.2.1",
-    "pytest-mock==3.14.1",
+    "pytest-asyncio==1.2.0",
+    "pytest-cov==7.0.0",
+    "pytest-mock==3.15.1",
     "requests-mock==1.12.1",
 ]
-dev = ["bandit==1.8.5", "pipdeptree==2.26.1", "pylint==3.3.7", "twine==6.1.0"]
+dev = [
+    "build==1.3.0",
+    "bandit==1.8.6",
+    "pipdeptree==2.28.0",
+    "pylint==3.3.8",
+    "python-dotenv==1.1.1",
+    "twine==6.2.0",
+]
+docs = [
+    "mkdocs-material==9.6.20",
+    "mkdocs-mermaid2-plugin==1.2.2",
+    "mkdocs-minify-plugin==0.8.0",
+    "mkdocstrings-python==1.18.2",
+]
 
 [tool.setuptools.packages.find]
 where = ["api"]
@@ -62,6 +75,10 @@ version_variables = ["api/main.py:__version__"]
 version_toml = ["pyproject.toml:project.version"]
 version_source = "tag"
 branch = "master"
+build_command = """
+    python -m pip install -e .[build]
+    python -m build .
+"""
 commit_message = "chore(release): Version Release v{version}"
 tag_format = "v{version}"
 logging_use_named_masks = true
@@ -74,6 +91,11 @@ token = { env = "GH_TOKEN" }
 
 [tool.semantic_release.changelog]
 default_templates.changelog_file = "CHANGELOG.md"
+mode = "update"
+insertion_flag = "<!-- CHANGELOG -->"
+template_dir = "templates"
+changelog_template = "CHANGELOG.md.j2"
+release_notes_template = "release_notes.md.j2"
 exclude_commit_patterns = [
     '''chore(?:\([^)]*?\))?: .+''',
     '''ci(?:\([^)]*?\))?: .+''',
@@ -84,15 +106,10 @@ exclude_commit_patterns = [
     '''Merged? .*''',
     '''Initial Commit.*''',
 ]
-mode = "update"
-insertion_flag = "<!-- CHANGELOG -->"
-template_dir = "templates"
-release_notes_template = "release_notes.md.j2"
 
 [tool.semantic_release.changelog.environment]
 trim_blocks = true
-autoescape = false
-ignore_token_for_push = false
+logging_use_named_masks = true
 
 [tool.semantic_release.publish]
 upload_to_vcs_release = true

@@ -1,4 +1,6 @@
 # Steam Stats📶
+A GitHub Action and Docker container to generate Steam user stats cards (PNG) for your README using the official Steam Web API and web scraping for Workshop stats.
+
 [![Steam Stats](https://github.com/Nicconike/Steam-Stats/actions/workflows/steam-stats.yml/badge.svg)](https://github.com/Nicconike/Steam-Stats/actions/workflows/steam-stats.yml)
 [![Release](https://github.com/Nicconike/Steam-Stats/actions/workflows/release.yml/badge.svg)](https://github.com/Nicconike/Steam-Stats/actions/workflows/release.yml)
 [![CodeQL & Pylint](https://github.com/Nicconike/Steam-Stats/actions/workflows/codeql.yml/badge.svg)](https://github.com/Nicconike/Steam-Stats/actions/workflows/codeql.yml)
@@ -7,10 +9,12 @@
 ![Pylint](https://img.shields.io/badge/Pylint-10.00-brightgreen?logo=python)
 [![codecov](https://codecov.io/gh/Nicconike/Steam-Stats/graph/badge.svg?token=SC5P7CS1BW)](https://codecov.io/gh/Nicconike/Steam-Stats)
 ![Docker Image Size](https://img.shields.io/docker/image-size/nicconike/steam-stats?logo=docker&label=Docker%20Image&link=https%3A%2F%2Fhub.docker.com%2Fr%2Fnicconike%2Fsteam-stats)
+[![Bugs](https://sonarcloud.io/api/project_badges/measure?project=Steam-Stats&metric=bugs)](https://sonarcloud.io/summary/new_code?id=Steam-Stats)
 ![Docker Pulls](https://img.shields.io/docker/pulls/nicconike/steam-stats?logo=docker&label=Docker%20Pulls&link=https%3A%2F%2Fhub.docker.com%2Fr%2Fnicconike%2Fsteam-stats)
 ![GitHub Release](https://img.shields.io/github/v/release/nicconike/steam-stats)
 ![Python Version from PEP 621 TOML](https://img.shields.io/python/required-version-toml?tomlFilePath=https%3A%2F%2Fgithub.com%2FNicconike%2FSteam-Stats%2Fblob%2Fmaster%2Fpyproject.toml%3Fraw%3Dtrue)
 ![PyPI - Version](https://img.shields.io/pypi/v/steam-stats)
+[![Docs](https://img.shields.io/badge/docs-steam--stats-blue.svg)](https://nicconike.github.io/Steam-Stats/)
 ![GitHub License](https://img.shields.io/github/license/nicconike/Steam-Stats)
 [![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/Nicconike/Steam-Stats/badge)](https://scorecard.dev/viewer/?uri=github.com/Nicconike/Steam-Stats)
 [![OpenSSF Best Practices](https://www.bestpractices.dev/projects/9965/badge)](https://www.bestpractices.dev/projects/9965)
@@ -18,6 +22,20 @@
 [![Visitor Badge](https://badges.pufler.dev/visits/nicconike/steam-stats)](https://badges.pufler.dev)
 
 > ### From one Passionate Gamer and Developer to Another 🍻
+---
+> **Full Documentation now available:**
+> [nicconike.github.io/Steam-Stats/](https://nicconike.github.io/Steam-Stats/)
+>
+> Browse detailed guides on:
+> - Getting Started (API Keys, setup, README integration)
+> - Usage & Configuration: User Guide
+> - Automated Examples & Feature Flags
+> - API Reference (developer-level docs)
+> - Developer Guide (contributing, testing, local setup)
+>
+> Found missing info or want to improve these docs?
+> [Open a documentation issue or PR!](https://github.com/Nicconike/Steam-Stats/issues)
+
 ***
 ## Prerequisites
 1. **Steam Web API Key:** API key is important to fetch your account details and for that you will require a key which you can create for your account [here](https://steamcommunity.com/dev)
@@ -36,7 +54,9 @@ schedule:
 > Also, make sure that you have set the country correctly in your Steam Account.
 >
 > You can refer the [Steam Stats Wiki](https://github.com/Nicconike/Steam-Stats/wiki) if you have any questions related to any of the steps mentioned in [Prerequisites](#Prerequisites).
+
 ***
+
 ## Samples (From my [Steam Account](https://steamcommunity.com/id/nicconike/))
 **Example for Steam User Stats**
 <!-- Steam-Stats start -->
@@ -66,7 +86,7 @@ schedule:
 > The `Steam-Stats` marker should be placed before the `Steam-Workshop` markers if you are using both.
 ***
 ## Features
-1. Steam Player Summary[^1]
+1. Steam Player Summary (Note: Steam Web API doesn't support Web Sockets, so the profile status cannot be updated in real time.)
 2. Recently Played Games from Steam in the Last 2 Weeks
 3. Steam Workshop Stats (If Applicable)
 
@@ -80,7 +100,7 @@ schedule:
 			![Recently Played Games](https://github.com/Nicconike/Steam-Stats/blob/master/assets/recently_played_games(linear).png)
 		3. When `LOG_SCALE` is `True`
 
-			![Recently Played Games](https://github.com/Nicconike/Steam-Stats/blob/master/assets/recently_played_games(logarithmic).png)
+			![Recently Played Games](https://github.com/Nicconike/Steam-Stats/blob/master/assets/recently_played_games(log).png)
 2. Steam Workshop Stats (Optional)
 	1. Workshop Stats Module can be used by adding this flag in your workflow file in the environment variables: `WORKSHOP_STATS: True`
 	2. This module displays the total number of Unique Visitors, Subscribers and Favorites for your Steam Workshop Items
@@ -152,5 +172,3 @@ If you are using this project and are really happy with it, then there are few w
 #### **Thanks!🫡**
 ***
 Created with 🐍 & ❤️ by [Nicco](https://x.com/Nicco_nike)
-
-[^1]: Unfortunately, Steam Web API doesn't support Web Sockets so the profile status cannot be updated in real time as it gets updated in steam profile 🥲

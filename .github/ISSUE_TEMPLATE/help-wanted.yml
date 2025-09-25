@@ -2,7 +2,8 @@ name: Help Wanted
 description: Request help for a specific issue or concern
 title: "Help:"
 labels: ["help wanted"]
-assignees: "nicconike"
+assignees:
+    - nicconike
 body:
     - type: markdown
       attributes:

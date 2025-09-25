@@ -60,7 +60,7 @@ def test_get_server_info_success(requests_mock):
     result = get_server_info("dummy_api_key")
     if result is None:
         pytest.fail("Expected result to be not None")
-    if "servertime" not in result:
+    elif "servertime" not in result:
         pytest.fail("Expected 'servertime' to be in result")
 
 

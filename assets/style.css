@@ -40,7 +40,7 @@ progress::-moz-progress-bar {
     top: 10px;
     right: 10px;
     font-size: 0.6em;
-    color: rgba(85, 53, 53, 0.5);
+    color: rgba(85, 53, 53, 0.6);
     pointer-events: none;
     z-index: 1000;
     font-weight: bold;

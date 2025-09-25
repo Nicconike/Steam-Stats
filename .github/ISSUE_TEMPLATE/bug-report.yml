@@ -2,7 +2,8 @@ name: Bug Report
 description: Report a bug to help me improve Steam Stats
 title: "Bug:"
 labels: ["bug"]
-assignees: "nicconike"
+assignees:
+    - nicconike
 body:
     - type: markdown
       attributes:

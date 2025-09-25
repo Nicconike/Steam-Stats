@@ -126,7 +126,10 @@ def parse_stats_table(stats_table):
     if not isinstance(stats_table, Tag):
         return stats
     for row in stats_table.find_all("tr"):
-        cells = row.find_all("td")
+        # Skip non-Tag children
+        if not isinstance(row, Tag):
+            continue
+        cells = [c for c in row.find_all("td") if isinstance(c, Tag)]
         if len(cells) == 2:
             key = cells[1].text.strip().lower().replace(" ", "_")
             value = cells[0].text.strip().replace(",", "")

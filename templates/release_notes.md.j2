@@ -1,12 +1,10 @@
-{% set releases = context.history.released.values() | list %}
-{% for release in releases %}
-## {{ release.version }} - {{
-    release.date.strftime('%Y-%m-%d')
-    if release.date and release.date.strftime
-    else "Unknown Date"
-}}
-
+{% for release in context.history.released.values() %}
+## {{ release.version }} ({{ release.tagged_date.strftime('%Y‑%m‑%d') }})
 {% include "components/changes.md.j2" %}
 
+**Detailed Changes**: [{{ prev_tag }}...{{ release.version.as_tag() }}]({{ prev_tag|compare_url(release.version.as_tag()) }})
+**Installable artifacts are available from**:
+- [PyPI Registry](...)
+- [GitHub Release Assets](...)
 ---
 {% endfor %}

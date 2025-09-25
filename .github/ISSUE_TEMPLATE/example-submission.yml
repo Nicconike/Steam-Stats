@@ -1,0 +1,64 @@
+name: Example Submission
+description: Submit your Steam Stats integration to be featured in the Examples gallery
+title: "Docs(Add profile): "
+labels: ["documentation", "example"]
+assignees:
+    - nicconike
+
+body:
+    - type: markdown
+      attributes:
+          value: |
+              Thanks for using Steam Stats! I'd love to feature your profile in the Examples gallery
+
+    - type: input
+      id: username
+      attributes:
+          label: GitHub Username
+          description: Your GitHub username (for the profile link)
+          placeholder: "your username"
+      validations:
+          required: true
+
+    - type: input
+      id: profile-url
+      attributes:
+          label: Profile Repository URL
+          description: Link to your profile repository (usually github.com/username/username)
+          placeholder: "https://github.com/your-username/your-username"
+      validations:
+          required: true
+
+    - type: textarea
+      id: screenshot
+      attributes:
+          label: Screenshot
+          description: Upload a screenshot showing Steam Stats cards in your README
+          placeholder: "Drag and drop or paste your screenshot here"
+      validations:
+          required: true
+
+    - type: checkboxes
+      id: optional-features
+      attributes:
+          label: Optional Features Used
+          description: Check any optional features you've enabled
+          options:
+              - label: "LOG_SCALE: True (logarithmic Recent Games chart)"
+              - label: "WORKSHOP_STATS: True (Workshop statistics)"
+
+    - type: textarea
+      id: additional-notes
+      attributes:
+          label: Additional Notes
+          description: Any custom configuration, scheduling or other details you'd like to mention
+          placeholder: "Custom cron schedule, specific use case, etc."
+
+    - type: checkboxes
+      id: terms
+      attributes:
+          label: Agreement
+          description: By submitting this issue, you agree to have your profile featured in the Steam Stats documentation
+          options:
+              - label: "I agree to have my profile featured in the Examples gallery"
+                required: true
