@@ -40,7 +40,6 @@ jobs:
               run: |
                   git config user.name "github-actions[bot]"
                   git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-                  git remote set-url origin https://${{ steps.app-token.outputs.token }}@github.com/Nicconike/Steam-Stats.git
 
             - name: Setup Python
               uses: actions/setup-python@e797f83bcb11b83ae66e0230d6156d7c80228e7c # v6.0.0
@@ -63,6 +62,7 @@ jobs:
               run: pip install mkdocs-material mkdocs-mermaid2-plugin mkdocs-minify-plugin mkdocstrings-python
 
             - name: Deploy to GitHub Pages
-              run: mkdocs gh-deploy --force --remote-url https://${{ steps.app-token.outputs.token }}@github.com/Nicconike/Steam-Stats.git
+              run: mkdocs gh-deploy --force
               env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
                   GOOGLE_ANALYTICS_ID: ${{ secrets.GOOGLE_ANALYTICS_ID }}
