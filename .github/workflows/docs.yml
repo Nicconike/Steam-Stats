@@ -13,20 +13,25 @@ permissions:
 
 jobs:
     mkdocs-deploy:
-        name: Deploy MkDocs site to GitHub Pages
+        name: Deploy MkDocs
         concurrency: mkdocs-deploy
         if: |
             github.actor != 'dependabot[bot]' &&
             github.actor != 'github-actions[bot]' &&
             github.actor != 'protected-auto-commits[bot]'
         runs-on: ubuntu-latest
-        env:
-            GOOGLE_ANALYTICS_ID: ${{ secrets.GOOGLE_ANALYTICS_ID }}
         steps:
             - name: Harden the runner
               uses: step-security/harden-runner@f4a75cfd619ee5ce8d5b864b0d183aff3c69b55a # v2.13.1
               with:
                   egress-policy: audit
+
+            - name: GitHub App Token
+              uses: actions/create-github-app-token@67018539274d69449ef7c02e8e71183d1719ab42 # v2.1.4
+              id: app-token
+              with:
+                  app-id: ${{ secrets.APP_ID }}
+                  private-key: ${{ secrets.APP_PRIVATE_KEY }}
 
             - name: Checkout Code
               uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
@@ -58,3 +63,6 @@ jobs:
 
             - name: Deploy to GitHub Pages
               run: mkdocs gh-deploy --force
+              env:
+                  GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
+                  GOOGLE_ANALYTICS_ID: ${{ secrets.GOOGLE_ANALYTICS_ID }}
