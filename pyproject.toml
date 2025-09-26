@@ -75,7 +75,6 @@ version_variables = ["api/main.py:__version__"]
 version_toml = ["pyproject.toml:project.version"]
 version_source = "tag"
 branch = "master"
-build_command = "python -m build ."
 commit_message = "chore(release): Version Release v{version}"
 tag_format = "v{version}"
 logging_use_named_masks = true
