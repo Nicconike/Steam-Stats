@@ -74,7 +74,7 @@ where = ["api"]
 version_variables = ["api/main.py:__version__"]
 version_toml = ["pyproject.toml:project.version"]
 version_source = "tag"
-branch = "master"
+match = "master"
 commit_message = "chore(release): Version Release v{version}"
 tag_format = "v{version}"
 logging_use_named_masks = true
@@ -86,20 +86,18 @@ type = "github"
 token = { env = "GH_TOKEN" }
 
 [tool.semantic_release.changelog]
-default_templates.changelog_file = "CHANGELOG.md"
+changelog_file = "CHANGELOG.md"
 mode = "update"
 insertion_flag = "<!-- CHANGELOG -->"
-template_dir = "templates"
-changelog_template = "CHANGELOG.md.j2"
-release_notes_template = "release_notes.md.j2"
 exclude_commit_patterns = [
     '''chore(?:\([^)]*?\))?: .+''',
     '''ci(?:\([^)]*?\))?: .+''',
+    '''refactor(?:\([^)]*?\))?: .+''',
     '''style(?:\([^)]*?\))?: .+''',
     '''test(?:\([^)]*?\))?: .+''',
     '''build\((?!deps\): .+)''',
     '''Merged? .*''',
-    '''Initial Commit.*''',
+    '''Initial Commit*''',
 ]
 
 [tool.semantic_release.changelog.environment]
@@ -108,3 +106,4 @@ trim_blocks = true
 [tool.semantic_release.publish]
 upload_to_vcs_release = true
 upload_to_pypi = true
+dist_glob_patterns = ["dist/*"]

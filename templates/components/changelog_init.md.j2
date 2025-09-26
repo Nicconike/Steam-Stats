@@ -1,9 +1,0 @@
-{% for release in releases | sort(attribute="version", reverse=True) %}
-## {{ release.version }} - {{ release.date.strftime('%Y-%m-%d') }}
-{% for commit in release.commit_groups %}
-### {{ commit.title }}
-{% for c in commit.commits %}
-- {{ c.subject }}
-{% endfor %}
-{% endfor %}
-{% endfor %}

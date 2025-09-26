@@ -57,7 +57,7 @@ A GitHub Action and Docker container to generate Steam user stats cards (PNG) fo
 #### Time Tracking
 [![wakatime](https://wakatime.com/badge/user/018e538b-3f55-4e8e-95fa-6c3225418eed/project/018e62a4-056d-49fd-babd-b079ee94859f.svg)](https://wakatime.com/badge/user/018e538b-3f55-4e8e-95fa-6c3225418eed/project/018e62a4-056d-49fd-babd-b079ee94859f)
 
-> ### From one Passionate Gamer and Developer to Another 🍻
+> ### From one Passionate Gamer to Another 🍻
 
 > **Full Documentation now available:**
 > [nicconike.github.io/Steam-Stats/](https://nicconike.github.io/Steam-Stats/)

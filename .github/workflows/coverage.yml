@@ -18,6 +18,7 @@ on:
         paths:
             - ".github/workflows/coverage.yml"
             - "tests/*.py"
+            - "sonar-project.properties"
     pull_request:
         types: [opened, synchronize, reopened]
 
