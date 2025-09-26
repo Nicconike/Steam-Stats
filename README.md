@@ -1,46 +1,60 @@
 # Steam Stats📶
 A GitHub Action and Docker container to generate Steam user stats cards (PNG) for your README using the official Steam Web API and web scraping for Workshop stats.
 
-### Workflow Status
+### Badges
+#### Workflow Status
 [![Steam Stats](https://github.com/Nicconike/Steam-Stats/actions/workflows/steam-stats.yml/badge.svg)](https://github.com/Nicconike/Steam-Stats/actions/workflows/steam-stats.yml)
 [![Release](https://github.com/Nicconike/Steam-Stats/actions/workflows/release.yml/badge.svg)](https://github.com/Nicconike/Steam-Stats/actions/workflows/release.yml)
 [![CodeQL & Pylint](https://github.com/Nicconike/Steam-Stats/actions/workflows/codeql.yml/badge.svg)](https://github.com/Nicconike/Steam-Stats/actions/workflows/codeql.yml)
 [![Bandit](https://github.com/Nicconike/Steam-Stats/actions/workflows/bandit.yml/badge.svg)](https://github.com/Nicconike/Steam-Stats/actions/workflows/bandit.yml)
 [![Codecov](https://github.com/Nicconike/Steam-Stats/actions/workflows/coverage.yml/badge.svg)](https://github.com/Nicconike/Steam-Stats/actions/workflows/coverage.yml)
+[![MkDocs Deploy](https://github.com/Nicconike/Steam-Stats/actions/workflows/docs.yml/badge.svg)](https://github.com/Nicconike/Steam-Stats/actions/workflows/docs.yml)
+[![Scorecard Security](https://github.com/Nicconike/Steam-Stats/actions/workflows/scorecard.yml/badge.svg)](https://github.com/Nicconike/Steam-Stats/actions/workflows/scorecard.yml)
 [![Dependabot Updates](https://github.com/Nicconike/Steam-Stats/actions/workflows/dependabot/dependabot-updates/badge.svg)](https://github.com/Nicconike/Steam-Stats/actions/workflows/dependabot/dependabot-updates)
 [![Automatic Dependency Submission](https://github.com/Nicconike/Steam-Stats/actions/workflows/dependency-graph/auto-submission/badge.svg)](https://github.com/Nicconike/Steam-Stats/actions/workflows/dependency-graph/auto-submission)
 [![Dependency Review](https://github.com/Nicconike/Steam-Stats/actions/workflows/dependency-review.yml/badge.svg)](https://github.com/Nicconike/Steam-Stats/actions/workflows/dependency-review.yml)
-[![MkDocs Deploy](https://github.com/Nicconike/Steam-Stats/actions/workflows/docs.yml/badge.svg)](https://github.com/Nicconike/Steam-Stats/actions/workflows/docs.yml)
-[![Scorecard Security](https://github.com/Nicconike/Steam-Stats/actions/workflows/scorecard.yml/badge.svg)](https://github.com/Nicconike/Steam-Stats/actions/workflows/scorecard.yml)
 
-### Code Quality & Coverage
+#### Code Quality & Coverage
 ![Pylint](https://img.shields.io/badge/Pylint-10.00-brightgreen?logo=python)
 [![codecov](https://codecov.io/gh/Nicconike/Steam-Stats/graph/badge.svg?token=SC5P7CS1BW)](https://codecov.io/gh/Nicconike/Steam-Stats)
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=Steam-Stats&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=Steam-Stats)
-[![Bugs](https://sonarcloud.io/api/project_badges/measure?project=Steam-Stats&metric=bugs)](https://sonarcloud.io/summary/new_code?id=Steam-Stats)
 [![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=Steam-Stats&metric=sqale_rating)](https://sonarcloud.io/summary/new_code?id=Steam-Stats)
 [![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=Steam-Stats&metric=security_rating)](https://sonarcloud.io/summary/new_code?id=Steam-Stats)
+[![Reliability Rating](https://sonarcloud.io/api/project_badges/measure?project=Steam-Stats&metric=reliability_rating)](https://sonarcloud.io/summary/new_code?id=Steam-Stats)
 [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=Steam-Stats&metric=coverage)](https://sonarcloud.io/summary/new_code?id=Steam-Stats)
+[![Code Smells](https://sonarcloud.io/api/project_badges/measure?project=Steam-Stats&metric=code_smells)](https://sonarcloud.io/summary/new_code?id=Steam-Stats)
+[![Bugs](https://sonarcloud.io/api/project_badges/measure?project=Steam-Stats&metric=bugs)](https://sonarcloud.io/summary/new_code?id=Steam-Stats)
+[![Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=Steam-Stats&metric=vulnerabilities)](https://sonarcloud.io/summary/new_code?id=Steam-Stats)
 [![Lines of Code](https://sonarcloud.io/api/project_badges/measure?project=Steam-Stats&metric=ncloc)](https://sonarcloud.io/summary/new_code?id=Steam-Stats)
+[![Duplicated Lines (%)](https://sonarcloud.io/api/project_badges/measure?project=Steam-Stats&metric=duplicated_lines_density)](https://sonarcloud.io/summary/new_code?id=Steam-Stats)
+[![Technical Debt](https://sonarcloud.io/api/project_badges/measure?project=Steam-Stats&metric=sqale_index)](https://sonarcloud.io/summary/new_code?id=Steam-Stats)
 
-
-### Packaging & Deployment
+#### Packaging & Deployment
 ![Docker Image Size](https://img.shields.io/docker/image-size/nicconike/steam-stats?logo=docker&label=Docker%20Image&link=https%3A%2F%2Fhub.docker.com%2Fr%2Fnicconike%2Fsteam-stats)
 ![Docker Pulls](https://img.shields.io/docker/pulls/nicconike/steam-stats?logo=docker&label=Docker%20Pulls&link=https%3A%2F%2Fhub.docker.com%2Fr%2Fnicconike%2Fsteam-stats)
 ![GitHub Release](https://img.shields.io/github/v/release/nicconike/steam-stats)
 ![Python Version from PEP 621 TOML](https://img.shields.io/python/required-version-toml?tomlFilePath=https%3A%2F%2Fgithub.com%2FNicconike%2FSteam-Stats%2Fblob%2Fmaster%2Fpyproject.toml%3Fraw%3Dtrue)
 ![PyPI - Version](https://img.shields.io/pypi/v/steam-stats)
+![PyPI - Implementation](https://img.shields.io/pypi/implementation/Steam-Stats)
+![PyPI - Downloads](https://img.shields.io/pypi/dm/Steam-Stats)
+![PyPI - Format](https://img.shields.io/pypi/format/Steam-Stats)
+![PyPI - Status](https://img.shields.io/pypi/status/Steam-Stats)
+![Pepy Total Downloads](https://img.shields.io/pepy/dt/Steam-Stats)
 
-### Documentation
-[![Docs](https://img.shields.io/badge/docs-steam--stats-blue.svg)](https://nicconike.github.io/Steam-Stats/)
-![GitHub Repo Size](https://img.shields.io/github/repo-size/nicconike/Steam-Stats)
+#### Environments
+![GitHub deployments](https://img.shields.io/github/deployments/nicconike/steam-stats/pypi?label=PyPI)
+![GitHub deployments](https://img.shields.io/github/deployments/nicconike/steam-stats/github-pages?label=GitHub%20Pages)
 
-### License & Security
+#### Documentation & Repo
+[![Documentation](https://img.shields.io/badge/Documentation-MkDocs-blue?logo=read-the-docs)](https://nicconike.github.io/Steam-Stats)
+![GitHub repo size](https://img.shields.io/github/repo-size/nicconike/steam-stats?logo=github&label=Repo%20Size)
+
+#### License & Security
 ![GitHub License](https://img.shields.io/github/license/nicconike/Steam-Stats)
 [![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/Nicconike/Steam-Stats/badge)](https://scorecard.dev/viewer/?uri=github.com/Nicconike/Steam-Stats)
 [![OpenSSF Best Practices](https://www.bestpractices.dev/projects/9965/badge)](https://www.bestpractices.dev/projects/9965)
 
-### Time Tracking
+#### Time Tracking
 [![wakatime](https://wakatime.com/badge/user/018e538b-3f55-4e8e-95fa-6c3225418eed/project/018e62a4-056d-49fd-babd-b079ee94859f.svg)](https://wakatime.com/badge/user/018e538b-3f55-4e8e-95fa-6c3225418eed/project/018e62a4-056d-49fd-babd-b079ee94859f)
 
 > ### From one Passionate Gamer and Developer to Another 🍻
