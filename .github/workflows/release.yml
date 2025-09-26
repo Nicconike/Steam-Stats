@@ -46,6 +46,8 @@ jobs:
             contents: write
         outputs:
             released: ${{ steps.semantic.outputs.released }}
+            version: ${{ steps.semantic.outputs.version }}
+            previous_version: ${{ steps.semantic.outputs.previous_version }}
         steps:
             - name: Harden the runner
               uses: step-security/harden-runner@f4a75cfd619ee5ce8d5b864b0d183aff3c69b55a # v2.13.1
@@ -104,14 +106,6 @@ jobs:
                   github_token: ${{ steps.app-token.outputs.token }}
                   tag: ${{ steps.semantic.outputs.tag }}
 
-            - name: Upload Artifacts
-              uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
-              # if: steps.semantic.outputs.released == 'true'
-              with:
-                  name: python-artifacts
-                  path: dist
-                  if-no-files-found: warn
-
     pypi:
         name: PyPI
         runs-on: ubuntu-latest
@@ -129,14 +123,13 @@ jobs:
               with:
                   egress-policy: audit
 
-            - name: Download Build Artifacts
-              uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
-              with:
-                  name: python-artifacts
-                  path: dist
+            - name: Build distribution
+              run: |
+                  python -m pip install --upgrade build
+                  python -m build
 
             - name: Publish to PyPI
-              if: steps.semantic.outputs.released == 'true'
+              # if: steps.semantic.outputs.released == 'true'
               uses: pypa/gh-action-pypi-publish@ed0c53931b1dc9bd32cbe73a98c7f6766f8a527e # v1.13.0
               with:
                   packages-dir: dist
@@ -197,12 +190,6 @@ jobs:
                   username: ${{ github.actor }}
                   password: ${{ secrets.GITHUB_TOKEN }}
 
-            - name: Get latest Release
-              id: get_latest_release
-              run: echo "LATEST_RELEASE=${{ needs.release.outputs.version }}" >> $GITHUB_ENV
-              env:
-                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
             - name: Extract Docker Metadata
               id: meta
               uses: docker/metadata-action@c1e51972afc2121e065aed6d45c65596fe445f3f # v5.8.0
@@ -212,7 +199,7 @@ jobs:
                       ghcr.io/${{ github.repository_owner }}/${{ github.event.repository.name }}
                   tags: |
                       type=raw,value=master
-                      type=raw,value=${{ env.LATEST_RELEASE }}
+                      type=raw,value=v${{ needs.release.outputs.version }}
 
             - name: Build & Push Docker Image
               uses: docker/build-push-action@263435318d21b8e681c14492fe198d362a7d2c83 # v6.18.0
@@ -270,6 +257,10 @@ jobs:
         permissions:
             contents: read
             packages: write
+        env:
+            MASTER_TAG: master
+            CURRENT_TAG: ${{ needs.release.outputs.version }}
+            PREV_TAG: ${{ needs.release.outputs.previous_version }}
         steps:
             - name: Harden the runner
               uses: step-security/harden-runner@f4a75cfd619ee5ce8d5b864b0d183aff3c69b55a # v2.13.1
@@ -296,33 +287,44 @@ jobs:
               env:
                   REPO_NAME: ${{ github.event.repository.name }}
                   DOCKER_TOKEN: ${{ secrets.DOCKER_TOKEN }}
+                  MASTER_TAG: ${{ env.MASTER_TAG }}
+                  CURRENT_TAG: ${{ env.CURRENT_TAG }}
+                  PREV_TAG: ${{ env.PREV_TAG }}
               run: |
-                  echo "Fetching Docker Hub tags for $REPO_NAME..."
-                  tags=$(curl -s -H "Authorization: Bearer $DOCKER_TOKEN" \
-                  "https://hub.docker.com/v2/repositories/${{ vars.DOCKER_USERNAME }}/$REPO_NAME/tags?page_size=100" | \
-                  jq -r '.results[].name')
+                  set -euo pipefail
+                  echo "Fetching Docker Hub tags for $REPO_NAME"
+                  tags_json=$(curl -s -H "Authorization: Bearer $DOCKER_TOKEN" \
+                  "https://hub.docker.com/v2/repositories/${{ vars.DOCKER_USERNAME }}/$REPO_NAME/tags?page_size=100")
+
+                  tags=$(echo "$tags_json" | jq -r '.results? // [] | .[].name')
+
+                  if [ -z "$tags" ]; then
+                      echo "No tags found or failed to fetch tags from Docker Hub"
+                      exit 0
+                  fi
 
                   echo "Tags found in Docker Hub:"
                   echo "$tags"
 
-                  latest_tag=$(echo "$tags" | grep -E '^v?[0-9]+\.[0-9]+\.[0-9]+$' | sort -rV | head -n 1)
-                  echo "Latest semantic version tag is: $latest_tag"
-
                   for tag in $tags; do
-                      if [[ "$tag" != "master" && "$tag" != "$latest_tag" ]]; then
-                          echo "Deleting tag $tag from Docker Hub"
-                          curl -s -X DELETE -H "Authorization: Bearer $DOCKER_TOKEN" \
-                          "https://hub.docker.com/v2/repositories/${{ vars.DOCKER_USERNAME }}/$REPO_NAME/tags/$tag/"
-                      else
-                          echo "Keeping tag $tag"
-                      fi
+                    if [[ "$tag" != "$MASTER_TAG" && "$tag" != "$CURRENT_TAG" && "$tag" != "$PREV_TAG" ]]; then
+                        echo "Deleting tag $tag from Docker Hub"
+                        curl -s -X DELETE -H "Authorization: Bearer $DOCKER_TOKEN" \
+                        "https://hub.docker.com/v2/repositories/${{ vars.DOCKER_USERNAME }}/$REPO_NAME/tags/$tag/"
+                    else
+                        echo "Keeping tag $tag"
+                    fi
                   done
 
             - name: Delete Old GHCR Tags
               env:
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
                   REPO_NAME: ${{ inputs.repo_name }}
+                  MASTER_TAG: ${{ env.MASTER_TAG }}
+                  CURRENT_TAG: ${{ env.CURRENT_TAG }}
+                  PREV_TAG: ${{ env.PREV_TAG }}
               run: |
+                  set -euo pipefail
                   echo "Fetching GHCR tags for $REPO_NAME"
                   page=1
                   all_tags=()
@@ -342,18 +344,15 @@ jobs:
                   echo "Tags found in GHCR:"
                   printf "%s\n" "${all_tags[@]}"
 
-                  latest_tag=$(printf "%s\n" "${all_tags[@]}" | grep -E '^v?[0-9]+\.[0-9]+\.[0-9]+$' | sort -rV | head -n 1)
-                  echo "Latest semantic version tag is: $latest_tag"
-
                   for tag in "${all_tags[@]}"; do
-                      if [[ "$tag" != "master" && "$tag" != "$latest_tag" ]]; then
-                          echo "Deleting tag $tag from GHCR"
+                      if [[ "$tag" != "$MASTER_TAG" && "$tag" != "$CURRENT_TAG" && "$tag" != "$PREV_TAG" ]]; then
+                        echo "Deleting tag $tag from GHCR"
                           version_id=$(curl -s -H "Authorization: Bearer $GITHUB_TOKEN" \
                           "https://api.github.com/user/packages/container/$REPO_NAME/versions" | \
                           jq -r ".[] | select(.metadata.container.tags[] == \"$tag\") | .id")
 
                           if [[ -n "$version_id" ]]; then
-                          curl -s -X DELETE -H "Authorization: Bearer $GITHUB_TOKEN" \
+                               curl -s -X DELETE -H "Authorization: Bearer $GITHUB_TOKEN" \
                               "https://api.github.com/user/packages/container/$REPO_NAME/versions/$version_id"
                           else
                               echo "Warning: Could not find version ID for tag $tag"

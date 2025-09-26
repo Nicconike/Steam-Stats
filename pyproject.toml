@@ -86,7 +86,7 @@ type = "github"
 token = { env = "GH_TOKEN" }
 
 [tool.semantic_release.changelog]
-changelog_file = "CHANGELOG.md"
+default_templates.changelog_file = "CHANGELOG.md"
 mode = "update"
 insertion_flag = "<!-- CHANGELOG -->"
 exclude_commit_patterns = [

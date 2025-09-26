@@ -30,7 +30,7 @@ A GitHub Action and Docker container to generate Steam user stats cards (PNG) fo
 [![Technical Debt](https://sonarcloud.io/api/project_badges/measure?project=Steam-Stats&metric=sqale_index)](https://sonarcloud.io/summary/new_code?id=Steam-Stats)
 
 #### Packaging & Deployment
-![Docker Image Size](https://img.shields.io/docker/image-size/nicconike/steam-stats?logo=docker&label=Docker%20Image&link=https%3A%2F%2Fhub.docker.com%2Fr%2Fnicconike%2Fsteam-stats)
+![Docker Image Size (tag)](https://img.shields.io/docker/image-size/nicconike/steam-stats/master?logo=docker&label=Docker%20Image&link=https%3A%2F%2Fhub.docker.com%2Frepository%2Fdocker%2Fnicconike%2Fsteam-stats%2Ftags)
 ![Docker Pulls](https://img.shields.io/docker/pulls/nicconike/steam-stats?logo=docker&label=Docker%20Pulls&link=https%3A%2F%2Fhub.docker.com%2Fr%2Fnicconike%2Fsteam-stats)
 ![GitHub Release](https://img.shields.io/github/v/release/nicconike/steam-stats)
 ![Python Version from PEP 621 TOML](https://img.shields.io/python/required-version-toml?tomlFilePath=https%3A%2F%2Fgithub.com%2FNicconike%2FSteam-Stats%2Fblob%2Fmaster%2Fpyproject.toml%3Fraw%3Dtrue)
