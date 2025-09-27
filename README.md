@@ -36,10 +36,9 @@ A GitHub Action and Docker container to generate Steam user stats cards (PNG) fo
 ![Python Version from PEP 621 TOML](https://img.shields.io/python/required-version-toml?tomlFilePath=https%3A%2F%2Fgithub.com%2FNicconike%2FSteam-Stats%2Fblob%2Fmaster%2Fpyproject.toml%3Fraw%3Dtrue)
 ![PyPI - Version](https://img.shields.io/pypi/v/steam-stats)
 ![PyPI - Implementation](https://img.shields.io/pypi/implementation/Steam-Stats)
-![PyPI - Downloads](https://img.shields.io/pypi/dm/Steam-Stats)
+![Pepy Total Downloads](https://img.shields.io/pepy/dt/Steam-Stats)
 ![PyPI - Format](https://img.shields.io/pypi/format/Steam-Stats)
 ![PyPI - Status](https://img.shields.io/pypi/status/Steam-Stats)
-![Pepy Total Downloads](https://img.shields.io/pepy/dt/Steam-Stats)
 
 #### Environments
 ![GitHub deployments](https://img.shields.io/github/deployments/nicconike/steam-stats/pypi?label=PyPI)

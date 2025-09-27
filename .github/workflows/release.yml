@@ -99,7 +99,6 @@ jobs:
               uses: python-semantic-release/python-semantic-release@4d4cb0ab842247caea1963132c242c62aab1e4d5 # v10.4.1
               with:
                   github_token: ${{ steps.app-token.outputs.token }}
-                  build: true
               env:
                   PYTHON_KEYRING_BACKEND: keyring.backends.null.Keyring
 
@@ -115,48 +114,17 @@ jobs:
                   python -m build
 
             - name: Publish to PyPI
-              # if: steps.semantic.outputs.released == 'true'
+              if: steps.semantic.outputs.released == 'true'
               uses: pypa/gh-action-pypi-publish@ed0c53931b1dc9bd32cbe73a98c7f6766f8a527e # v1.13.0
               with:
                   packages-dir: dist
                   print-hash: true
                   verbose: true
 
-    # pypi:
-    #     name: PyPI
-    #     runs-on: ubuntu-latest
-    #     needs: release
-    #     # if: needs.release.outputs.released == 'true'
-    #     permissions:
-    #         contents: read
-    #         id-token: write
-    #     environment:
-    #         name: pypi
-    #         url: https://pypi.org/project/Steam-Stats/
-    #     steps:
-    #         - name: Harden the runner
-    #           uses: step-security/harden-runner@f4a75cfd619ee5ce8d5b864b0d183aff3c69b55a # v2.13.1
-    #           with:
-    #               egress-policy: audit
-
-    #         - name: Build distribution
-    #           run: |
-    #               python -m pip install --upgrade build
-    #               python -m build
-
-    #         - name: Publish to PyPI
-    #           # if: steps.semantic.outputs.released == 'true'
-    #           uses: pypa/gh-action-pypi-publish@ed0c53931b1dc9bd32cbe73a98c7f6766f8a527e # v1.13.0
-    #           with:
-    #               packages-dir: dist
-    #               print-hash: true
-    #               verbose: true
-
     docker:
         name: Docker
         runs-on: ubuntu-latest
         needs: release
-        # if: needs.release.outputs.released == 'true'
         concurrency:
             group: ${{ github.workflow }}-${{ github.ref }}
             cancel-in-progress: ${{ github.ref != 'refs/heads/master' }}
@@ -266,7 +234,6 @@ jobs:
         runs-on: ubuntu-latest
         name: Cleanup
         needs: [release, docker]
-        # if: needs.release.outputs.released == 'true'
         concurrency:
             group: ${{ github.workflow }}-${{ github.ref }}
             cancel-in-progress: ${{ github.ref != 'refs/heads/master' }}
@@ -274,7 +241,6 @@ jobs:
             contents: read
             packages: write
         env:
-            MASTER_TAG: master
             CURRENT_TAG: ${{ needs.release.outputs.version }}
             PREV_TAG: ${{ needs.release.outputs.previous_version }}
         steps:
@@ -283,103 +249,68 @@ jobs:
               with:
                   egress-policy: audit
 
-            - name: Checkout Repo
-              uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
-
-            - name: Login to Docker Hub
-              uses: docker/login-action@184bdaa0721073962dff0199f1fb9940f07167d1 # v3.5.0
-              with:
-                  username: ${{ vars.DOCKER_USERNAME }}
-                  password: ${{ secrets.DOCKER_TOKEN }}
-
-            - name: Login to GitHub Container Registry
-              uses: docker/login-action@184bdaa0721073962dff0199f1fb9940f07167d1 # v3.5.0
-              with:
-                  registry: ghcr.io
-                  username: ${{ github.actor }}
-                  password: ${{ secrets.GITHUB_TOKEN }}
-
             - name: Delete Old Docker Hub Tags
               env:
-                  REPO_NAME: ${{ github.event.repository.name }}
-                  DOCKER_TOKEN: ${{ secrets.DOCKER_TOKEN }}
-                  MASTER_TAG: ${{ env.MASTER_TAG }}
-                  CURRENT_TAG: ${{ env.CURRENT_TAG }}
-                  PREV_TAG: ${{ env.PREV_TAG }}
+                  USERNAME: ${{ vars.DOCKER_USERNAME }}
+                  PASSWORD: ${{ secrets.DOCKER_TOKEN }}
+                  REPO: ${{ github.event.repository.name }}
+                  KEEP_TAGS: "master,${{ env.CURRENT_TAG }},${{ env.PREV_TAG }}"
               run: |
                   set -euo pipefail
-                  echo "Fetching Docker Hub tags for $REPO_NAME"
-                  tags_json=$(curl -s -H "Authorization: Bearer $DOCKER_TOKEN" \
-                  "https://hub.docker.com/v2/repositories/${{ vars.DOCKER_USERNAME }}/$REPO_NAME/tags?page_size=100")
+                  echo "Keeping tags: $KEEP_TAGS"
 
-                  tags=$(echo "$tags_json" | jq -r '.results? // [] | .[].name')
+                  # Get auth token for Registry API
+                  TOKEN=$(curl -s "https://auth.docker.io/token?service=registry.docker.io&scope=repository:${USERNAME}/${REPO}:pull,push,delete" | jq -r .token)
 
-                  if [ -z "$tags" ]; then
-                      echo "No tags found or failed to fetch tags from Docker Hub"
-                      exit 0
+                  if [ "$TOKEN" == "null" ] || [ -z "$TOKEN" ]; then
+                    echo "Failed to get Docker Hub auth token"
+                    exit 1
                   fi
 
-                  echo "Tags found in Docker Hub:"
-                  echo "$tags"
+                  # List all tags
+                  TAGS_JSON=$(curl -H "Authorization: Bearer $TOKEN" -s \
+                    "https://registry-1.docker.io/v2/${USERNAME}/${REPO}/tags/list")
 
-                  for tag in $tags; do
-                    if [[ "$tag" != "$MASTER_TAG" && "$tag" != "$CURRENT_TAG" && "$tag" != "$PREV_TAG" ]]; then
-                        echo "Deleting tag $tag from Docker Hub"
-                        curl -s -X DELETE -H "Authorization: Bearer $DOCKER_TOKEN" \
-                        "https://hub.docker.com/v2/repositories/${{ vars.DOCKER_USERNAME }}/$REPO_NAME/tags/$tag/"
+                  TAGS=$(echo "$TAGS_JSON" | jq -r '.tags[]' 2>/dev/null || echo "")
+
+                  if [ -z "$TAGS" ]; then
+                    echo "No tags found in Docker Hub registry"
+                    exit 0
+                  fi
+
+                  echo "All tags found: $TAGS"
+
+                  # Delete tags
+                  for tag in $TAGS; do
+                    if [[ "|$KEEP_TAGS|" != *"|$tag|"* ]]; then
+                      echo "Deleting tag: $tag"
+
+                      # Get manifest digest
+                      DIGEST=$(curl -H "Authorization: Bearer $TOKEN" \
+                        -H "Accept: application/vnd.docker.distribution.manifest.v2+json" \
+                        -I -s "https://registry-1.docker.io/v2/${USERNAME}/${REPO}/manifests/${tag}" | \
+                        grep -i docker-content-digest | awk '{print $2}' | tr -d '\r')
+
+                      if [ -n "$DIGEST" ]; then
+                        # Delete manifest (this removes the tag)
+                        RESULT=$(curl -H "Authorization: Bearer $TOKEN" \
+                          -X DELETE \
+                          -s -w "%{http_code}" \
+                          "https://registry-1.docker.io/v2/${USERNAME}/${REPO}/manifests/${DIGEST}")
+                        echo "Deletion result for $tag: HTTP $RESULT"
+                      else
+                        echo "Could not get digest for tag: $tag"
+                      fi
                     else
-                        echo "Keeping tag $tag"
+                      echo "Keeping tag: $tag"
                     fi
                   done
 
-            - name: Delete Old GHCR Tags
-              env:
-                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-                  REPO_NAME: ${{ github.event.repository.name }}
-                  MASTER_TAG: ${{ env.MASTER_TAG }}
-                  CURRENT_TAG: ${{ env.CURRENT_TAG }}
-                  PREV_TAG: ${{ env.PREV_TAG }}
-              run: |
-                  set -euo pipefail
-                  echo "Fetching GHCR tags for $REPO_NAME"
-                  page=1
-                  all_tags=()
-                  while true; do
-                      page_tags=$(curl -s -H "Authorization: Bearer $GITHUB_TOKEN" \
-                          "https://api.github.com/user/packages/container/$REPO_NAME/versions?per_page=100&page=$page")
-
-                      if echo "$json" | jq -e 'type == "array"' >/dev/null; then
-                          page_tags=$(echo "$json" | jq -r '.[] | select(.metadata? and .metadata.container? and .metadata.container.tags) | .metadata.container.tags[]')
-                      else
-                          break
-                      fi
-
-                      if [[ -z "$page_tags" ]]; then
-                          break
-                      fi
-
-                      all_tags+=($page_tags)
-                      ((page++))
-                  done
-
-                  echo "Tags found in GHCR:"
-                  printf "%s\n" "${all_tags[@]}"
-
-                  for tag in "${all_tags[@]}"; do
-                      if [[ "$tag" != "$MASTER_TAG" && "$tag" != "$CURRENT_TAG" && "$tag" != "$PREV_TAG" ]]; then
-                        echo "Deleting tag $tag from GHCR"
-                          version_id=$(curl -s -H "Authorization: Bearer $GITHUB_TOKEN" \
-                          "https://api.github.com/user/packages/container/$REPO_NAME/versions" | \
-                          jq -r ".[] | select(.metadata? and .metadata.container? and (.metadata.container.tags[] == \"$tag\")) | .id")
-
-                          if [[ -n "$version_id" ]]; then
-                               curl -s -X DELETE -H "Authorization: Bearer $GITHUB_TOKEN" \
-                              "https://api.github.com/user/packages/container/$REPO_NAME/versions/$version_id"
-                              echo "Deleted version $version_id ($tag)"
-                          else
-                              echo "Warning: Could not find version ID for tag $tag"
-                          fi
-                      else
-                          echo "Keeping tag $tag"
-                      fi
-                  done
+            - name: Delete Old GHCR Versions
+              uses: actions/delete-package-versions@e5bc658cc4c965c472efe991f8beea3981499c55 # v5.0.0
+              with:
+                  package-name: ${{ github.event.repository.name }}
+                  package-type: "container"
+                  min-versions-to-keep: 3
+                  ignore-versions: "^(master|v?${{ env.CURRENT_TAG }}|v?${{ env.PREV_TAG }})$"
+                  token: ${{ secrets.GITHUB_TOKEN }}
