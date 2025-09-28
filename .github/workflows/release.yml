@@ -270,7 +270,7 @@ jobs:
               env:
                   USERNAME: ${{ vars.DOCKER_USERNAME }}
                   PASSWORD: ${{ secrets.DOCKER_TOKEN }}
-                  REPO: ${{ github.event.repository.name }}
+                  REPO: "steam-stats"
                   LATEST_TAG: ${{ steps.tags.outputs.latest_version }}
                   PREV_TAG: ${{ steps.tags.outputs.prev_version }}
               run: |
@@ -314,8 +314,9 @@ jobs:
             - name: Delete Old GHCR Tags
               uses: actions/delete-package-versions@e5bc658cc4c965c472efe991f8beea3981499c55 # v5.0.0
               with:
-                  package-name: ${{ github.event.repository.name }}
+                  package-name: "steam-stats"
                   package-type: "container"
-                  min-versions-to-keep: 3
-                  ignore-versions: ^(master|v?${{ steps.tags.outputs.latest_version }}|v?${{ steps.tags.outputs.prev_version }})$
+                  min-versions-to-keep: 0
+                  ignore-versions: ^(master|${{ steps.tags.outputs.latest_version }}|${{ steps.tags.outputs.prev_version }})$
+                  delete-only-untagged-versions: false
                   token: ${{ secrets.GITHUB_TOKEN }}

@@ -10,8 +10,6 @@ A GitHub Action and Docker container to generate Steam user stats cards (PNG) fo
 [![Codecov](https://github.com/Nicconike/Steam-Stats/actions/workflows/coverage.yml/badge.svg)](https://github.com/Nicconike/Steam-Stats/actions/workflows/coverage.yml)
 [![MkDocs Deploy](https://github.com/Nicconike/Steam-Stats/actions/workflows/docs.yml/badge.svg)](https://github.com/Nicconike/Steam-Stats/actions/workflows/docs.yml)
 [![Scorecard Security](https://github.com/Nicconike/Steam-Stats/actions/workflows/scorecard.yml/badge.svg)](https://github.com/Nicconike/Steam-Stats/actions/workflows/scorecard.yml)
-[![Dependabot Updates](https://github.com/Nicconike/Steam-Stats/actions/workflows/dependabot/dependabot-updates/badge.svg)](https://github.com/Nicconike/Steam-Stats/actions/workflows/dependabot/dependabot-updates)
-[![Automatic Dependency Submission](https://github.com/Nicconike/Steam-Stats/actions/workflows/dependency-graph/auto-submission/badge.svg)](https://github.com/Nicconike/Steam-Stats/actions/workflows/dependency-graph/auto-submission)
 [![Dependency Review](https://github.com/Nicconike/Steam-Stats/actions/workflows/dependency-review.yml/badge.svg)](https://github.com/Nicconike/Steam-Stats/actions/workflows/dependency-review.yml)
 
 #### Code Quality & Coverage
@@ -35,14 +33,14 @@ A GitHub Action and Docker container to generate Steam user stats cards (PNG) fo
 ![GitHub Release](https://img.shields.io/github/v/release/nicconike/steam-stats)
 ![Python Version from PEP 621 TOML](https://img.shields.io/python/required-version-toml?tomlFilePath=https%3A%2F%2Fgithub.com%2FNicconike%2FSteam-Stats%2Fblob%2Fmaster%2Fpyproject.toml%3Fraw%3Dtrue)
 ![PyPI - Version](https://img.shields.io/pypi/v/steam-stats)
-![PyPI - Implementation](https://img.shields.io/pypi/implementation/Steam-Stats)
-![Pepy Total Downloads](https://img.shields.io/pepy/dt/Steam-Stats)
-![PyPI - Format](https://img.shields.io/pypi/format/Steam-Stats)
-![PyPI - Status](https://img.shields.io/pypi/status/Steam-Stats)
+![PyPI - Implementation](https://img.shields.io/pypi/implementation/steam-stats?logo=pypi&label=PyPI%20Implementation)
+![Pepy Total Downloads](https://img.shields.io/pepy/dt/steam-stats?logo=pypi&label=PyPI%20Downloads&color=blue&link=https%3A%2F%2Fpypi.org%2Fproject%2FSteam-Stats%2F)
+![PyPI - Format](https://img.shields.io/pypi/format/steam-stats?logo=pypi&label=PyPI%20Format)
+![PyPI - Status](https://img.shields.io/pypi/status/steam-stats?logo=pypi&label=PyPI%20Release%20Status)
 
 #### Environments
-![GitHub deployments](https://img.shields.io/github/deployments/nicconike/steam-stats/pypi?label=PyPI)
-![GitHub deployments](https://img.shields.io/github/deployments/nicconike/steam-stats/github-pages?label=GitHub%20Pages)
+![GitHub deployments](https://img.shields.io/github/deployments/nicconike/steam-stats/PyPI?logo=pypi&label=PyPI&link=https%3A%2F%2Fgithub.com%2FNicconike%2FSteam-Stats%2Fdeployments%2FPyPI)
+![GitHub deployments](https://img.shields.io/github/deployments/nicconike/steam-stats/github-pages?logo=githubpages&label=GitHub%20Pages&link=https%3A%2F%2Fgithub.com%2FNicconike%2FSteam-Stats%2Fdeployments%2Fgithub-pages)
 
 #### Documentation & Repo
 [![Documentation](https://img.shields.io/badge/Documentation-MkDocs-blue?logo=read-the-docs)](https://nicconike.github.io/Steam-Stats)
