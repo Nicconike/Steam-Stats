@@ -3,7 +3,8 @@ FROM mcr.microsoft.com/playwright/python:v1.55.0-jammy-amd64@sha256:080da941d1ba
 
 # Set environment variables
 ENV PYTHONUNBUFFERED=1 \
-	PYTHONDONTWRITEBYTECODE=1
+	PYTHONDONTWRITEBYTECODE=1 \
+	PYTHONPATH=/steam-stats
 
 # Create non-root user with explicit UID
 RUN useradd -u 10000 -ms /bin/bash steam-stats
