@@ -109,6 +109,7 @@ jobs:
                   tag: ${{ steps.semantic.outputs.tag }}
 
             - name: Build distribution
+              if: steps.semantic.outputs.released == 'true'
               run: |
                   python -m pip install --upgrade build
                   python -m build
@@ -125,6 +126,7 @@ jobs:
         name: Docker
         runs-on: ubuntu-latest
         needs: release
+        # if: needs.release.outputs.released == 'true'
         concurrency:
             group: ${{ github.workflow }}-${{ github.ref }}
             cancel-in-progress: ${{ github.ref != 'refs/heads/master' }}
@@ -156,7 +158,7 @@ jobs:
               if: github.event_name != 'pull_request'
               uses: sigstore/cosign-installer@d7543c93d881b35a8faa02e8e3605f69b7a1ce62 # v3.10.0
               with:
-                  cosign-release: "v2.5.0"
+                  cosign-release: "v2.6.0"
 
             - name: Setup Docker Buildx
               uses: docker/setup-buildx-action@e468171a9de216ec08956ac3ada2f0791b6bd435 # v3.11.1
@@ -240,21 +242,36 @@ jobs:
         permissions:
             contents: read
             packages: write
-        env:
-            CURRENT_TAG: ${{ needs.release.outputs.version }}
-            PREV_TAG: ${{ needs.release.outputs.previous_version }}
         steps:
             - name: Harden the runner
               uses: step-security/harden-runner@f4a75cfd619ee5ce8d5b864b0d183aff3c69b55a # v2.13.1
               with:
                   egress-policy: audit
 
+            - name: Checkout Code
+              uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+              with:
+                  fetch-depth: 0
+
+            - name: Get Latest Tags
+              id: tags
+              run: |
+                  # Get 2 latest semver tags
+                  LATEST_TAG=$(git tag --sort=-version:refname | grep -E '^v?[0-9]+\.[0-9]+\.[0-9]+$' | head -n1)
+                  PREV_TAG=$(git tag --sort=-version:refname | grep -E '^v?[0-9]+\.[0-9]+\.[0-9]+$' | head -n2 | tail -n1)
+
+                  echo "latest_version=$LATEST_TAG" >> $GITHUB_OUTPUT
+                  echo "prev_version=$PREV_TAG" >> $GITHUB_OUTPUT
+
+                  echo "Latest version: $LATEST_TAG"
+                  echo "Previous version: $PREV_TAG"
+
             - name: Delete Old Docker Hub Tags
               env:
                   USERNAME: ${{ vars.DOCKER_USERNAME }}
                   PASSWORD: ${{ secrets.DOCKER_TOKEN }}
                   REPO: ${{ github.event.repository.name }}
-                  KEEP_TAGS: "master,${{ env.CURRENT_TAG }},${{ env.PREV_TAG }}"
+                  KEEP_TAGS: "master,${LATEST_TAG},${PREV_TAG}"
               run: |
                   set -euo pipefail
                   echo "Keeping tags: $KEEP_TAGS"
@@ -262,55 +279,40 @@ jobs:
                   # Get auth token for Registry API
                   TOKEN=$(curl -s "https://auth.docker.io/token?service=registry.docker.io&scope=repository:${USERNAME}/${REPO}:pull,push,delete" | jq -r .token)
 
-                  if [ "$TOKEN" == "null" ] || [ -z "$TOKEN" ]; then
-                    echo "Failed to get Docker Hub auth token"
-                    exit 1
-                  fi
-
                   # List all tags
-                  TAGS_JSON=$(curl -H "Authorization: Bearer $TOKEN" -s \
-                    "https://registry-1.docker.io/v2/${USERNAME}/${REPO}/tags/list")
+                  TAGS_JSON=$(curl -s "https://hub.docker.com/v2/repositories/${USERNAME}/${REPO}/tags/?page_size=100")
+                  TAGS=$(echo "$TAGS_JSON" | jq -r '.results[].name')
 
-                  TAGS=$(echo "$TAGS_JSON" | jq -r '.tags[]' 2>/dev/null || echo "")
-
-                  if [ -z "$TAGS" ]; then
-                    echo "No tags found in Docker Hub registry"
-                    exit 0
-                  fi
-
-                  echo "All tags found: $TAGS"
-
-                  # Delete tags
                   for tag in $TAGS; do
                     if [[ "|$KEEP_TAGS|" != *"|$tag|"* ]]; then
                       echo "Deleting tag: $tag"
 
                       # Get manifest digest
-                      DIGEST=$(curl -H "Authorization: Bearer $TOKEN" \
+                      DIGEST=$(curl -s -H "Authorization: Bearer $TOKEN" \
                         -H "Accept: application/vnd.docker.distribution.manifest.v2+json" \
-                        -I -s "https://registry-1.docker.io/v2/${USERNAME}/${REPO}/manifests/${tag}" | \
+                        -I "https://registry-1.docker.io/v2/${USERNAME}/${REPO}/manifests/${tag}" | \
                         grep -i docker-content-digest | awk '{print $2}' | tr -d '\r')
 
-                      if [ -n "$DIGEST" ]; then
-                        # Delete manifest (this removes the tag)
-                        RESULT=$(curl -H "Authorization: Bearer $TOKEN" \
-                          -X DELETE \
-                          -s -w "%{http_code}" \
-                          "https://registry-1.docker.io/v2/${USERNAME}/${REPO}/manifests/${DIGEST}")
-                        echo "Deletion result for $tag: HTTP $RESULT"
-                      else
+                      if [ -z "$DIGEST" ]; then
                         echo "Could not get digest for tag: $tag"
+                        continue
                       fi
+
+                      # Delete manifest/tag
+                      curl -s -H "Authorization: Bearer $TOKEN" \
+                        -X DELETE \
+                        "https://registry-1.docker.io/v2/${USERNAME}/${REPO}/manifests/${DIGEST}"
+                      echo "Deleted $tag ($DIGEST)"
                     else
                       echo "Keeping tag: $tag"
                     fi
                   done
 
-            - name: Delete Old GHCR Versions
+            - name: Delete Old GHCR Tags
               uses: actions/delete-package-versions@e5bc658cc4c965c472efe991f8beea3981499c55 # v5.0.0
               with:
                   package-name: ${{ github.event.repository.name }}
                   package-type: "container"
                   min-versions-to-keep: 3
-                  ignore-versions: "^(master|v?${{ env.CURRENT_TAG }}|v?${{ env.PREV_TAG }})$"
+                  ignore-versions: ^(master|v?${{ steps.tags.outputs.latest_version }}|v?${{ steps.tags.outputs.prev_version }})$
                   token: ${{ secrets.GITHUB_TOKEN }}
