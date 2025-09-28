@@ -15,6 +15,7 @@ __pycache__/
 Thumbs.db
 build/
 dist/
+site/
 .git/
 .gitignore
 .github/
@@ -23,11 +24,15 @@ dist/
 .env
 .env.example
 .venv
+.pre-commit-config.yaml
 venv/
 env/
 tests/
+templates/
+docs/
 LICENSE
 CHANGELOG.md
 README.md
-action.yml
+*.yml
 pytest.ini
+sonar-project.properties

@@ -271,34 +271,37 @@ jobs:
                   USERNAME: ${{ vars.DOCKER_USERNAME }}
                   PASSWORD: ${{ secrets.DOCKER_TOKEN }}
                   REPO: ${{ github.event.repository.name }}
-                  KEEP_TAGS: "master,${LATEST_TAG},${PREV_TAG}"
+                  LATEST_TAG: ${{ steps.tags.outputs.latest_version }}
+                  PREV_TAG: ${{ steps.tags.outputs.prev_version }}
               run: |
                   set -euo pipefail
+                  KEEP_TAGS="master,${LATEST_TAG},${PREV_TAG}"
                   echo "Keeping tags: $KEEP_TAGS"
 
-                  # Get auth token for Registry API
+                  # Get Docker Hub Registry API token
                   TOKEN=$(curl -s "https://auth.docker.io/token?service=registry.docker.io&scope=repository:${USERNAME}/${REPO}:pull,push,delete" | jq -r .token)
 
                   # List all tags
                   TAGS_JSON=$(curl -s "https://hub.docker.com/v2/repositories/${USERNAME}/${REPO}/tags/?page_size=100")
-                  TAGS=$(echo "$TAGS_JSON" | jq -r '.results[].name')
+                  echo "TAGS_JSON: $TAGS_JSON"
+                  TAGS=$(echo "$TAGS_JSON" | jq -r '.results[].name' 2>/dev/null || echo "")
+
+                  if [ -z "$TAGS" ]; then
+                    echo "No tags found or failed to fetch tags from Docker Hub. API response above"
+                    exit 0
+                  fi
 
                   for tag in $TAGS; do
-                    if [[ "|$KEEP_TAGS|" != *"|$tag|"* ]]; then
+                    if [[ "$tag" != "master" && "$tag" != "$LATEST_TAG" && "$tag" != "$PREV_TAG" ]]; then
                       echo "Deleting tag: $tag"
-
-                      # Get manifest digest
                       DIGEST=$(curl -s -H "Authorization: Bearer $TOKEN" \
                         -H "Accept: application/vnd.docker.distribution.manifest.v2+json" \
                         -I "https://registry-1.docker.io/v2/${USERNAME}/${REPO}/manifests/${tag}" | \
                         grep -i docker-content-digest | awk '{print $2}' | tr -d '\r')
-
                       if [ -z "$DIGEST" ]; then
                         echo "Could not get digest for tag: $tag"
                         continue
                       fi
-
-                      # Delete manifest/tag
                       curl -s -H "Authorization: Bearer $TOKEN" \
                         -X DELETE \
                         "https://registry-1.docker.io/v2/${USERNAME}/${REPO}/manifests/${DIGEST}"
