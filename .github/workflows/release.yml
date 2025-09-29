@@ -238,7 +238,7 @@ jobs:
         needs: [release, docker]
         concurrency:
             group: ${{ github.workflow }}-${{ github.ref }}
-            cancel-in-progress: ${{ github.ref != 'refs/heads/master' }}
+            cancel-in-progress: false
         permissions:
             contents: read
             packages: write
@@ -275,41 +275,77 @@ jobs:
                   PREV_TAG: ${{ steps.tags.outputs.prev_version }}
               run: |
                   set -euo pipefail
-                  KEEP_TAGS="master,${LATEST_TAG},${PREV_TAG}"
-                  echo "Keeping tags: $KEEP_TAGS"
-
-                  # Get Docker Hub Registry API token
-                  TOKEN=$(curl -s "https://auth.docker.io/token?service=registry.docker.io&scope=repository:${USERNAME}/${REPO}:pull,push,delete" | jq -r .token)
-
-                  # List all tags
-                  TAGS_JSON=$(curl -s "https://hub.docker.com/v2/repositories/${USERNAME}/${REPO}/tags/?page_size=100")
-                  echo "TAGS_JSON: $TAGS_JSON"
-                  TAGS=$(echo "$TAGS_JSON" | jq -r '.results[].name' 2>/dev/null || echo "")
-
-                  if [ -z "$TAGS" ]; then
-                    echo "No tags found or failed to fetch tags from Docker Hub. API response above"
+                  # Skip if no tags found
+                  if [[ -z "$LATEST_TAG" || -z "$PREV_TAG" ]]; then
+                    echo "No semver tags found, skipping Docker Hub cleanup"
                     exit 0
                   fi
 
+                  KEEP_TAGS="master,${LATEST_TAG},${PREV_TAG}"
+                  echo "Keeping tags: $KEEP_TAGS"
+
+                  # Get Docker Hub auth token
+                  AUTH_URL="https://auth.docker.io/token"
+                  SCOPE="repository:${USERNAME}/${REPO}:pull,push,delete"
+                  TOKEN_RESPONSE=$(curl -s -u "${USERNAME}:${PASSWORD}" "${AUTH_URL}?service=registry.docker.io&scope=${SCOPE}")
+
+                  if !TOKEN=$(echo "$TOKEN_RESPONSE" | jq -r '.token' 2>/dev/null) || [[ "$TOKEN" == "null" ]]; then
+                    echo "Failed to get authentication token. Response: $TOKEN_RESPONSE"
+                    exit 1
+                  fi
+
+                  # Get tags from Docker Hub API
+                  TAGS_RESPONSE=$(curl -s "https://hub.docker.com/v2/repositories/${USERNAME}/${REPO}/tags/?page_size=100")
+
+                  if ! TAGS=$(echo "$TAGS_RESPONSE" | jq -r '.results[]?.name' 2>/dev/null); then
+                    echo "Failed to fetch tags. Response: $TAGS_RESPONSE"
+                    exit 0
+                  fi
+
+                  # Delete old tags using Registry API v2
+                  REGISTRY_URL="https://registry-1.docker.io"
+                  DELETED_COUNT=0
+
                   for tag in $TAGS; do
-                    if [[ "$tag" != "master" && "$tag" != "$LATEST_TAG" && "$tag" != "$PREV_TAG" ]]; then
-                      echo "Deleting tag: $tag"
-                      DIGEST=$(curl -s -H "Authorization: Bearer $TOKEN" \
-                        -H "Accept: application/vnd.docker.distribution.manifest.v2+json" \
-                        -I "https://registry-1.docker.io/v2/${USERNAME}/${REPO}/manifests/${tag}" | \
-                        grep -i docker-content-digest | awk '{print $2}' | tr -d '\r')
-                      if [ -z "$DIGEST" ]; then
-                        echo "Could not get digest for tag: $tag"
-                        continue
-                      fi
-                      curl -s -H "Authorization: Bearer $TOKEN" \
-                        -X DELETE \
-                        "https://registry-1.docker.io/v2/${USERNAME}/${REPO}/manifests/${DIGEST}"
-                      echo "Deleted $tag ($DIGEST)"
-                    else
+                    # Skip protected tags
+                    if [[ "$tag" == "master" || "$tag" == "$LATEST_TAG" || "$tag" == "$PREV_TAG" ]]; then
                       echo "Keeping tag: $tag"
+                      continue
+                    fi
+
+                    echo "Attempting to delete tag: $tag"
+
+                    # Get manifest digest
+                    DIGEST_RESPONSE=$(curl -s -I \
+                      -H "Authorization: Bearer $TOKEN" \
+                      -H "Accept: application/vnd.docker.distribution.manifest.v2+json" \
+                      "${REGISTRY_URL}/v2/${USERNAME}/${REPO}/manifests/${tag}")
+
+                    DIGEST=$(echo "$DIGEST_RESPONSE" | grep -i "docker-content-digest" | awk '{print $2}' | tr -d '\r\n' || echo "")
+
+                    if [[ -z "$DIGEST" ]]; then
+                      echo "Could not get digest for tag: $tag"
+                      continue
+                    fi
+
+                    # Delete by digest
+                    DELETE_RESPONSE=$(curl -s -w "HTTP_CODE:%{http_code}" \
+                      -H "Authorization: Bearer $TOKEN" \
+                      -X DELETE \
+                      "${REGISTRY_URL}/v2/${USERNAME}/${REPO}/manifests/${DIGEST}")
+
+                    HTTP_CODE=$(echo "$DELETE_RESPONSE" | grep -o "HTTP_CODE:[0-9]*" | cut -d: -f2)
+
+                    if [[ "$HTTP_CODE" =~ ^(202|204)$ ]]; then
+                      echo "Successfully deleted $tag (${DIGEST})"
+                      ((DELETED_COUNT++))
+                    else
+                      echo "Failed to delete $tag. HTTP: $HTTP_CODE"
+                      echo "Response: $(echo "$DELETE_RESPONSE" | sed 's/HTTP_CODE:[0-9]*//g')"
                     fi
                   done
+
+                  echo "Deleted $DELETED_COUNT tag(s) from Docker Hub"
 
             - name: Delete Old GHCR Tags
               uses: actions/delete-package-versions@e5bc658cc4c965c472efe991f8beea3981499c55 # v5.0.0
@@ -317,6 +353,6 @@ jobs:
                   package-name: "steam-stats"
                   package-type: "container"
                   min-versions-to-keep: 0
-                  ignore-versions: ^(master|${{ steps.tags.outputs.latest_version }}|${{ steps.tags.outputs.prev_version }})$
+                  ignore-versions: "^(master|${{ steps.tags.outputs.latest_version }}|${{ steps.tags.outputs.prev_version }})$"
                   delete-only-untagged-versions: false
                   token: ${{ secrets.GITHUB_TOKEN }}
