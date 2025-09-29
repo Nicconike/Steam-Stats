@@ -1,5 +1,5 @@
 # Steam Stats📶
-A GitHub Action and Docker container to generate Steam user stats cards (PNG) for your README using the official Steam Web API and web scraping for Workshop stats.
+**Automated GitHub Action and Docker container to generate Steam user stats cards for your profile README.**
 
 ### Badges
 #### Workflow Status
@@ -56,152 +56,90 @@ A GitHub Action and Docker container to generate Steam user stats cards (PNG) fo
 
 > ### From one Passionate Gamer to Another 🍻
 
-> **Full Documentation now available:**
-> [nicconike.github.io/Steam-Stats/](https://nicconike.github.io/Steam-Stats/)
->
-> Browse detailed guides on:
-> - Getting Started (API Keys, setup, README integration)
-> - Usage & Configuration: User Guide
-> - Automated Examples & Feature Flags
-> - API Reference (developer-level docs)
-> - Developer Guide (contributing, testing, local setup)
->
-> Found missing info or want to improve these docs?
-> [Open a documentation issue or PR!](https://github.com/Nicconike/Steam-Stats/issues)
+**[📚 Complete Documentation](https://nicconike.github.io/Steam-Stats/)**
 
-***
-## Prerequisites
-1. **Steam Web API Key:** API key is important to fetch your account details and for that you will require a key which you can create for your account [here](https://steamcommunity.com/dev)
-2. **Markdown Comments:** Update the markdown file by adding the comments where the Steam Stats will be embedded to. Refer [here](#Update-Readme) to learn more.
-3. **Steam ID:** You can get your 64-bit Steam id (SteamID64 - 17 digit number) by clicking on your profile name in the top right corner in steam desktop client, select "Account Details" and your Steam ID will be displayed directly under your account name
-4. **Steam Custom ID:** Open the Steam desktop application, click on your profile name in the top right corner. Select _View Profile_ and your custom URL will be displayed in the URL bar. From this url you will know your Steam Custom ID
+## Quick Start
 
-The Github Actions is set to run on every Monday 12 AM IST (UTC+5:30) which you can modify to your own time as per your liking by updating it in the workflow file
+1. Get your [Steam Web API Key](https://steamcommunity.com/dev)
+2. Get your [Steam ID](https://nicconike.github.io/Steam-Stats/getting-started/steam-id/#find-your-steam-id) and [Custom ID](https://nicconike.github.io/Steam-Stats/getting-started/steam-id/#find-your-custom-steam-id)
+3. Save them as [GitHub Secrets](https://nicconike.github.io/Steam-Stats/getting-started/steam-web-api/#storing-secrets-in-github) & [GitHub Variables](https://nicconike.github.io/Steam-Stats/getting-started/steam-id/#storing-steam-ids-in-github) in your profile repository
+4. Add to your workflow:
+	```yml
+	name: Steam Stats
 
-```yml
-schedule:
-        - cron: "30 18 * * 0"
-```
-> [!IMPORTANT]
-> Please don't forget any of the steps mentioned in the prerequisites else the Github Action will not work.
-> Also, make sure that you have set the country correctly in your Steam Account.
->
-> You can refer the [Steam Stats Wiki](https://github.com/Nicconike/Steam-Stats/wiki) if you have any questions related to any of the steps mentioned in [Prerequisites](#Prerequisites).
+	on:
+	push:
+	  branches: master
+	  workflow_dispatch:
+	  schedule:
+		# Runs every Monday at 12AM IST (UTC+5:30)
+		- cron: "30 18 * * 0"
 
-***
+	jobs:
+	steam-stats:
+	  name: Steam Stats
+	  runs-on: ubuntu-latest
+	  steps:
+	  - uses: nicconike/steam-stats@master
+		with:
+		  STEAM_API_KEY: ${{ secrets.STEAM_API_KEY }} # Steam API key env var
+		  STEAM_ID: ${{ vars.STEAM_ID }} # Steam ID env var
+		  STEAM_CUSTOM_ID: ${{ vars.STEAM_CUSTOM_ID }} # Custom ID env var
+		  WORKSHOP_STATS: True # Optional
+		  LOG_SCALE: True # Optional
+	```
 
-## Samples (From my [Steam Account](https://steamcommunity.com/id/nicconike/))
-**Example for Steam User Stats**
+5. Add markdown comments to your README for Steam Stats
+	```md
+	<!-- Steam-Stats start -->
+	<!-- Steam-Stats end -->
+	```
+
+6. Add these markdown comments for Steam Workshop Stats (Optional)
+	```md
+	<!-- Steam-Workshop start -->
+	<!-- Steam-Workshop end -->
+	```
+
+**[Full Setup Guide](https://nicconike.github.io/Steam-Stats/getting-started/prerequisites/)**
+
+## Sample Output
+
+### Steam Stats Cards
 <!-- Steam-Stats start -->
 ![Steam Summary](https://github.com/Nicconike/Steam-Stats/blob/master/assets/steam_summary.png)
 ![Recently Played Games](https://github.com/Nicconike/Steam-Stats/blob/master/assets/recently_played_games.png)
 <!-- Steam-Stats end -->
 
-**Example for Steam Workshop Stats**
+### Steam Workshop Stats (Optional)
 <!-- Steam-Workshop start -->
 ![Steam Workshop Stats](https://github.com/Nicconike/Steam-Stats/blob/master/assets/steam_workshop_stats.png)
 <!-- Steam-Workshop end -->
-***
-## Update README
-1. Add below comment in your markdown file for Steam User Stats
-	```md
-	<!-- Steam-Stats start -->
-	<!-- Steam-Stats end -->
-	```
-2. Add below comment for Steam Workshop Stats (Optional)
-	```md
-	<!-- Steam-Workshop start -->
-	<!-- Steam-Workshop end -->
-	```
-3. Don't forget to add these comments in your readme file or wherever you want to display your steam stats, because without the comments the readme will not get updated
 
-> [!CAUTION]
-> The `Steam-Stats` marker should be placed before the `Steam-Workshop` markers if you are using both.
-***
 ## Features
-1. Steam Player Summary (Note: Steam Web API doesn't support Web Sockets, so the profile status cannot be updated in real time.)
-2. Recently Played Games from Steam in the Last 2 Weeks
-3. Steam Workshop Stats (If Applicable)
 
-### Feature Flags
-1. Steam User Stats (Required | Default)
-	1. Steam Player Summary
-	2. Steam's Recently Played Games in the last 2 weeks
-		1. The Graph plot for recently played games is by default implemented in a fixed linear scale but if you want you can update it to be in a logarithmic scale by using this flag in your workflow: `LOG_SCALE: True`
-		2. When `LOG_SCALE` is `False`
+- 🎮 **Player Summary** - Steam profile stats
+- 🕹️ **Recently Played Games** - Last 2 weeks activity
+- 🛠️ **Workshop Stats** - Unique visitors & subscribers
+- 🐳 **Docker Support** - Containerized execution
+- ⚡ **Automated Updates** - Scheduled via GitHub Actions
 
-			![Recently Played Games](https://github.com/Nicconike/Steam-Stats/blob/master/assets/recently_played_games(linear).png)
-		3. When `LOG_SCALE` is `True`
+**[View All Features & Configuration](https://nicconike.github.io/Steam-Stats/user-guide/)**
 
-			![Recently Played Games](https://github.com/Nicconike/Steam-Stats/blob/master/assets/recently_played_games(log).png)
-2. Steam Workshop Stats (Optional)
-	1. Workshop Stats Module can be used by adding this flag in your workflow file in the environment variables: `WORKSHOP_STATS: True`
-	2. This module displays the total number of Unique Visitors, Subscribers and Favorites for your Steam Workshop Items
-***
-## Setup with Example
-After completing the steps mentioned in the [Prerequisites](#Prerequisites), you have to save all the mentioned keys(except markdown comments) like Steam API Key, Steam-ID, Custom-ID as Secrets in your Github repo's settings.
+## Documentation
 
-> Repo Settings -> Security -> Secrets and Variables -> Actions -> Add in Repository Secrets
+- **[🚀 Getting Started](https://nicconike.github.io/Steam-Stats/getting-started/)** - Setup Guide
+- **[⚙️ Configuration](https://nicconike.github.io/Steam-Stats/user-guide/config/)** - Feature Flags & Options
+- **[🛠️ Troubleshooting](https://nicconike.github.io/Steam-Stats/user-guide/troubleshooting/)** - Common Issues
+- **[🤝 Contributing](https://nicconike.github.io/Steam-Stats/developer-guide/contributing/)** - Developer Guide
+- **[📚 API Reference](https://nicconike.github.io/Steam-Stats/reference/)** - Python Code
 
-If you are new to **Github Secrets** then you can checkout this official doc [here](https://docs.github.com/en/actions/security-guides/using-secrets-in-github-actions).
+## Support 💙
 
-**Sample Workflow File**
+Star ⭐ this project if it helps you! For detailed support options:
 
-`steam-stats.yml`
+**[Support & Contributing Guide](https://nicconike.github.io/Steam-Stats/developer-guide/contributing/)**
 
-```yaml
-name: Steam Stats
+---
 
-on:
-  push:
-    branches: master
-    schedule:
-      # Runs every Monday at 12AM IST (UTC+5:30)
-      - cron: "30 18 * * 0"
-    workflow_dispatch:
-
-jobs:
-  steam-stats:
-    name: Steam Stats
-    runs-on: ubuntu-latest
-    steps:
-      - uses: nicconike/steam-stats@master
-        with:
-          STEAM_API_KEY: ${{ secrets.STEAM_API_KEY }} # Created Steam API key env var
-          STEAM_ID: ${{ vars.STEAM_ID }} # Steam ID env var
-          STEAM_CUSTOM_ID: ${{ vars.STEAM_CUSTOM_ID }} # Custom ID env var
-          WORKSHOP_STATS: True # Optional
-          LOG_SCALE: True # Optional
-```
-
-Checkout this real time usage example in a github repo from [here](https://github.com/Nicconike/Nicconike?tab=readme-ov-file#gaming-) and also the github actions [workflow file](https://github.com/Nicconike/Nicconike/blob/master/.github/workflows/steam-stats.yml).
-
-***
-## Contributions
-
-Star⭐ and Fork🍴 the Repo to start with your feature request(or bug) and experiment with the project to implement whatever Idea you might have and sent the Pull Request through 🤙
-
-Please refer [Contributing.md](https://github.com/Nicconike/Steam-Stats/blob/master/.github/CONTRIBUTING.md) to get to know how to contribute to this project.
-And thank you for considering to contribute.
-
-***
-## Credits
-
-- **Actions**
-	- **[GitHub Actions](https://github.com/actions)**
-	- **[Python Semantic Release](https://github.com/python-semantic-release/python-semantic-release)**
-	- **[Docker](https://github.com/docker)**
-	- **[CodeQL](https://github.com/github/codeql-action)**
-	- **[Codecov](https://github.com/codecov/codecov-action)**
-
-***
-## Support💙
-If you are using this project and are really happy with it, then there are few ways to support me so that I can keep doing what I like doing:
-- Credit in your readme where you use this action
-- Drop a follow!😁
-- Starring and Sharing the project
-- Donations through [GitHub Sponsers](https://github.com/sponsors/Nicconike) or whichever platform you like. So, that I can create more projects like these and play more games🎮🎧
-
-#### **Thanks!🫡**
-***
-Created with 🐍 & ❤️ by [Nicco](https://x.com/Nicco_nike)
+**📖 [Full Documentation](https://nicconike.github.io/Steam-Stats) • 🐛 [Report Issues](https://github.com/Nicconike/Steam-Stats/issues) • 💬 [Discussions](https://github.com/Nicconike/Steam-Stats/discussions)**

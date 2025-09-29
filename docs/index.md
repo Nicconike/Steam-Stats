@@ -45,26 +45,24 @@ Display aggregated totals for all your Steam Workshop items: subscribers, favori
 3. Add a workflow file named `.github/workflows/steam-stats.yml` to your repo with:
     ```yml
     name: Steam Stats
-
     on:
-        workflow_dispatch:
-        schedule:
-            # Runs every Monday at 12 AM IST (UTC+5:30)
-            - cron: "30 18 * * 0"
-
+    workflow_dispatch:
+    schedule:
+        # Runs every Monday at 12 AM IST (UTC+5:30)
+        - cron: "30 18 * * 0"
     jobs:
-        steam-stats:
-            name: Steam Stats
-            runs-on: ubuntu-latest
-            steps:
-              - name: Steam Stats
-                uses: nicconike/steam-stats@master
-                with:
-                    STEAM_API_KEY: ${{ secrets.STEAM_API_KEY }}
-                    STEAM_ID: ${{ vars.STEAM_ID }}
-                    STEAM_CUSTOM_ID: ${{ vars.STEAM_CUSTOM_ID }}
-                    WORKSHOP_STATS: True # Optional
-                    LOG_SCALE: True # Optional
+    steam-stats:
+        name: Steam Stats
+        runs-on: ubuntu-latest
+        steps:
+        - name: Steam Stats
+            uses: nicconike/steam-stats@master
+            with:
+            STEAM_API_KEY: ${{ secrets.STEAM_API_KEY }}
+            STEAM_ID: ${{ vars.STEAM_ID }}
+            STEAM_CUSTOM_ID: ${{ vars.STEAM_CUSTOM_ID }}
+            WORKSHOP_STATS: True # Optional
+            LOG_SCALE: True # Optional
     ```
 4. In your `README.md` file, add these comment pairs where you want the cards inserted:
     1. Steam Stats
@@ -113,4 +111,4 @@ Steam Stats makes it easy to display your gaming statistics alongside your codin
 
 ---
 
-*Built by a Gamer who codes (sometimes :fontawesome-solid-grin-tongue-wink:). Star the project on GitHub if you find it useful!*
+*Built by a Gamer who codes (sometimes :fontawesome-solid-grin-tongue-wink:). Star :material-star: the project on GitHub if you find it useful!*

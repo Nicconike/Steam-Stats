@@ -288,16 +288,16 @@ jobs:
                   AUTH_URL="https://auth.docker.io/token"
                   SCOPE="repository:${USERNAME}/${REPO}:pull,push,delete"
                   TOKEN_RESPONSE=$(curl -s -u "${USERNAME}:${PASSWORD}" "${AUTH_URL}?service=registry.docker.io&scope=${SCOPE}")
-
-                  if !TOKEN=$(echo "$TOKEN_RESPONSE" | jq -r '.token' 2>/dev/null) || [[ "$TOKEN" == "null" ]]; then
+                  TOKEN=$(echo "$TOKEN_RESPONSE" | jq -r '.token' 2>/dev/null || echo "")
+                  if [[ -z "$TOKEN" || "$TOKEN" == "null" ]]; then
                     echo "Failed to get authentication token. Response: $TOKEN_RESPONSE"
                     exit 1
                   fi
 
                   # Get tags from Docker Hub API
                   TAGS_RESPONSE=$(curl -s "https://hub.docker.com/v2/repositories/${USERNAME}/${REPO}/tags/?page_size=100")
-
-                  if ! TAGS=$(echo "$TAGS_RESPONSE" | jq -r '.results[]?.name' 2>/dev/null); then
+                  TAGS=$(echo "$TAGS_RESPONSE" | jq -r '.results[]?.name' 2>/dev/null || echo "")
+                  if [[ -z "$TAGS" ]]; then
                     echo "Failed to fetch tags. Response: $TAGS_RESPONSE"
                     exit 0
                   fi

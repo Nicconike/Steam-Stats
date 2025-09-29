@@ -8,6 +8,17 @@ version = "1.4.0"
 authors = [{ name = "Nicco", email = "github.giving328@passmail.com" }]
 description = "A python project to get the stats of your Steam account and display them in your GitHub profile."
 requires-python = ">= 3.8"
+keywords = [
+    "steam",
+    "github",
+    "stats",
+    "api",
+    "automation",
+    "games",
+    "gaming",
+    "cards",
+    "playwright",
+]
 readme = "README.md"
 license = "GPL-3.0"
 license-files = ["LICENSE"]
@@ -61,6 +72,7 @@ dev = [
     "twine==6.2.0",
 ]
 docs = [
+    "mkdocs-git-revision-date-localized-plugin==1.4.7",
     "mkdocs-material==9.6.20",
     "mkdocs-mermaid2-plugin==1.2.2",
     "mkdocs-minify-plugin==0.8.0",
@@ -74,7 +86,6 @@ where = ["api"]
 version_variables = ["api/main.py:__version__"]
 version_toml = ["pyproject.toml:project.version"]
 version_source = "tag"
-match = "master"
 commit_message = "chore(release): Version Release v{version}"
 tag_format = "v{version}"
 logging_use_named_masks = true

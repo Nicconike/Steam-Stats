@@ -1,6 +1,8 @@
 ---
 title: License
 description: This is not legal advice
+hide:
+    - feedback
 ---
 
 # License :material-license:

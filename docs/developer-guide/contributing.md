@@ -45,19 +45,13 @@ Follow [Local Development](local-development.md) for environment setup.
 
 ### 4. Coding Standards
 
-| Standard            | Tool    | Notes                               |
-|---------------------|---------|-----------------------------------|
-| Code formatting     | black   | 88-char line length                |
-| Import sorting      | isort   | Compatible with black              |
-| Linting            | flake8  | Ignore E203, W503                  |
-| Type checking      | mypy    | Strict mode on new code            |
-
-```sh
-Run:
-    black .
-    isort .
-    flake8
-```
+| Standard          | Tool    | Notes                   |
+|-------------------|---------|-------------------------|
+| Code formatting   | black   | 100-char line length    |
+| Import sorting    | isort   | Compatible with black   |
+| Linting           | pylint  | 10/10 score maintained  |
+| Type checking     | mypy    | Strict mode on new code |
+| Security scanning | bandit  | Vulnerability detection |
 
 ### 5. Commit Messages
 

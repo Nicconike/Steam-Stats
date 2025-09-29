@@ -14,29 +14,26 @@ In your repository, create the workflow directory and file:
 3. **Add the following content**:
     ```yml
     name: Steam Stats
-
-    permissions:
-        contents: read
-
+    permissions: # Least privilege for GitHub Actions
+      contents: read
     on:
-        workflow_dispatch:
+      workflow_dispatch:
         schedule:
-            # Runs every Monday at 12 AM IST (UTC+5:30)
-            - cron: "30 18 * * 0"
-
+          # Runs every Monday at 12 AM IST (UTC+5:30)
+          - cron: "30 18 * * 0"
     jobs:
-        steam-stats:
-            name: Steam Stats
-            runs-on: ubuntu-latest
-            steps:
-              - name: Steam Stats
-                uses: nicconike/steam-stats@master
-                with:
-                    STEAM_API_KEY: ${{ secrets.STEAM_API_KEY }}
-                    STEAM_ID: ${{ vars.STEAM_ID }}
-                    STEAM_CUSTOM_ID: ${{ vars.STEAM_CUSTOM_ID }}
-                    WORKSHOP_STATS: True # Optional
-                    LOG_SCALE: True # Optional
+      steam-stats:
+        name: Steam Stats
+        runs-on: ubuntu-latest
+        steps:
+        - name: Steam Stats
+            uses: nicconike/steam-stats@master
+            with:
+            STEAM_API_KEY: ${{ secrets.STEAM_API_KEY }}
+            STEAM_ID: ${{ vars.STEAM_ID }}
+            STEAM_CUSTOM_ID: ${{ vars.STEAM_CUSTOM_ID }}
+            WORKSHOP_STATS: True # Optional
+            LOG_SCALE: True # Optional
     ```
 
 ## Enable Log Scale for Recently Played Games

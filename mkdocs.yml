@@ -1,10 +1,11 @@
 site_name: Steam Stats
 site_author: Nicconike
 site_description: Showcase your Steam Gaming Stats in your GitHub Profile with automated cards
-site_url: https://nicconike.github.io/Steam-Stats
+site_url: https://nicconike.github.io/Steam-Stats/
 repo_name: Nicconike/Steam-Stats
 repo_url: https://github.com/Nicconike/Steam-Stats
-edit_uri: edit/main/docs/
+edit_uri: edit/master/docs/
+copyright: Copyright &copy; 2024 - 2025 Nicconike
 
 theme:
     name: material
@@ -76,7 +77,7 @@ nav:
           - Prerequisites: getting-started/prerequisites.md
           - Steam Web API Setup: getting-started/steam-web-api.md
           - Steam IDs: getting-started/steam-id.md
-          - GitHub Action Setup: getting-started/github-action.md
+          - GitHub Actions Setup: getting-started/github-action.md
           - Readme Integration: getting-started/readme-integration.md
           - Verification: getting-started/verification.md
 
@@ -107,12 +108,15 @@ nav:
           - Testing: developer-guide/testing.md
 
 plugins:
+    - privacy
     - search:
           separator: '[\s\u200b\-_,:!=\[\]()"`/]+|\.(?!\d)|&[lg]t;|(?!\b)(?=[A-Z][a-z])'
     - minify:
           minify_html: true
     - mkdocstrings:
           default_handler: python
+    - git-revision-date-localized:
+          enable_creation_date: true
     - autorefs
     - mermaid2
 
@@ -151,7 +155,16 @@ markdown_extensions:
 
 extra:
     generator: false
-    copyright: Copyright &copy; 2024 - 2025 Nicconike
+    version:
+        provider: mike
+        default: latest
+    consent:
+        title: Cookie Consent
+        description: >-
+            We use cookies to recognize your repeated visits and preferences, as well as to measure the effectiveness of the documentation and whether users find what they're searching for. With your consent, you're helping us to make the documentation better.
+        actions:
+            - manage
+            - accept
     social:
         - icon: fontawesome/brands/github
           link: https://github.com/Nicconike
@@ -168,3 +181,16 @@ extra:
     analytics:
         provider: google
         property: !ENV GOOGLE_ANALYTICS_ID
+        feedback:
+            title: Was this page helpful?
+            ratings:
+                - icon: material/heart
+                  name: This page was helpful
+                  data: 1
+                  note: >-
+                      Thanks for your feedback!
+                - icon: material/heart-broken
+                  name: This page could be improved
+                  data: 0
+                  note: >-
+                      Thanks for your feedback! Help me improve this page by using the <a href="..." target="_blank" rel="noopener">feedback form</a>.

@@ -272,7 +272,49 @@ git push origin feature/your-feature-name
 ## VS Code Configuration :material-microsoft-visual-studio-code:
 
 ### Recommended Extensions :simple-gitextensions:
-Essential extensions for Steam Stats development:
+Based on the project's tech stack, these extensions enhance development:
+
+#### Core Development
+- `ms-python.python` - Python language support
+- `ms-python.pylint` - Pylint integration
+- `ms-python.black-formatter` - Code formatting
+- `ms-python.vscode-pylance` - Enhanced Python IntelliSense
+
+#### Code Quality & Security
+- `sonarsource.sonarlint-vscode` - Code quality analysis
+- `shardulm94.trailing-spaces` - Whitespace management
+
+#### Development Productivity
+- `github.copilot` - AI-powered code completion
+- `github.copilot-chat` - AI assistant
+- `wakatime.vscode-wakatime` - Time tracking
+
+#### File Handling & Formatting
+- `redhat.vscode-yaml` - YAML language support
+- `tamasfe.even-better-toml` - TOML file support
+- `samuelcolvin.jinjahtml` - Jinja template support
+- `mechatroner.rainbow-csv` - CSV file visualization
+
+#### Additional Tools
+- `ms-azuretools.vscode-containers` - Docker container support
+- `vscode-icons-team.vscode-icons` - Enhanced file icons
+- `ms-vscode.live-server` - Local development server
+
+#### Installation Command
+You can install all recommended extensions at once using:
+
+```sh
+code --install-extension ms-python.python
+--install-extension ms-python.pylint
+--install-extension ms-python.black-formatter
+--install-extension ms-python.vscode-pylance
+--install-extension sonarsource.sonarlint-vscode
+--install-extension shardulm94.trailing-spaces
+--install-extension redhat.vscode-yaml
+--install-extension tamasfe.even-better-toml
+--install-extension samuelcolvin.jinjahtml
+--install-extension mechatroner.rainbow-csv
+```
 
 | Extension              | Purpose                     |
 |------------------------|-----------------------------|
@@ -283,7 +325,6 @@ Essential extensions for Steam Stats development:
 | **GitLens**            | Enhanced Git capabilities   |
 | **YAML**               | YAML file support           |
 | **Markdown All in One**| Documentation editing       |
-| **Material Icon Theme**| File icons                  |
 
 ### VS Code Settings :material-cog:
 
@@ -294,7 +335,7 @@ Create `.vscode/settings.json`:
     "python.defaultInterpreterPath": "./venv/bin/python",
     "python.formatting.provider": "black",
     "python.linting.enabled": true,
-    "python.linting.flake8Enabled": true,
+    "python.linting.pylintEnabled": true,
     "python.testing.pytestEnabled": true,
     "files.exclude": {
         "**/__pycache__": true,
