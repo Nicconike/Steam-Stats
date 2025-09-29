@@ -68,25 +68,25 @@
 	name: Steam Stats
 
 	on:
-	push:
-		branches: master
+		push:
+			branches: [master]
 		workflow_dispatch:
 		schedule:
-		# Runs every Monday at 12AM IST (UTC+5:30)
-		- cron: "30 18 * * 0"
+			# Runs every Monday at 12AM IST (UTC+5:30)
+			- cron: "30 18 * * 0"
 
 	jobs:
-	steam-stats:
-		name: Steam Stats
-		runs-on: ubuntu-latest
-		steps:
-		  - uses: nicconike/steam-stats@master
-			with:
-				STEAM_API_KEY: ${{ secrets.STEAM_API_KEY }} # Steam API key env var
-				STEAM_ID: ${{ vars.STEAM_ID }} # Steam ID env var
-				STEAM_CUSTOM_ID: ${{ vars.STEAM_CUSTOM_ID }} # Custom ID env var
-				WORKSHOP_STATS: True # Optional
-				LOG_SCALE: True # Optional
+		steam-stats:
+			name: Steam Stats
+			runs-on: ubuntu-latest
+			steps:
+			- uses: nicconike/steam-stats@master
+				with:
+					STEAM_API_KEY: ${{ secrets.STEAM_API_KEY }} # Steam API key env var
+					STEAM_ID: ${{ vars.STEAM_ID }} # Steam ID env var
+					STEAM_CUSTOM_ID: ${{ vars.STEAM_CUSTOM_ID }} # Custom ID env var
+					WORKSHOP_STATS: True # Optional
+					LOG_SCALE: True # Optional
 	```
 
 5. Add markdown comments to your README for Steam Stats

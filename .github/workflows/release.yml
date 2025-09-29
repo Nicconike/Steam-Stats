@@ -237,7 +237,7 @@ jobs:
         name: Cleanup
         needs: [release, docker]
         concurrency:
-            group: ${{ github.workflow }}-${{ github.ref }}
+            group: ${{ github.workflow }}-cleanup
             cancel-in-progress: false
         permissions:
             contents: read
