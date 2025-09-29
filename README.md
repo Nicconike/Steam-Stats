@@ -56,7 +56,7 @@
 
 > ### From one Passionate Gamer to Another 🍻
 
-**[📚 Complete Documentation](https://nicconike.github.io/Steam-Stats/)**
+> ### **[📚 Complete Documentation](https://nicconike.github.io/Steam-Stats/)**
 
 ## Quick Start
 
@@ -69,24 +69,24 @@
 
 	on:
 	push:
-	  branches: master
-	  workflow_dispatch:
-	  schedule:
+		branches: master
+		workflow_dispatch:
+		schedule:
 		# Runs every Monday at 12AM IST (UTC+5:30)
 		- cron: "30 18 * * 0"
 
 	jobs:
 	steam-stats:
-	  name: Steam Stats
-	  runs-on: ubuntu-latest
-	  steps:
-	  - uses: nicconike/steam-stats@master
-		with:
-		  STEAM_API_KEY: ${{ secrets.STEAM_API_KEY }} # Steam API key env var
-		  STEAM_ID: ${{ vars.STEAM_ID }} # Steam ID env var
-		  STEAM_CUSTOM_ID: ${{ vars.STEAM_CUSTOM_ID }} # Custom ID env var
-		  WORKSHOP_STATS: True # Optional
-		  LOG_SCALE: True # Optional
+		name: Steam Stats
+		runs-on: ubuntu-latest
+		steps:
+		  - uses: nicconike/steam-stats@master
+			with:
+				STEAM_API_KEY: ${{ secrets.STEAM_API_KEY }} # Steam API key env var
+				STEAM_ID: ${{ vars.STEAM_ID }} # Steam ID env var
+				STEAM_CUSTOM_ID: ${{ vars.STEAM_CUSTOM_ID }} # Custom ID env var
+				WORKSHOP_STATS: True # Optional
+				LOG_SCALE: True # Optional
 	```
 
 5. Add markdown comments to your README for Steam Stats
@@ -117,27 +117,30 @@
 <!-- Steam-Workshop end -->
 
 ## Features
-
-- 🎮 **Player Summary** - Steam profile stats
-- 🕹️ **Recently Played Games** - Last 2 weeks activity
-- 🛠️ **Workshop Stats** - Unique visitors & subscribers
-- 🐳 **Docker Support** - Containerized execution
-- ⚡ **Automated Updates** - Scheduled via GitHub Actions
+| Feature                      | Description           |
+|------------------------------|-----------------------|
+| 🎮 **Player Summary**        | Steam profile stats  |
+| 🕹️ **Recently Played Games** | Last 2 weeks activity |
+| 🛠️ **Workshop Stats**        | Unique visitors & subscribers |
+| 🐳 **Docker Support**        | Containerized execution |
+| ⚡ **Automated Updates**     | Scheduled via GitHub Actions |
 
 **[View All Features & Configuration](https://nicconike.github.io/Steam-Stats/user-guide/)**
 
 ## Documentation
-
-- **[🚀 Getting Started](https://nicconike.github.io/Steam-Stats/getting-started/)** - Setup Guide
-- **[⚙️ Configuration](https://nicconike.github.io/Steam-Stats/user-guide/config/)** - Feature Flags & Options
-- **[🛠️ Troubleshooting](https://nicconike.github.io/Steam-Stats/user-guide/troubleshooting/)** - Common Issues
-- **[🤝 Contributing](https://nicconike.github.io/Steam-Stats/developer-guide/contributing/)** - Developer Guide
-- **[📚 API Reference](https://nicconike.github.io/Steam-Stats/reference/)** - Python Code
+| Section | Description |
+|---------|-------------|
+| **[🚀 Getting Started](https://nicconike.github.io/Steam-Stats/getting-started/)** | Setup Guide |
+| **[⚙️ Configuration](https://nicconike.github.io/Steam-Stats/user-guide/config/)** | Feature Flags & Options |
+| **[🛠️ Troubleshooting](https://nicconike.github.io/Steam-Stats/user-guide/troubleshooting/)** | Common Issues |
+| **[🤝 Contributing](https://nicconike.github.io/Steam-Stats/developer-guide/contributing/)** | Developer Guide |
+| **[📚 API Reference](https://nicconike.github.io/Steam-Stats/reference/)** | Python Code |
 
 ## Support 💙
 
-Star ⭐ this project if it helps you! For detailed support options:
+Star ⭐ this project if you find it useful!
 
+For detailed support options:
 **[Support & Contributing Guide](https://nicconike.github.io/Steam-Stats/developer-guide/contributing/)**
 
 ---
