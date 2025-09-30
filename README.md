@@ -1,7 +1,9 @@
 # Steam Stats📶
 **Automated GitHub Action and Docker container to generate Steam user stats cards for your profile README.**
 
-### Badges
+<details>
+<summary><h3>Badges</h3></summary>
+
 #### Workflow Status
 [![Steam Stats](https://github.com/Nicconike/Steam-Stats/actions/workflows/steam-stats.yml/badge.svg)](https://github.com/Nicconike/Steam-Stats/actions/workflows/steam-stats.yml)
 [![Release](https://github.com/Nicconike/Steam-Stats/actions/workflows/release.yml/badge.svg)](https://github.com/Nicconike/Steam-Stats/actions/workflows/release.yml)
@@ -54,6 +56,8 @@
 #### Time Tracking
 [![wakatime](https://wakatime.com/badge/user/018e538b-3f55-4e8e-95fa-6c3225418eed/project/018e62a4-056d-49fd-babd-b079ee94859f.svg)](https://wakatime.com/badge/user/018e538b-3f55-4e8e-95fa-6c3225418eed/project/018e62a4-056d-49fd-babd-b079ee94859f)
 
+</details>
+
 > ### From one Passionate Gamer to Another 🍻
 
 > ### **[📚 Complete Documentation](https://nicconike.github.io/Steam-Stats/)**
@@ -64,30 +68,30 @@
 2. Get your [Steam ID](https://nicconike.github.io/Steam-Stats/getting-started/steam-id/#find-your-steam-id) and [Custom ID](https://nicconike.github.io/Steam-Stats/getting-started/steam-id/#find-your-custom-steam-id)
 3. Save them as [GitHub Secrets](https://nicconike.github.io/Steam-Stats/getting-started/steam-web-api/#storing-secrets-in-github) & [GitHub Variables](https://nicconike.github.io/Steam-Stats/getting-started/steam-id/#storing-steam-ids-in-github) in your profile repository
 4. Add to your workflow:
-	```yml
-	name: Steam Stats
+```yml
+name: Steam Stats
 
-	on:
-		push:
-			branches: [master]
-		workflow_dispatch:
-		schedule:
-			# Runs every Monday at 12AM IST (UTC+5:30)
-			- cron: "30 18 * * 0"
+on:
+  push:
+    branches: [master]
+  workflow_dispatch:
+  schedule:
+    # Runs every Monday at 12AM IST (UTC+5:30)
+    - cron: "30 18 * * 0"
 
-	jobs:
-		steam-stats:
-			name: Steam Stats
-			runs-on: ubuntu-latest
-			steps:
-			- uses: nicconike/steam-stats@master
-				with:
-					STEAM_API_KEY: ${{ secrets.STEAM_API_KEY }} # Steam API key env var
-					STEAM_ID: ${{ vars.STEAM_ID }} # Steam ID env var
-					STEAM_CUSTOM_ID: ${{ vars.STEAM_CUSTOM_ID }} # Custom ID env var
-					WORKSHOP_STATS: True # Optional
-					LOG_SCALE: True # Optional
-	```
+jobs:
+  steam-stats:
+    name: Steam Stats
+    runs-on: ubuntu-latest
+    steps:
+      - uses: nicconike/steam-stats@master
+        with:
+          STEAM_API_KEY: ${{ secrets.STEAM_API_KEY }} # Steam API key env var
+          STEAM_ID: ${{ vars.STEAM_ID }} # Steam ID env var
+          STEAM_CUSTOM_ID: ${{ vars.STEAM_CUSTOM_ID }} # Custom ID env var
+          WORKSHOP_STATS: True # Optional
+          LOG_SCALE: True # Optional
+```
 
 5. Add markdown comments to your README for Steam Stats
 	```md
