@@ -57,8 +57,8 @@ For urgent issues or if email is unavailable:
 
 For sensitive reports, you can encrypt your message using my PGP key:
 
-**PGP Fingerprint:** `FAF455A3287AAF52858D8A097217AE9924885496`
-**Key Servers:** keyserver.ubuntu.com, keys.openpgp.org
+- **PGP Fingerprint:** `FAF455A3287AAF52858D8A097217AE9924885496`
+- **Key Servers:** keyserver.ubuntu.com, keys.openpgp.org
 
 #### Quick PGP Setup:
 1. **Download Key:**
@@ -342,4 +342,5 @@ As a solo maintainer, CVD just means:
 
 ***
 *Last Updated: October 5, 2025*
+
 *Policy Version: 2.0*

@@ -102,7 +102,7 @@ jobs:
             - name: Build distribution
               if: steps.semantic.outputs.released == 'true'
               run: |
-                  pip install build==1.3.0
+                  pip install ".[dev]"
                   python -m build
 
             - name: Publish to PyPI
@@ -244,29 +244,29 @@ jobs:
               with:
                   fetch-depth: 0
 
-            - name: Get Latest Tags
-              id: tags
-              run: |
-                  # Get 2 latest semver tags
-                  LATEST_TAG=$(git tag --sort=-version:refname | grep -E '^v?[0-9]+\.[0-9]+\.[0-9]+$' | head -n1)
-                  PREV_TAG=$(git tag --sort=-version:refname | grep -E '^v?[0-9]+\.[0-9]+\.[0-9]+$' | head -n2 | tail -n1)
+            # - name: Get Latest Tags
+            #   id: tags
+            #   run: |
+            #       # Get 2 latest semver tags
+            #       LATEST_TAG=$(git tag --sort=-version:refname | grep -E '^v?[0-9]+\.[0-9]+\.[0-9]+$' | head -n1)
+            #       PREV_TAG=$(git tag --sort=-version:refname | grep -E '^v?[0-9]+\.[0-9]+\.[0-9]+$' | head -n2 | tail -n1)
 
-                  LATEST_ESCAPED=$(echo "$LATEST_TAG" | sed 's/\./\\./g')
-                  PREV_ESCAPED=$(echo "$PREV_TAG" | sed 's/\./\\./g')
+            #       LATEST_ESCAPED=$(echo "$LATEST_TAG" | sed 's/\./\\./g')
+            #       PREV_ESCAPED=$(echo "$PREV_TAG" | sed 's/\./\\./g')
 
-                  echo "latest_version=$LATEST_TAG" >> $GITHUB_OUTPUT
-                  echo "prev_version=$PREV_TAG" >> $GITHUB_OUTPUT
-                  echo "latest_escaped=$LATEST_ESCAPED" >> $GITHUB_OUTPUT
-                  echo "prev_escaped=$PREV_ESCAPED" >> $GITHUB_OUTPUT
+            #       echo "latest_version=$LATEST_TAG" >> $GITHUB_OUTPUT
+            #       echo "prev_version=$PREV_TAG" >> $GITHUB_OUTPUT
+            #       echo "latest_escaped=$LATEST_ESCAPED" >> $GITHUB_OUTPUT
+            #       echo "prev_escaped=$PREV_ESCAPED" >> $GITHUB_OUTPUT
 
-                  echo "Latest version: $LATEST_TAG (escaped: $LATEST_ESCAPED)"
-                  echo "Previous version: $PREV_TAG (escaped: $PREV_ESCAPED)"
+            #       echo "Latest version: $LATEST_TAG (escaped: $LATEST_ESCAPED)"
+            #       echo "Previous version: $PREV_TAG (escaped: $PREV_ESCAPED)"
 
             - name: Delete Old GHCR Tags
               uses: actions/delete-package-versions@e5bc658cc4c965c472efe991f8beea3981499c55 # v5.0.0
               with:
                   package-name: "steam-stats"
                   package-type: "container"
-                  min-versions-to-keep: 0
-                  ignore-versions: "^(master|${{ steps.tags.outputs.latest_escaped }}|${{ steps.tags.outputs.prev_escaped }})$"
+                  min-versions-to-keep: 2
+                  delete-only-untagged-versions: true
                   token: ${{ secrets.GITHUB_TOKEN }}

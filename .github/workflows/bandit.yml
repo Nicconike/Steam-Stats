@@ -39,7 +39,7 @@ jobs:
                   cache: "pip"
 
             - name: Install Bandit
-              run: pip install bandit==1.8.6
+              run: pip install ".[dev]"
 
             - name: Run Bandit Scan
               run: bandit -r . -f json -o bandit-report.json
