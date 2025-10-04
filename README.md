@@ -1,6 +1,8 @@
 # Steam Stats📶
 **Automated GitHub Action and Docker container to generate Steam user stats cards for your profile README.**
 
+> ### From one Passionate Gamer to Another 🍻
+
 <details>
 <summary><h3>Badges</h3></summary>
 
@@ -58,9 +60,7 @@
 
 </details>
 
-> ### From one Passionate Gamer to Another 🍻
-
-> ### **[📚 Complete Documentation](https://nicconike.github.io/Steam-Stats/)**
+### **[📚 Complete Documentation](https://nicconike.github.io/Steam-Stats/)**
 
 ## Quick Start
 

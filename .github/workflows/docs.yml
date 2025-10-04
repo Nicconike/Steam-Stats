@@ -47,22 +47,11 @@ jobs:
                   python-version: "3.13"
                   cache: "pip"
 
-            - name: Set Cache ID
-              run: echo "cache_id=$(date --utc '+%V')" >> $GITHUB_ENV
-
-            - name: Cache Dependencies
-              uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
-              with:
-                  path: ~/.cache/pip
-                  key: mkdocs-material-${{ env.cache_id }}
-                  restore-keys: |
-                      mkdocs-material-
-
             - name: Install Dependencies
-              run: pip install mkdocs-material mkdocs-mermaid2-plugin mkdocs-minify-plugin mkdocstrings-python mkdocs-git-revision-date-localized-plugin
+              run: pip install ".[docs]"
 
             - name: Build Documentation
-              run: mkdocs build --clean
+              run: mkdocs build --clean --strict
               env:
                   GOOGLE_ANALYTICS_ID: ${{ secrets.GOOGLE_ANALYTICS_ID }}
 

@@ -76,18 +76,9 @@ jobs:
                   python-version: "3.13"
                   cache: "pip"
 
-            - name: Cache Dependencies
-              uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
-              with:
-                  path: ~/.cache/pip
-                  key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
-                  restore-keys: |
-                      ${{ runner.os }}-pip-
-
             - name: Install Dependencies
               run: |
-                  python -m pip install --upgrade pip
-                  pip install python-semantic-release
+                  pip install python-semantic-release==10.4.1
 
             - name: Update to Latest Commit
               run: |
@@ -111,7 +102,7 @@ jobs:
             - name: Build distribution
               if: steps.semantic.outputs.released == 'true'
               run: |
-                  python -m pip install --upgrade build
+                  pip install build==1.3.0
                   python -m build
 
             - name: Publish to PyPI
@@ -260,92 +251,16 @@ jobs:
                   LATEST_TAG=$(git tag --sort=-version:refname | grep -E '^v?[0-9]+\.[0-9]+\.[0-9]+$' | head -n1)
                   PREV_TAG=$(git tag --sort=-version:refname | grep -E '^v?[0-9]+\.[0-9]+\.[0-9]+$' | head -n2 | tail -n1)
 
+                  LATEST_ESCAPED=$(echo "$LATEST_TAG" | sed 's/\./\\./g')
+                  PREV_ESCAPED=$(echo "$PREV_TAG" | sed 's/\./\\./g')
+
                   echo "latest_version=$LATEST_TAG" >> $GITHUB_OUTPUT
                   echo "prev_version=$PREV_TAG" >> $GITHUB_OUTPUT
+                  echo "latest_escaped=$LATEST_ESCAPED" >> $GITHUB_OUTPUT
+                  echo "prev_escaped=$PREV_ESCAPED" >> $GITHUB_OUTPUT
 
-                  echo "Latest version: $LATEST_TAG"
-                  echo "Previous version: $PREV_TAG"
-
-            # - name: Delete Old Docker Hub Tags
-            #   env:
-            #       USERNAME: ${{ vars.DOCKER_USERNAME }}
-            #       PASSWORD: ${{ secrets.DOCKER_TOKEN }}
-            #       REPO: "steam-stats"
-            #       LATEST_TAG: ${{ steps.tags.outputs.latest_version }}
-            #       PREV_TAG: ${{ steps.tags.outputs.prev_version }}
-            #   run: |
-            #       set -euo pipefail
-            #       # Skip if no tags found
-            #       if [[ -z "$LATEST_TAG" || -z "$PREV_TAG" ]]; then
-            #         echo "No semver tags found, skipping Docker Hub cleanup"
-            #         exit 0
-            #       fi
-
-            #       KEEP_TAGS="master,${LATEST_TAG},${PREV_TAG}"
-            #       echo "Keeping tags: $KEEP_TAGS"
-
-            #       # Get Docker Hub auth token
-            #       AUTH_URL="https://auth.docker.io/token"
-            #       SCOPE="repository:${USERNAME}/${REPO}:pull,push,delete"
-            #       TOKEN_RESPONSE=$(curl -s -u "${USERNAME}:${PASSWORD}" "${AUTH_URL}?service=registry.docker.io&scope=${SCOPE}")
-            #       TOKEN=$(echo "$TOKEN_RESPONSE" | jq -r '.token' 2>/dev/null || echo "")
-            #       if [[ -z "$TOKEN" || "$TOKEN" == "null" ]]; then
-            #         echo "Failed to get authentication token. Response: $TOKEN_RESPONSE"
-            #         exit 1
-            #       fi
-
-            #       # Get tags from Docker Hub API
-            #       TAGS_RESPONSE=$(curl -s "https://hub.docker.com/v2/repositories/${USERNAME}/${REPO}/tags/?page_size=100")
-            #       TAGS=$(echo "$TAGS_RESPONSE" | jq -r '.results[]?.name' 2>/dev/null || echo "")
-            #       if [[ -z "$TAGS" ]]; then
-            #         echo "Failed to fetch tags. Response: $TAGS_RESPONSE"
-            #         exit 0
-            #       fi
-
-            #       # Delete old tags using Registry API v2
-            #       REGISTRY_URL="https://registry-1.docker.io"
-            #       DELETED_COUNT=0
-
-            #       for tag in $TAGS; do
-            #         # Skip protected tags
-            #         if [[ "$tag" == "master" || "$tag" == "$LATEST_TAG" || "$tag" == "$PREV_TAG" ]]; then
-            #           echo "Keeping tag: $tag"
-            #           continue
-            #         fi
-
-            #         echo "Attempting to delete tag: $tag"
-
-            #         # Get manifest digest
-            #         DIGEST_RESPONSE=$(curl -s -I \
-            #           -H "Authorization: Bearer $TOKEN" \
-            #           -H "Accept: application/vnd.docker.distribution.manifest.v2+json" \
-            #           "${REGISTRY_URL}/v2/${USERNAME}/${REPO}/manifests/${tag}")
-
-            #         DIGEST=$(echo "$DIGEST_RESPONSE" | grep -i "docker-content-digest" | awk '{print $2}' | tr -d '\r\n' || echo "")
-
-            #         if [[ -z "$DIGEST" ]]; then
-            #           echo "Could not get digest for tag: $tag"
-            #           continue
-            #         fi
-
-            #         # Delete by digest
-            #         DELETE_RESPONSE=$(curl -s -w "HTTP_CODE:%{http_code}" \
-            #           -H "Authorization: Bearer $TOKEN" \
-            #           -X DELETE \
-            #           "${REGISTRY_URL}/v2/${USERNAME}/${REPO}/manifests/${DIGEST}")
-
-            #         HTTP_CODE=$(echo "$DELETE_RESPONSE" | grep -o "HTTP_CODE:[0-9]*" | cut -d: -f2)
-
-            #         if [[ "$HTTP_CODE" =~ ^(202|204)$ ]]; then
-            #           echo "Successfully deleted $tag (${DIGEST})"
-            #           ((DELETED_COUNT++))
-            #         else
-            #           echo "Failed to delete $tag. HTTP: $HTTP_CODE"
-            #           echo "Response: $(echo "$DELETE_RESPONSE" | sed 's/HTTP_CODE:[0-9]*//g')"
-            #         fi
-            #       done
-
-            #       echo "Deleted $DELETED_COUNT tag(s) from Docker Hub"
+                  echo "Latest version: $LATEST_TAG (escaped: $LATEST_ESCAPED)"
+                  echo "Previous version: $PREV_TAG (escaped: $PREV_ESCAPED)"
 
             - name: Delete Old GHCR Tags
               uses: actions/delete-package-versions@e5bc658cc4c965c472efe991f8beea3981499c55 # v5.0.0
@@ -353,6 +268,5 @@ jobs:
                   package-name: "steam-stats"
                   package-type: "container"
                   min-versions-to-keep: 0
-                  ignore-versions: "^(master|${{ steps.tags.outputs.latest_version }}|${{ steps.tags.outputs.prev_version }})$"
-                  delete-only-untagged-versions: false
+                  ignore-versions: "^(master|${{ steps.tags.outputs.latest_escaped }}|${{ steps.tags.outputs.prev_escaped }})$"
                   token: ${{ secrets.GITHUB_TOKEN }}

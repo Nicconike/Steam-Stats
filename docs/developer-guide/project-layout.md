@@ -19,12 +19,13 @@ Steam-Stats/
 ├── action.yml                             # GitHub Action definition
 ├── CHANGELOG.md                           # Version history and release notes
 ├── Dockerfile                             # Container image definition
-├── LICENSE                                # Project license (GPLv3)
+├── LICENSE                                # Project license (GPLv3.0)
 ├── mkdocs.yml                             # Documentation configuration
 ├── pyproject.toml                         # Modern Python project configuration
 ├── pytest.ini                             # Pytest configuration
 ├── README.md                              # Project overview and quick start
 ├── requirements.txt                       # Python dependencies
+├── sonar-project.properties               # SonarQube project configuration
 ├── .github/                               # GitHub-specific configuration
 │   ├── codecov.yml                        # Code coverage configuration
 │   ├── CODEOWNERS                         # Code review assignments
@@ -106,12 +107,16 @@ Steam-Stats/
 │       └── troubleshooting.md
 ├── templates/                             # Jinja2 templates for automation
 │   ├── CHANGELOG.md.j2                    # Changelog generation template
-│   ├── release_notes.md.j2                # Release notes template
-│   └── components/                        # Reusable template components
+│   ├── .release_notes.md.j2                # Release notes template
+│   └── .components/                        # Reusable template components
 │       ├── changelog_header.md.j2
 │       ├── changelog_init.md.j2
 │       ├── changelog_update.md.j2
-│       └── changes.md.j2
+│       ├── changes.md.j2
+│       ├── first_release.md.j2
+│       ├── macros.md.j2
+│       ├── unreleased_changes.md.j2
+│       └── versioned_changes.md.j2
 └── tests/                                 # Test suite
     ├── test_card.py                       # Card generation and PNG tests
     ├── test_main.py                       # Main workflow integration tests

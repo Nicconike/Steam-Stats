@@ -73,7 +73,7 @@ dev = [
 ]
 docs = [
     "mkdocs-git-revision-date-localized-plugin==1.4.7",
-    "mkdocs-material==9.6.20",
+    "mkdocs-material==9.6.21",
     "mkdocs-mermaid2-plugin==1.2.2",
     "mkdocs-minify-plugin==0.8.0",
     "mkdocstrings-python==1.18.2",

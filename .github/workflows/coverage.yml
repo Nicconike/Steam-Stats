@@ -58,7 +58,6 @@ jobs:
               env:
                   USE_PLAYWRIGHT: ${{ inputs.use_playwright }}
               run: |
-                  python -m pip install --upgrade pip
                   pip install -r requirements.txt
                   if [ "$USE_PLAYWRIGHT" = "true" ]; then
                       playwright install --with-deps chromium
