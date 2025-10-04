@@ -9,9 +9,6 @@ on:
                 required: true
     push:
         branches: [master]
-        paths:
-            - ".github/workflows/codeql.yml"
-            - "**/*.py"
     pull_request:
         branches: [master]
 
@@ -84,7 +81,7 @@ jobs:
             - name: Run Pylint and Generate Badge
               id: run-pylint
               run: |
-                  pip install ".[dev]"
+                  pip install ".[dev,test]"
                   pylint_output=$(pylint api tests || true)
                   echo "$pylint_output"
 

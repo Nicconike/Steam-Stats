@@ -9,9 +9,6 @@ on:
                 required: true
     push:
         branches: [master]
-        paths:
-            - ".github/workflows/scorecard.yml"
-            - "api/*.py"
     pull_request:
         branches: [master]
 
