@@ -81,7 +81,7 @@ jobs:
             - name: Run Pylint and Generate Badge
               id: run-pylint
               run: |
-                  pip install ".[dev,test]"
+                  pip install pylint==3.3.8 --hash=sha256:7ef94aa692a600e82fabdd17102b73fc226758218c97473c7ad67bd4cb905d83 pytest==8.4.2 --hash=sha256:872f880de3fc3a5bdc88a11b39c9710c3497a547cfa9320bc3c5e62fbf272e79
                   pylint_output=$(pylint api tests || true)
                   echo "$pylint_output"
 

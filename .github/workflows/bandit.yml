@@ -39,7 +39,7 @@ jobs:
                   cache: "pip"
 
             - name: Install Bandit
-              run: pip install ".[dev]"
+              run: pip install bandit==1.8.6 --hash=sha256:3348e934d736fcdb68b6aa4030487097e23a501adf3e7827b63658df464dddd0
 
             - name: Run Bandit Scan
               run: bandit -r . -f json -o bandit-report.json
