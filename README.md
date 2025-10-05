@@ -17,7 +17,7 @@
 [![Dependency Review](https://github.com/Nicconike/Steam-Stats/actions/workflows/dependency-review.yml/badge.svg)](https://github.com/Nicconike/Steam-Stats/actions/workflows/dependency-review.yml)
 
 #### Code Quality & Coverage
-![Pylint](https://img.shields.io/badge/Pylint-10.00-brightgreen?logo=python)
+![Pylint](https://img.shields.io/badge/Pylint-9.66-greenyellow?logo=python)
 [![codecov](https://codecov.io/gh/Nicconike/Steam-Stats/graph/badge.svg?token=SC5P7CS1BW)](https://codecov.io/gh/Nicconike/Steam-Stats)
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=Steam-Stats&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=Steam-Stats)
 [![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=Steam-Stats&metric=sqale_rating)](https://sonarcloud.io/summary/new_code?id=Steam-Stats)
