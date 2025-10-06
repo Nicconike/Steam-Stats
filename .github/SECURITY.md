@@ -2,14 +2,14 @@
 
 ## 👤 About This Project
 
-Steam Stats is **maintained by a single developer** (@nicconike) as an open-source GitHub Action. This security policy reflects the realities of solo project maintenance while maintaining security best practices.
+Steam Stats is **maintained by a single developer** ([@nicconike](https://x.com/Nicco_nike)) as an open-source GitHub Action. This security policy reflects the realities of solo project maintenance while maintaining security best practices.
 
 ## 🔒 Security Standards & Compliance
 
 ### OpenSSF Scorecard
 [![OpenSSF Best Practices](https://www.bestpractices.dev/projects/9965/badge)](https://www.bestpractices.dev/projects/9965)
 
-**Steam Stats** best practices and maintains high security standards:
+**Steam Stats** follows best practices and maintains high security standards:
 
 - ✅ **Pinned Dependencies** - All dependencies are pinned to specific versions
 - ✅ **Code Review Required** - All changes require peer review before merging
@@ -341,6 +341,6 @@ As a solo maintainer, CVD just means:
 *As a solo maintainer, I appreciate your patience and understanding. Security is important to me, but please keep in mind this is maintained by one person with other commitments.*
 
 ***
-*Last Updated: October 5, 2025*
+*Last Updated: October 7, 2025*
 
-*Policy Version: 2.0*
+*Policy Version: 2.1*

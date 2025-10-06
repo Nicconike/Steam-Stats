@@ -38,11 +38,13 @@ classifiers = [
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: Implementation :: CPython",
     "Operating System :: OS Independent",
     "Development Status :: 5 - Production/Stable",
     "Framework :: Pytest",
     "Intended Audience :: Developers",
     "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: Software Development :: Testing :: Mocking",
     "Topic :: Software Development :: Version Control :: Git",
     "Topic :: System :: Monitoring",
     "Topic :: Games/Entertainment",
@@ -52,7 +54,7 @@ classifiers = [
 [project.urls]
 Homepage = "https://github.com/Nicconike/Steam-Stats"
 Changelog = "https://github.com/Nicconike/Steam-Stats/blob/master/CHANGELOG.md"
-Documentation = "https://github.com/Nicconike/Steam-Stats/blob/master/README.md"
+Documentation = "https://nicconike.github.io/Steam-Stats/"
 Wiki = "https://github.com/Nicconike/Steam-Stats/wiki"
 Issues = "https://github.com/Nicconike/Steam-Stats/issues"
 

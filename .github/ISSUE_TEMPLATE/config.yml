@@ -4,8 +4,8 @@ contact_links:
       url: https://discord.gg/UbetHfu
       about: You can join and create new discussions on Discord
     - name: Code does not work
-      url: https://github.com/nicconike/steam-stats/blob/master/CONTRIBUTING.md
+      url: https://github.com/Nicconike/Steam-Stats/blob/master/.github/CONTRIBUTING.md
       about: Before opening a new issue, please make sure to read CONTRIBUTING.md
     - name: Security Vulnerability
-      url: https://mailto:your-email@example.com
+      url: https://mailto:github.giving328@passmail.com
       about: Report security issues privately via email - do not create public issues

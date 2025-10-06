@@ -19,7 +19,7 @@ updates:
       versioning-strategy: "increase-if-necessary"
       open-pull-requests-limit: 3
       groups:
-          python-deps:
+          python-packages:
               patterns:
                   - "*"
 
@@ -53,7 +53,7 @@ updates:
           - dependabot
           - docker
       rebase-strategy: auto
-      open-pull-requests-limit: 4
+      open-pull-requests-limit: 3
       groups:
           docker:
               patterns:
