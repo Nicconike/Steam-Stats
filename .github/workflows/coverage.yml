@@ -1,22 +1,6 @@
 name: Codecov
 
 on:
-    workflow_call:
-        inputs:
-            use_playwright:
-                required: false
-                type: boolean
-        secrets:
-            CODECOV_TOKEN:
-                required: true
-            GITHUB_TOKEN:
-                required: true
-            SONAR_TOKEN:
-                required: true
-            INPUT_STEAM_API_KEY:
-                required: false
-            INPUT_WAKATIME_API_KEY:
-                required: false
     push:
         branches: [master]
         paths:
@@ -59,13 +43,9 @@ jobs:
                   cache: "pip"
 
             - name: Install Dependencies
-              env:
-                  USE_PLAYWRIGHT: ${{ inputs.use_playwright }}
               run: |
                   pip install -r requirements.txt
-                  if [ "$USE_PLAYWRIGHT" = "true" ]; then
-                      playwright install --with-deps chromium
-                  fi
+                  playwright install --with-deps chromium
 
             - name: Run tests with coverage
               run: |

@@ -1,21 +1,6 @@
 name: Release
 
 on:
-    workflow_call:
-        inputs:
-            repo_name:
-                required: true
-                type: string
-            docker_image:
-                required: true
-                type: string
-        secrets:
-            APP_ID:
-                required: true
-            APP_PRIVATE_KEY:
-                required: true
-            DOCKER_TOKEN:
-                required: true
     push:
         branches: [master]
         tags:
