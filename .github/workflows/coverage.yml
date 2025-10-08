@@ -9,6 +9,8 @@ on:
         secrets:
             CODECOV_TOKEN:
                 required: true
+            GITHUB_TOKEN:
+                required: true
             SONAR_TOKEN:
                 required: true
             INPUT_STEAM_API_KEY:
@@ -22,7 +24,7 @@ on:
             - "tests/*.py"
             - "sonar-project.properties"
     pull_request:
-        types: [opened, synchronize, reopened]
+        branches: [master]
 
 permissions:
     contents: read
