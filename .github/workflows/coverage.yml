@@ -9,6 +9,8 @@ on:
         secrets:
             CODECOV_TOKEN:
                 required: true
+            SONAR_TOKEN:
+                required: true
             INPUT_STEAM_API_KEY:
                 required: false
             INPUT_WAKATIME_API_KEY:
