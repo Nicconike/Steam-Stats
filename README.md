@@ -18,6 +18,7 @@
 
 #### Code Quality & Coverage
 ![Pylint](https://img.shields.io/badge/Pylint-10.00-brightgreen?logo=python)
+[![pre-commit.ci status](https://results.pre-commit.ci/badge/github/Nicconike/Steam-Stats/master.svg)](https://results.pre-commit.ci/latest/github/Nicconike/Steam-Stats/master)
 [![codecov](https://codecov.io/gh/Nicconike/Steam-Stats/graph/badge.svg?token=SC5P7CS1BW)](https://codecov.io/gh/Nicconike/Steam-Stats)
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=Steam-Stats&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=Steam-Stats)
 [![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=Steam-Stats&metric=sqale_rating)](https://sonarcloud.io/summary/new_code?id=Steam-Stats)

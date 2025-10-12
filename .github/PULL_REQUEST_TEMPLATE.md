@@ -7,9 +7,9 @@
 ## Changes Made
 <!-- List the specific changes you've made in bullet points -->
 
-- 
-- 
-- 
+-
+-
+-
 
 ## Testing Done
 <!-- Describe the testing you've done to validate your changes -->
@@ -32,4 +32,4 @@
 ## References
 <!-- Link any related issues, pull requests, or documentation. -->
 
-- 
+-
