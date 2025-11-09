@@ -135,11 +135,11 @@ jobs:
 ## Documentation
 | Section | Description |
 |---------|-------------|
-| **[🚀 Getting Started](https://nicconike.github.io/Steam-Stats/getting-started/)** | Setup Guide |
-| **[⚙️ Configuration](https://nicconike.github.io/Steam-Stats/user-guide/config/)** | Feature Flags & Options |
-| **[🛠️ Troubleshooting](https://nicconike.github.io/Steam-Stats/user-guide/troubleshooting/)** | Common Issues |
-| **[🤝 Contributing](https://nicconike.github.io/Steam-Stats/developer-guide/contributing/)** | Developer Guide |
-| **[📚 API Reference](https://nicconike.github.io/Steam-Stats/reference/)** | Python Code |
+| 🚀 **[Getting Started](https://nicconike.github.io/Steam-Stats/getting-started/)** | Setup Guide |
+| ⚙️ **[Configuration](https://nicconike.github.io/Steam-Stats/user-guide/config/)** | Feature Flags & Options |
+| 🛠️ **[Troubleshooting](https://nicconike.github.io/Steam-Stats/user-guide/troubleshooting/)** | Common Issues |
+| 🤝 **[Contributing](https://nicconike.github.io/Steam-Stats/developer-guide/contributing/)** | Developer Guide |
+| 📚 **[API Reference](https://nicconike.github.io/Steam-Stats/reference/)** | Python Code |
 
 ## Support 💙
 
