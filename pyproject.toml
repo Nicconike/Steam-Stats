@@ -27,7 +27,7 @@ dependencies = [
     "DateTime==5.5",
     "playwright==1.55.0",
     "PyGithub==2.8.1",
-    "python-semantic-release==10.4.1",
+    "python-semantic-release==10.5.1",
 ]
 classifiers = [
     "Programming Language :: Python",
