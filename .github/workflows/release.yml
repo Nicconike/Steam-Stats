@@ -38,7 +38,7 @@ jobs:
             previous_version: ${{ steps.semantic.outputs.previous_version }}
         steps:
             - name: Harden the runner
-              uses: step-security/harden-runner@f4a75cfd619ee5ce8d5b864b0d183aff3c69b55a # v2.13.1
+              uses: step-security/harden-runner@95d9a5deda9de15063e7595e9719c11c38c90ae2 # v2.13.2
               with:
                   egress-policy: audit
 
@@ -72,14 +72,14 @@ jobs:
 
             - name: Semantic Release
               id: semantic
-              uses: python-semantic-release/python-semantic-release@4d4cb0ab842247caea1963132c242c62aab1e4d5 # v10.4.1
+              uses: python-semantic-release/python-semantic-release@02f2a5c74dbb6aa2989f10fc4af12cd8e6bf025f # v10.5.2
               with:
                   github_token: ${{ steps.app-token.outputs.token }}
               env:
                   PYTHON_KEYRING_BACKEND: keyring.backends.null.Keyring
 
             - name: Publish to GitHub Release Assets
-              uses: python-semantic-release/publish-action@ae6462adc12bd3d1738070d784b65b5189b955a9 # v10.4.1
+              uses: python-semantic-release/publish-action@948bb8fccc5e8072f2c52464b45c76a8bb3878e6 # v10.5.2
               with:
                   github_token: ${{ steps.app-token.outputs.token }}
                   tag: ${{ steps.semantic.outputs.tag }}
@@ -113,7 +113,7 @@ jobs:
             packages: write
         steps:
             - name: Harden the runner
-              uses: step-security/harden-runner@f4a75cfd619ee5ce8d5b864b0d183aff3c69b55a # v2.13.1
+              uses: step-security/harden-runner@95d9a5deda9de15063e7595e9719c11c38c90ae2 # v2.13.2
               with:
                   egress-policy: audit
 
@@ -154,7 +154,7 @@ jobs:
 
             - name: Extract Docker Metadata
               id: meta
-              uses: docker/metadata-action@c1e51972afc2121e065aed6d45c65596fe445f3f # v5.8.0
+              uses: docker/metadata-action@318604b99e75e41977312d83839a89be02ca4893 # v5.9.0
               with:
                   images: |
                       ${{ vars.DOCKER_USERNAME }}/${{ github.event.repository.name }}
@@ -220,7 +220,7 @@ jobs:
             packages: write
         steps:
             - name: Harden the runner
-              uses: step-security/harden-runner@f4a75cfd619ee5ce8d5b864b0d183aff3c69b55a # v2.13.1
+              uses: step-security/harden-runner@95d9a5deda9de15063e7595e9719c11c38c90ae2 # v2.13.2
               with:
                   egress-policy: audit
 
