@@ -1,5 +1,5 @@
 # Use the official Playwright image from Microsoft with pinned digest
-FROM mcr.microsoft.com/playwright/python:v1.55.0-jammy-amd64@sha256:080da941d1baa9d1c31b36dfef1044b38a772b58e1d468112ec340abb540a18f
+FROM mcr.microsoft.com/playwright/python:v1.56.0-jammy-amd64@sha256:89902d5e054761daa611834d4065f3e1f1e641639da7b003a54e2952ffc1731e
 
 # Set environment variables
 ENV PYTHONUNBUFFERED=1 \
