@@ -39,7 +39,7 @@ jobs:
                   private-key: ${{ secrets.APP_PRIVATE_KEY }}
 
             - name: Run Steam Stats
-              uses: docker://nicconike/steam-stats:master@sha256:4ff07d3a6c09403d59ee6dfe8259d8f7cd3e9b2b19d8fb523eeb55d57c7a5796
+              uses: docker://nicconike/steam-stats:master
               env:
                   GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
                   INPUT_STEAM_API_KEY: ${{ secrets.STEAM_API_KEY }}
