@@ -51,7 +51,7 @@ Follow [Local Development](local-development.md) for environment setup.
 | Import sorting    | isort   | Compatible with black   |
 | Linting           | pylint  | 10/10 score maintained  |
 | Type checking     | mypy    | Strict mode on new code |
-| Security scanning | bandit  | Vulnerability detection |
+| Security scanning | codeql  | Security analysis       |
 
 ### 5. Commit Messages
 

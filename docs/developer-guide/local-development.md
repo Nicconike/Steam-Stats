@@ -213,8 +213,7 @@ pre-commit run --all-files
 
 All PRs run through these automated workflows:
 
-- **Security Scanning** `(bandit.yml)`: Vulnerability detection in Python code
-- **Code Quality** `(codeql.yml)`: Static analysis and security scanning
+- **Security Scanning** `(codeql.yml)`: Static analysis and security scanning
 - **Test Coverage** `(coverage.yml)`: Code coverage reporting and enforcement
 - **Dependency Security** `(dependency-review.yml)`: Check for vulnerable dependencies
 - **Container Build**: Ensures Docker image builds successfully

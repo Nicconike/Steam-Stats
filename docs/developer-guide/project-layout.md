@@ -45,7 +45,6 @@ Steam-Stats/
 │   │   ├── help-wanted.yml
 │   │   └── question.yml
 │   └── workflows/                         # GitHub Actions workflows
-│       ├── bandit.yml                     # Security vulnerability scanning
 │       ├── codeql.yml                     # Code quality and security analysis
 │       ├── coverage.yml                   # Code coverage reporting
 │       ├── dependency-review.yml          # Dependency security review
@@ -251,7 +250,7 @@ graph TD
 |------------------|-------------------------------------------------------------------|------------------------------------|
 | **Testing**      | `pytest-asyncio`, `pytest-cov`, `pytest-mock`, `requests-mock`    | Unit testing, coverage, mocking    |
 | **Documentation**| `mkdocs-material`, `mkdocs-mermaid2-plugin`, `mkdocstrings-python`| Documentation generation           |
-| **Code Quality** | `bandit`, `pylint`                                                | Security scanning, code linting    |
+| **Code Quality** | `pylint`                                                | Code linting                      |
 | **Release**      | `python-semantic-release`, `twine`                                | Automated releases, PyPI publishing|
 
 ### System Dependencies :octicons-package-dependencies-24:

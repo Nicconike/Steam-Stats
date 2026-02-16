@@ -10,7 +10,6 @@
 [![Steam Stats](https://github.com/Nicconike/Steam-Stats/actions/workflows/steam-stats.yml/badge.svg)](https://github.com/Nicconike/Steam-Stats/actions/workflows/steam-stats.yml)
 [![Release](https://github.com/Nicconike/Steam-Stats/actions/workflows/release.yml/badge.svg)](https://github.com/Nicconike/Steam-Stats/actions/workflows/release.yml)
 [![CodeQL & Pylint](https://github.com/Nicconike/Steam-Stats/actions/workflows/codeql.yml/badge.svg)](https://github.com/Nicconike/Steam-Stats/actions/workflows/codeql.yml)
-[![Bandit](https://github.com/Nicconike/Steam-Stats/actions/workflows/bandit.yml/badge.svg)](https://github.com/Nicconike/Steam-Stats/actions/workflows/bandit.yml)
 [![Codecov](https://github.com/Nicconike/Steam-Stats/actions/workflows/coverage.yml/badge.svg)](https://github.com/Nicconike/Steam-Stats/actions/workflows/coverage.yml)
 [![MkDocs Deploy](https://github.com/Nicconike/Steam-Stats/actions/workflows/docs.yml/badge.svg)](https://github.com/Nicconike/Steam-Stats/actions/workflows/docs.yml)
 [![Scorecard Security](https://github.com/Nicconike/Steam-Stats/actions/workflows/scorecard.yml/badge.svg)](https://github.com/Nicconike/Steam-Stats/actions/workflows/scorecard.yml)
