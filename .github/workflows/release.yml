@@ -38,14 +38,14 @@ jobs:
             previous_version: ${{ steps.semantic.outputs.previous_version }}
         steps:
             - name: Harden the runner
-              uses: step-security/harden-runner@fe104658747b27e96e4f7e80cd0a94068e53901d # v2.16.1
+              uses: step-security/harden-runner@9af89fc71515a100421586dfdb3dc9c984fbf411 # v2.19.4
               with:
                   egress-policy: audit
                   disable-telemetry: true
                   disable-sudo: true
 
             - name: GitHub App Token
-              uses: actions/create-github-app-token@f8d387b68d61c58ab83c6c016672934102569859 # v3.0.0
+              uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
               id: app-token
               with:
                   app-id: ${{ secrets.APP_ID }}
@@ -94,7 +94,7 @@ jobs:
 
             - name: Publish to PyPI
               if: steps.semantic.outputs.released == 'true'
-              uses: pypa/gh-action-pypi-publish@ed0c53931b1dc9bd32cbe73a98c7f6766f8a527e # v1.13.0
+              uses: pypa/gh-action-pypi-publish@cef221092ed1bacb1cc03d23a2d87d1d172e277b # v1.14.0
               with:
                   packages-dir: dist
                   print-hash: true
@@ -115,14 +115,14 @@ jobs:
             packages: write
         steps:
             - name: Harden the runner
-              uses: step-security/harden-runner@fe104658747b27e96e4f7e80cd0a94068e53901d # v2.16.1
+              uses: step-security/harden-runner@9af89fc71515a100421586dfdb3dc9c984fbf411 # v2.19.4
               with:
                   egress-policy: audit
                   disable-telemetry: true
                   disable-sudo: true
 
             - name: GitHub App Token
-              uses: actions/create-github-app-token@f8d387b68d61c58ab83c6c016672934102569859 # v3.0.0
+              uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
               id: app-token
               with:
                   app-id: ${{ secrets.APP_ID }}
@@ -136,21 +136,21 @@ jobs:
 
             - name: Install CoSign
               if: github.event_name != 'pull_request'
-              uses: sigstore/cosign-installer@cad07c2e89fa2edd6e2d7bab4c1aa38e53f76003 # v4.1.1
+              uses: sigstore/cosign-installer@6f9f17788090df1f26f669e9d70d6ae9567deba6 # v4.1.2
               with:
                   cosign-release: "v2.6.0"
 
             - name: Setup Docker Buildx
-              uses: docker/setup-buildx-action@4d04d5d9486b7bd6fa91e7baf45bbb4f8b9deedd # v4.0.0
+              uses: docker/setup-buildx-action@d7f5e7f509e45cec5c76c4d5afdd7de93d0b3df5 # v4.1.0
 
             - name: Login to Docker Hub
-              uses: docker/login-action@b45d80f862d83dbcd57f89517bcf500b2ab88fb2 # v4.0.0
+              uses: docker/login-action@650006c6eb7dba73a995cc03b0b2d7f5ca915bee # v4.2.0
               with:
                   username: ${{ vars.DOCKER_USERNAME }}
                   password: ${{ secrets.DOCKER_TOKEN }}
 
             - name: Login to GitHub Container Registry
-              uses: docker/login-action@b45d80f862d83dbcd57f89517bcf500b2ab88fb2 # v4.0.0
+              uses: docker/login-action@650006c6eb7dba73a995cc03b0b2d7f5ca915bee # v4.2.0
               with:
                   registry: ghcr.io
                   username: ${{ github.actor }}
@@ -158,7 +158,7 @@ jobs:
 
             - name: Extract Docker Metadata
               id: meta
-              uses: docker/metadata-action@030e881283bb7a6894de51c315a6bfe6a94e05cf # v6.0.0
+              uses: docker/metadata-action@80c7e94dd9b9319bd5eb7a0e0fe9291e23a2a2e9 # v6.1.0
               with:
                   images: |
                       ${{ vars.DOCKER_USERNAME }}/${{ github.event.repository.name }}
@@ -168,7 +168,7 @@ jobs:
                       type=raw,value=v${{ needs.release.outputs.version }}
 
             - name: Build & Push Docker Image
-              uses: docker/build-push-action@d08e5c354a6adb9ed34480a06d141179aa583294 # v7.0.0
+              uses: docker/build-push-action@f9f3042f7e2789586610d6e8b85c8f03e5195baf # v7.2.0
               id: push
               with:
                   context: .
@@ -197,7 +197,7 @@ jobs:
                   push-to-registry: true
 
             - name: Docker Scout Scan
-              uses: docker/scout-action@8910519cee8ac046f3ee99686b0dc6654d5ba1a7 # v1.20.3
+              uses: docker/scout-action@cd72f264beff1cd72735de31148b9d3244a0234a # v1.21.0
               with:
                   command: quickview, cves
                   image: ${{ vars.DOCKER_USERNAME }}/${{ github.event.repository.name }}:master
@@ -207,7 +207,7 @@ jobs:
 
             - name: Upload Scout Scan Results
               if: always()
-              uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
+              uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
               with:
                   name: docker-scout-results
                   path: docker-scout-results.sarif
@@ -224,7 +224,7 @@ jobs:
             packages: write
         steps:
             - name: Harden the runner
-              uses: step-security/harden-runner@fe104658747b27e96e4f7e80cd0a94068e53901d # v2.16.1
+              uses: step-security/harden-runner@9af89fc71515a100421586dfdb3dc9c984fbf411 # v2.19.4
               with:
                   egress-policy: audit
                   disable-telemetry: true
