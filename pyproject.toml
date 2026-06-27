@@ -70,7 +70,7 @@ dev = [
     "bandit==1.8.6",
     "pipdeptree==2.28.0",
     "pylint==3.3.9",
-    "python-dotenv==1.2.1",
+    "python-dotenv==1.2.2",
     "twine==6.2.0",
 ]
 docs = [
